@@ -41,9 +41,10 @@ PrimeRoseFarms/
 ### Proposed Architecture: Multi-Tenant Web Application
 - **Frontend:** React-based SPA with role-based routing
 - **Backend:** Node.js/Express API with role-based middleware
-- **Database:** PostgreSQL with role-based access control
+- **Database:** MongoDB with encrypted data storage
 - **Authentication:** JWT-based with role claims
 - **Real-time:** WebSocket for live updates (harvest progress, alerts)
+- **Security:** Multi-layer encryption system for data protection
 
 ### Core Modules
 1. **Authentication & Authorization**
@@ -80,22 +81,58 @@ PrimeRoseFarms/
 - **Runtime:** Node.js with Express
 - **Language:** TypeScript
 - **Authentication:** Passport.js with JWT
-- **Database ORM:** Prisma or TypeORM
+- **Database ORM:** Mongoose
 - **Real-time:** Socket.io
+- **Encryption:** Node.js crypto module with AES-256-GCM
 
 ### Database
-- **Primary:** PostgreSQL
+- **Primary:** MongoDB with encrypted collections
 - **Caching:** Redis (optional)
-- **File Storage:** AWS S3 or local storage
+- **File Storage:** AWS S3 or local storage with encryption
 
 ### DevOps
 - **Containerization:** Docker
 - **Process Management:** PM2
 - **Environment:** Windows 11 Pro development
 
+## Security & Encryption System
+
+### Multi-Layer Encryption Strategy
+1. **Field-Level Encryption** - Sensitive data encrypted before database storage
+2. **Database-Level Encryption** - MongoDB encryption at rest
+3. **Transport Encryption** - HTTPS/TLS for all communications
+4. **Key Management** - Secure key rotation and storage
+
+### Encryption Implementation
+- **Algorithm:** AES-256-GCM for authenticated encryption
+- **Key Derivation:** PBKDF2 with salt for password-based keys
+- **Key Storage:** Environment variables with secure key management
+- **Sensitive Fields:** User passwords, personal data, financial information
+
+### Data Protection Levels
+- **Level 1 (Public):** General farm data, non-sensitive information
+- **Level 2 (Internal):** Operational data, schedules, basic user info
+- **Level 3 (Confidential):** Personal data, financial records, health information
+- **Level 4 (Restricted):** Admin credentials, system configurations
+
 ## Dependencies
 
-*To be defined during implementation phase*
+### Core Dependencies
+- **express** - Web framework
+- **mongoose** - MongoDB object modeling
+- **jsonwebtoken** - JWT authentication
+- **bcryptjs** - Password hashing
+- **crypto** - Node.js built-in encryption
+- **helmet** - Security middleware
+- **cors** - Cross-origin resource sharing
+- **dotenv** - Environment variable management
+
+### Development Dependencies
+- **typescript** - TypeScript support
+- **nodemon** - Development server
+- **jest** - Testing framework
+- **eslint** - Code linting
+- **prettier** - Code formatting
 
 ---
 
