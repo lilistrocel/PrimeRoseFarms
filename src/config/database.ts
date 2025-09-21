@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
-import { encryptionService } from '@/utils/encryption';
+import { encryptionService } from '../utils/encryption';
+import { logger, LogCategory } from '../utils/logger';
 
 /**
  * MongoDB connection configuration with encryption support
@@ -22,6 +23,13 @@ class DatabaseConfig {
    */
   public async connect(): Promise<void> {
     try {
+      // Check if already connected
+      if (mongoose.connection.readyState === 1) {
+        this.isConnected = true;
+        logger.debug(LogCategory.DATABASE, 'MongoDB already connected');
+        return;
+      }
+
       const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/primerosefarms';
       
       // MongoDB connection options
@@ -29,20 +37,21 @@ class DatabaseConfig {
         maxPoolSize: 10, // Maintain up to 10 socket connections
         serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
         socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-        bufferMaxEntries: 0, // Disable mongoose buffering
         bufferCommands: false, // Disable mongoose buffering
       };
 
+      logger.info(LogCategory.DATABASE, 'Connecting to MongoDB', { uri: mongoUri.replace(/\/\/.*@/, '//***:***@') });
+      
       await mongoose.connect(mongoUri, options);
       
       this.isConnected = true;
-      console.log('MongoDB connected successfully');
+      logger.info(LogCategory.DATABASE, 'MongoDB connected successfully');
       
       // Set up encryption for sensitive collections
       this.setupEncryption();
       
     } catch (error) {
-      console.error('MongoDB connection error:', error);
+      logger.error(LogCategory.DATABASE, 'MongoDB connection failed', { error: error instanceof Error ? error.message : 'Unknown error' });
       throw error;
     }
   }
@@ -54,9 +63,13 @@ class DatabaseConfig {
     try {
       await mongoose.disconnect();
       this.isConnected = false;
-      console.log('MongoDB disconnected successfully');
+      if (process.env.NODE_ENV !== 'test') {
+        console.log('MongoDB disconnected successfully');
+      }
     } catch (error) {
-      console.error('MongoDB disconnection error:', error);
+      if (process.env.NODE_ENV !== 'test') {
+        console.error('MongoDB disconnection error:', error);
+      }
       throw error;
     }
   }
@@ -73,7 +86,9 @@ class DatabaseConfig {
    */
   private setupEncryption(): void {
     // This will be used by mongoose plugins for automatic encryption/decryption
-    console.log('Encryption system initialized for sensitive data');
+    if (process.env.NODE_ENV !== 'test') {
+      console.log('Encryption system initialized for sensitive data');
+    }
   }
 
   /**

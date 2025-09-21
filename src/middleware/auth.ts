@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { User } from '@/models/User';
-import { IJWTPayload, UserRole } from '@/types';
+import { User } from '../models/User';
+import { IJWTPayload, UserRole } from '../types';
 
 // Extend Express Request interface to include user
 declare global {
@@ -46,7 +46,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 
     // Add user info to request
     req.user = {
-      userId: user._id.toString(),
+      userId: (user._id as any).toString(),
       email: user.email,
       role: user.role
     };
@@ -151,7 +151,7 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
       
       if (user && user.isActive) {
         req.user = {
-          userId: user._id.toString(),
+          userId: (user._id as any).toString(),
           email: user.email,
           role: user.role
         };
@@ -184,7 +184,7 @@ const extractToken = (req: Request): string | null => {
 export const generateToken = (payload: Omit<IJWTPayload, 'iat' | 'exp'>): string => {
   return jwt.sign(payload, process.env.JWT_SECRET!, {
     expiresIn: process.env.JWT_EXPIRE || '7d'
-  });
+  } as jwt.SignOptions);
 };
 
 /**
@@ -193,7 +193,7 @@ export const generateToken = (payload: Omit<IJWTPayload, 'iat' | 'exp'>): string
 export const generateRefreshToken = (payload: Omit<IJWTPayload, 'iat' | 'exp'>): string => {
   return jwt.sign(payload, process.env.JWT_REFRESH_SECRET!, {
     expiresIn: process.env.JWT_REFRESH_EXPIRE || '30d'
-  });
+  } as jwt.SignOptions);
 };
 
 /**

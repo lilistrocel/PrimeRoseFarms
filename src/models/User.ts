@@ -1,9 +1,9 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { IUser, UserRole, DataProtectionLevel } from '@/types';
-import { encryptionService } from '@/utils/encryption';
+import { IUser, UserRole, DataProtectionLevel } from '../types';
+import { encryptionService } from '../utils/encryption';
 
 // User Document Interface
-export interface IUserDocument extends IUser, Document {
+export interface IUserDocument extends Omit<IUser, '_id'>, Document {
   comparePassword(candidatePassword: string): Promise<boolean>;
   getFullName(): string;
   isRole(role: UserRole): boolean;
@@ -17,8 +17,7 @@ const userSchema = new Schema<IUserDocument>({
     required: true,
     unique: true,
     lowercase: true,
-    trim: true,
-    index: true
+    trim: true
   },
   password: {
     type: String,
@@ -66,7 +65,7 @@ const userSchema = new Schema<IUserDocument>({
 }, {
   timestamps: true,
   toJSON: {
-    transform: function(doc, ret) {
+    transform: function(doc, ret: any) {
       delete ret.password;
       delete ret.__v;
       return ret;
@@ -75,7 +74,6 @@ const userSchema = new Schema<IUserDocument>({
 });
 
 // Indexes for performance
-userSchema.index({ email: 1 });
 userSchema.index({ role: 1 });
 userSchema.index({ isActive: 1 });
 userSchema.index({ createdAt: -1 });
@@ -183,7 +181,7 @@ userSchema.methods.hasPermission = function(permission: string): boolean {
     [UserRole.DEMO]: ['farm.read', 'field.read', 'report.read'] // Limited demo access
   };
   
-  const userPermissions = rolePermissions[this.role] || [];
+  const userPermissions = rolePermissions[this.role as UserRole] || [];
   return userPermissions.includes('*') || userPermissions.includes(permission);
 };
 

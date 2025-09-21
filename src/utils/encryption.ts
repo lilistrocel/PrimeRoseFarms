@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { IEncryptionResult, DataProtectionLevel } from '@/types';
+import { IEncryptionResult, DataProtectionLevel } from '../types';
 
 /**
  * Multi-layer encryption system for PrimeRoseFarms
@@ -76,7 +76,7 @@ export class EncryptionService {
     try {
       const key = this.getEncryptionKey(protectionLevel);
       const iv = this.generateIV();
-      const cipher = crypto.createCipher(this.algorithm, key);
+      const cipher = crypto.createCipheriv(this.algorithm, key, iv) as crypto.CipherGCM;
       cipher.setAAD(Buffer.from(`protection_level_${protectionLevel}`));
 
       let encrypted = cipher.update(data, 'utf8', 'hex');
@@ -103,7 +103,7 @@ export class EncryptionService {
       const iv = Buffer.from(encryptionResult.iv, 'hex');
       const tag = Buffer.from(encryptionResult.tag, 'hex');
       
-      const decipher = crypto.createDecipher(this.algorithm, key);
+      const decipher = crypto.createDecipheriv(this.algorithm, key, iv) as crypto.DecipherGCM;
       decipher.setAAD(Buffer.from(`protection_level_${protectionLevel}`));
       decipher.setAuthTag(tag);
 

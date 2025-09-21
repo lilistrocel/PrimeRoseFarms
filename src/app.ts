@@ -2,11 +2,17 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
-import DatabaseConfig from '@/config/database';
-import { encryptionService } from '@/utils/encryption';
+import DatabaseConfig from './config/database';
+import { encryptionService } from './utils/encryption';
+import { loggingConfig } from './config/logging';
+import { requestLoggingMiddleware, errorLoggingMiddleware, performanceMiddleware, securityLoggingMiddleware } from './middleware/logging';
+import { logger, LogCategory } from './utils/logger';
 
 // Load environment variables
 dotenv.config();
+
+// Configure logging first
+loggingConfig.configureForEnvironment();
 
 // Create Express app
 const app = express();
@@ -24,6 +30,11 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false
 }));
 
+// Logging middleware (must be early in the chain)
+app.use(requestLoggingMiddleware);
+app.use(performanceMiddleware(1000)); // Log requests slower than 1 second
+app.use(securityLoggingMiddleware);
+
 // CORS configuration
 const corsOptions = {
   origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
@@ -35,12 +46,6 @@ app.use(cors(corsOptions));
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Request logging middleware
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-  next();
-});
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -76,9 +81,8 @@ app.get('/api', (req, res) => {
 });
 
 // Error handling middleware
+app.use(errorLoggingMiddleware);
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Error:', err);
-  
   res.status(500).json({
     success: false,
     message: 'Internal server error',
@@ -86,8 +90,8 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
+// 404 handler - using a different pattern
+app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: 'Endpoint not found'
@@ -97,13 +101,15 @@ app.use('*', (req, res) => {
 // Initialize database connection
 const initializeApp = async (): Promise<void> => {
   try {
+    logger.info(LogCategory.SYSTEM, 'Initializing PrimeRoseFarms application');
+    
     const dbConfig = DatabaseConfig.getInstance();
     dbConfig.setupEventHandlers();
     await dbConfig.connect();
     
-    console.log('PrimeRoseFarms application initialized successfully');
+    logger.info(LogCategory.SYSTEM, 'PrimeRoseFarms application initialized successfully');
   } catch (error) {
-    console.error('Failed to initialize application:', error);
+    logger.error(LogCategory.SYSTEM, 'Failed to initialize application', { error: error instanceof Error ? error.message : 'Unknown error' });
     process.exit(1);
   }
 };
