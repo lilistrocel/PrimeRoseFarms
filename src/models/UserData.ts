@@ -241,7 +241,6 @@ const userDataSchema = new Schema<IUserDataDocument>({
   userId: {
     type: String,
     required: true,
-    unique: true,
     ref: 'User'
   },
   

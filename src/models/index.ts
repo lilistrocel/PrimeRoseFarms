@@ -15,3 +15,7 @@ export { SensorData, ISensorData, ISensorDataDocument } from './SensorData';
 export { EnvironmentData, IEnvironmentData, IEnvironmentDataDocument } from './EnvironmentData';
 export { MarketData, IMarketData, IMarketDataDocument } from './MarketData';
 export { LogisticsData, ILogisticsData, ILogisticsDataDocument } from './LogisticsData';
+export { CostsData, ICostsData, ICostsDataDocument } from './CostsData';
+export { TaskTemplate, ITaskTemplate, ITaskTemplateDocument } from './TaskTemplate';
+export { SensorLogic, ISensorLogic, ISensorLogicDocument } from './SensorLogic';
+export { UserPermissions, IUserPermissions, IUserPermissionsDocument } from './UserPermissions';

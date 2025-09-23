@@ -206,7 +206,6 @@ const inventoryDataSchema = new Schema<IInventoryDataDocument>({
   itemId: {
     type: String,
     required: true,
-    unique: true,
     trim: true
   },
   
@@ -220,7 +219,7 @@ const inventoryDataSchema = new Schema<IInventoryDataDocument>({
     subcategory: { type: String, required: true, trim: true },
     brand: { type: String, required: true, trim: true },
     model: { type: String, trim: true },
-    sku: { type: String, required: true, unique: true, trim: true },
+    sku: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true, maxlength: 1000 },
     unit: {
       type: String,

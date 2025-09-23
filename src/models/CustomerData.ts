@@ -241,7 +241,6 @@ const customerDataSchema = new Schema<ICustomerDataDocument>({
   customerId: {
     type: String,
     required: true,
-    unique: true,
     trim: true
   },
   

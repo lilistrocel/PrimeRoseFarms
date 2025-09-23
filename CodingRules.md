@@ -20,11 +20,15 @@ This document establishes common coding standards and guidelines to ensure consi
 - Always update DevLog.md when making code changes or decisions
 - Keep both files current and comprehensive
 
+## Environment Configuration Rules
+
+7. **.env file access restriction** - The AI assistant does not have direct access to read or modify the .env file. When environment variable changes are needed, the AI must provide the exact content/changes to the user and ask them to update the .env file manually.
+
 ## Additional Rules
 
 *This section will be expanded as more rules are added during development*
 
 ---
 
-**Last Updated:** Initial creation
-**Version:** 1.0
+**Last Updated:** Environment configuration rule added
+**Version:** 1.1

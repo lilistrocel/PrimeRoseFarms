@@ -7,6 +7,7 @@ import { encryptionService } from './utils/encryption';
 import { loggingConfig } from './config/logging';
 import { requestLoggingMiddleware, errorLoggingMiddleware, performanceMiddleware, securityLoggingMiddleware } from './middleware/logging';
 import { logger, LogCategory } from './utils/logger';
+import routes from './routes';
 
 // Load environment variables
 dotenv.config();
@@ -63,22 +64,8 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API routes will be added here
-app.get('/api', (req, res) => {
-  res.json({
-    success: true,
-    message: 'PrimeRoseFarms API',
-    version: '1.0.0',
-    endpoints: {
-      health: '/health',
-      auth: '/api/auth',
-      users: '/api/users',
-      farms: '/api/farms',
-      fields: '/api/fields',
-      workers: '/api/workers'
-    }
-  });
-});
+// Mount API routes
+app.use('/', routes);
 
 // Error handling middleware
 app.use(errorLoggingMiddleware);

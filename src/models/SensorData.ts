@@ -181,7 +181,6 @@ const sensorDataSchema = new Schema<ISensorDataDocument>({
   sensorId: {
     type: String,
     required: true,
-    unique: true,
     trim: true
   },
   farmId: {
