@@ -22,6 +22,9 @@ import {
   Groups,
   Settings,
   Science,
+  ManageAccounts,
+  Business,
+  LocalFlorist,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { IUser, UserRole } from '../../../types';
@@ -36,7 +39,7 @@ interface NavigationItem {
   text: string;
   icon: React.ReactElement;
   path: string;
-  roles: UserRole[];
+  roles: string[];
   badge?: string;
 }
 
@@ -45,56 +48,84 @@ const navigationItems: NavigationItem[] = [
     text: 'Dashboard',
     icon: <Dashboard />,
     path: '/dashboard',
-    roles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.AGRONOMIST, UserRole.HR, UserRole.SALES],
+    roles: ['admin', 'manager', 'agronomist', 'hr', 'sales'],
+  },
+  {
+    text: 'User Management',
+    icon: <ManageAccounts />,
+    path: '/user-management',
+    roles: ['admin', 'manager'],
+    badge: 'New',
   },
   {
     text: 'Farm Management',
+    icon: <Business />,
+    path: '/farm-management',
+    roles: ['admin', 'manager'],
+    badge: 'New',
+  },
+  {
+    text: 'Cost Management',
+    icon: <AttachMoney />,
+    path: '/cost-management',
+    roles: ['admin', 'manager'],
+    badge: 'New',
+  },
+  {
+    text: 'Plant Data Management',
+    icon: <LocalFlorist />,
+    path: '/plant-data',
+    roles: ['admin', 'manager', 'agronomist'],
+    badge: 'New',
+  },
+  {
+    text: 'Farm Operations',
     icon: <Agriculture />,
     path: '/farms',
-    roles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.AGRONOMIST],
+    roles: ['admin', 'manager', 'agronomist'],
   },
   {
     text: 'Plant Data',
     icon: <Grass />,
     path: '/plants',
-    roles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.AGRONOMIST],
+    roles: ['admin', 'manager', 'agronomist'],
     badge: 'New',
   },
   {
     text: 'Worker Management',
     icon: <People />,
     path: '/workers',
-    roles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.HR],
+    roles: ['admin', 'manager', 'hr'],
   },
   {
     text: 'Inventory',
     icon: <Inventory />,
     path: '/inventory',
-    roles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.AGRONOMIST],
+    roles: ['admin', 'manager', 'agronomist'],
   },
   {
     text: 'Financial',
     icon: <AttachMoney />,
     path: '/financial',
-    roles: [UserRole.ADMIN, UserRole.MANAGER],
+    roles: ['admin', 'manager'],
   },
   {
     text: 'Analytics',
     icon: <Analytics />,
     path: '/analytics',
-    roles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.AGRONOMIST],
+    roles: ['admin', 'manager', 'agronomist'],
   },
   {
     text: 'Customer Management',
     icon: <Groups />,
     path: '/customers',
-    roles: [UserRole.ADMIN, UserRole.SALES],
+    roles: ['admin', 'sales'],
   },
   {
     text: 'Research Lab',
     icon: <Science />,
     path: '/research',
-    roles: [UserRole.ADMIN, UserRole.AGRONOMIST],
+    roles: ['admin', 'agronomist'],
     badge: 'Beta',
   },
 ];
@@ -105,7 +136,7 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ user, drawerWidth, open
 
   // Filter navigation items based on user role
   const availableItems = navigationItems.filter(item => 
-    item.roles.includes(user.role)
+    item.roles.includes(user.role.toLowerCase())
   );
 
   const handleNavigate = (path: string) => {

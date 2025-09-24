@@ -1,13 +1,92 @@
 import { Router, Request, Response } from 'express';
 import { User } from '../models/User';
-import { authorize } from '../middleware/auth';
+import { authenticate, authorize } from '../middleware/auth';
 import { logger, LogCategory } from '../utils/logger';
 import { UserRole } from '../types';
 
 const router = Router();
 
+// Create new user (Admin only)
+router.post('/', authenticate, authorize(UserRole.ADMIN), async (req: Request, res: Response) => {
+  try {
+    const { email, password, firstName, lastName, role, phoneNumber, address, department } = req.body;
+
+    // Validate required fields
+    if (!email || !password || !firstName || !lastName || !role) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email, password, firstName, lastName, and role are required'
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'User with this email already exists'
+      });
+    }
+
+    // Validate role
+    if (!Object.values(UserRole).includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid role specified'
+      });
+    }
+
+    // Create new user
+    const userData: any = {
+      email,
+      password,
+      firstName,
+      lastName,
+      role,
+      isActive: true
+    };
+
+    // Add optional fields if provided
+    if (phoneNumber) userData.phoneNumber = phoneNumber;
+    if (address) userData.address = address;
+    if (department) userData.department = department;
+
+    const user = new User(userData);
+    await user.save();
+
+    // Remove password from response
+    const userResponse = user.toJSON();
+    delete (userResponse as any).password;
+
+    logger.info(LogCategory.USER, 'User created successfully', {
+      createdBy: req.user?.userId,
+      newUserId: user._id,
+      email: user.email,
+      role: user.role
+    });
+
+    return res.status(201).json({
+      success: true,
+      data: userResponse,
+      message: 'User created successfully'
+    });
+
+  } catch (error: any) {
+    logger.error(LogCategory.USER, 'Error creating user', {
+      userId: req.user?.userId,
+      error: error.message,
+      stack: error.stack
+    });
+
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+});
+
 // Get all users (Admin only)
-router.get('/', authorize(UserRole.ADMIN), async (req: Request, res: Response) => {
+router.get('/', authenticate, authorize(UserRole.ADMIN), async (req: Request, res: Response) => {
   try {
     const { page = 1, limit = 10, role, isActive, search } = req.query;
     const skip = (Number(page) - 1) * Number(limit);
@@ -62,7 +141,7 @@ router.get('/', authorize(UserRole.ADMIN), async (req: Request, res: Response) =
 });
 
 // Get user by ID
-router.get('/:id', authorize(UserRole.ADMIN, UserRole.MANAGER, UserRole.HR), async (req: Request, res: Response) => {
+router.get('/:id', authenticate, authorize(UserRole.ADMIN, UserRole.MANAGER, UserRole.HR), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
@@ -102,7 +181,7 @@ router.get('/:id', authorize(UserRole.ADMIN, UserRole.MANAGER, UserRole.HR), asy
 });
 
 // Update user profile
-router.put('/:id', authorize(UserRole.ADMIN, UserRole.MANAGER, UserRole.HR), async (req: Request, res: Response) => {
+router.put('/:id', authenticate, authorize(UserRole.ADMIN, UserRole.MANAGER, UserRole.HR), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -228,7 +307,7 @@ router.put('/:id/password', async (req: Request, res: Response) => {
 });
 
 // Deactivate user (Admin only)
-router.put('/:id/deactivate', authorize(UserRole.ADMIN), async (req: Request, res: Response) => {
+router.put('/:id/deactivate', authenticate, authorize(UserRole.ADMIN), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
@@ -266,7 +345,7 @@ router.put('/:id/deactivate', authorize(UserRole.ADMIN), async (req: Request, re
 });
 
 // Activate user (Admin only)
-router.put('/:id/activate', authorize(UserRole.ADMIN), async (req: Request, res: Response) => {
+router.put('/:id/activate', authenticate, authorize(UserRole.ADMIN), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
@@ -304,7 +383,7 @@ router.put('/:id/activate', authorize(UserRole.ADMIN), async (req: Request, res:
 });
 
 // Delete user (Admin only)
-router.delete('/:id', authorize(UserRole.ADMIN), async (req: Request, res: Response) => {
+router.delete('/:id', authenticate, authorize(UserRole.ADMIN), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 

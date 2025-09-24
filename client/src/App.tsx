@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
-import { store, RootState, useAppDispatch, useAppSelector } from './store';
+import { store, useAppDispatch, useAppSelector } from './store';
 import { verifyToken } from './store/slices/authSlice';
 import { setOnlineStatus } from './store/slices/interfaceSlice';
 
@@ -15,6 +15,9 @@ import './utils/resizeObserverFix';
 const AppContent: React.FC = () => {
   const dispatch = useAppDispatch();
   const { isAuthenticated, loading, user } = useAppSelector((state) => state.auth);
+
+  // Debug logging
+  console.log('AppContent rendered:', { isAuthenticated, loading, user });
 
   // Check for existing token on app startup
   useEffect(() => {
@@ -56,6 +59,8 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  console.log('App component rendering...');
+  
   return (
     <Provider store={store}>
       <AppContent />

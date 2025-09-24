@@ -22,7 +22,7 @@ This document establishes common coding standards and guidelines to ensure consi
 
 ## Environment Configuration Rules
 
-7. **.env file access restriction** - The AI assistant does not have direct access to read or modify the .env file. When environment variable changes are needed, the AI must provide the exact content/changes to the user and ask them to update the .env file manually.
+7. **.env file access restriction** - The AI assistant does not have direct access to read or modify the .env file. When environment variable changes are needed, the AI must provide the exact content/changes to the user and ask them to update the .env file manually. This applies to both the main .env file in the root directory and the client/.env file in the client directory.
 
 ## Additional Rules
 

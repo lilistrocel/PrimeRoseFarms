@@ -39,6 +39,85 @@ export interface ILoginResponse {
   refreshToken?: string;
 }
 
+// Cost Management Interface
+export interface ICostsData {
+  _id: string;
+  farmId: string;
+  managerId: string;
+  laborRates: {
+    base: {
+      plantingPerPlant: number;
+      harvestPerKg: number;
+      maintenancePerHour: number;
+      irrigationPerHour: number;
+      fertilizingPerHour: number;
+    };
+    overtime: {
+      multiplier: number;
+      threshold: number;
+    };
+    seasonal: {
+      peakSeasonMultiplier: number;
+      peakMonths: number[];
+    };
+    skillPremiums: {
+      [skillLevel: string]: number;
+    };
+  };
+  infrastructure: {
+    land: {
+      rentPerHectare: number;
+      propertyTaxes: number;
+      insurance: number;
+    };
+    utilities: {
+      waterPerCubicMeter: number;
+      electricityPerKwh: number;
+      fuelPerLiter: number;
+      internetMonthly: number;
+    };
+    equipment: {
+      depreciationRate: number;
+      maintenanceRate: number;
+      insuranceRate: number;
+    };
+  };
+  materials: {
+    fertilizer: {
+      basePricePerKg: number;
+      bulkDiscounts: Array<{ minQuantity: number; discountPercent: number }>;
+    };
+    pesticides: {
+      basePricePerLiter: number;
+      applicationCostPerLiter: number;
+    };
+    seeds: {
+      basePricePerKg: number;
+      qualityPremium: number;
+    };
+    packaging: {
+      containerCost: number;
+      labelingCost: number;
+    };
+  };
+  logistics: {
+    fleet: {
+      vehicleCostPerKm: number;
+      fuelCostPerLiter: number;
+      maintenanceCostPerKm: number;
+      insuranceMonthly: number;
+    };
+    delivery: {
+      baseRate: number;
+      perKmRate: number;
+      perKgRate: number;
+    };
+  };
+  createdAt: string;
+  updatedAt: string;
+  isActive: boolean;
+}
+
 // Interface determination types
 export enum InterfaceType {
   DESKTOP = 'DESKTOP',
@@ -108,4 +187,65 @@ export interface IDeliveryRecord {
   status: 'assigned' | 'in_transit' | 'delivered' | 'failed';
   driverId: string;
   estimatedDelivery: string;
+}
+
+// Plant Data Management Interface
+export interface IPlantData {
+  _id: string;
+  name: string;
+  scientificName: string;
+  family: string;
+  variety: string;
+  growthCharacteristics: {
+    height: number;
+    spread: number;
+    rootDepth: number;
+    lifecycle: 'annual' | 'perennial' | 'biennial';
+  };
+  growingRequirements: {
+    soilType: string;
+    phRange: { min: number; max: number };
+    temperatureRange: { min: number; max: number; optimal: number };
+    humidityRange: { min: number; max: number };
+    lightRequirements: 'full_sun' | 'partial_shade' | 'shade';
+    waterRequirements: 'low' | 'moderate' | 'high';
+  };
+  fertilizerSchedule: Array<{
+    day: number;
+    fertilizerType: string;
+    applicationRate: number;
+    frequency: 'daily' | 'weekly' | 'bi_weekly' | 'monthly';
+    growthStage: 'seedling' | 'vegetative' | 'flowering' | 'fruiting' | 'harvest';
+    applicationMethod: 'soil_drench' | 'foliar_spray' | 'injection' | 'broadcast';
+  }>;
+  pesticideSchedule: Array<{
+    day: number;
+    chemicalType: string;
+    applicationRate: number;
+    frequency: 'preventive' | 'curative' | 'as_needed';
+    growthStage: 'seedling' | 'vegetative' | 'flowering' | 'fruiting' | 'harvest';
+    applicationMethod: 'foliar_spray' | 'dust' | 'injection' | 'soil_drench';
+    safetyRequirements: string;
+    reEntryInterval: number; // hours
+    harvestRestriction: number; // days
+  }>;
+  growthTimeline: {
+    germinationTime: number; // days
+    daysToMaturity: number;
+    harvestWindow: number; // days
+    seasonalPlanting: string[];
+  };
+  yieldInformation: {
+    expectedYieldPerPlant: number; // kg
+    yieldPerSquareMeter: number; // kg
+    qualityMetrics: {
+      size: string;
+      color: string;
+      texture: string;
+      brix: number;
+    };
+  };
+  createdAt: string;
+  updatedAt: string;
+  isActive: boolean;
 }

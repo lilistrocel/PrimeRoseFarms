@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
-import { IUser, UserRole } from '../../types';
+import { IUser } from '../../types';
 
 // Desktop layout components
 import DesktopNavbar from './layout/DesktopNavbar';
@@ -11,7 +11,9 @@ import DesktopSidebar from './layout/DesktopSidebar';
 
 // Desktop pages
 import DashboardPage from './pages/DashboardPage';
+import UserManagementPage from './pages/UserManagementPage';
 import FarmManagementPage from './pages/FarmManagementPage';
+import CostManagementPage from './pages/CostManagementPage';
 import PlantDataPage from './pages/PlantDataPage';
 import WorkerManagementPage from './pages/WorkerManagementPage';
 import InventoryPage from './pages/InventoryPage';
@@ -110,16 +112,30 @@ const DesktopInterface: React.FC<DesktopInterfaceProps> = ({ user }) => {
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<DashboardPage user={user} />} />
 
+              {/* User Management - Admin & Manager only */}
+        {(user.role.toLowerCase() === 'admin' || user.role.toLowerCase() === 'manager') && (
+          <Route path="/user-management" element={<UserManagementPage />} />
+        )}
+        {(user.role.toLowerCase() === 'admin' || user.role.toLowerCase() === 'manager') && (
+          <Route path="/farm-management" element={<FarmManagementPage />} />
+        )}
+        {(user.role.toLowerCase() === 'admin' || user.role.toLowerCase() === 'manager') && (
+          <Route path="/cost-management" element={<CostManagementPage />} />
+        )}
+        {(user.role.toLowerCase() === 'admin' || user.role.toLowerCase() === 'manager' || user.role.toLowerCase() === 'agronomist') && (
+          <Route path="/plant-data" element={<PlantDataPage />} />
+        )}
+
               {/* Core Management Pages */}
-              <Route path="/farms" element={<FarmManagementPage user={user} />} />
-              <Route path="/plants" element={<PlantDataPage user={user} />} />
+              <Route path="/farms" element={<FarmManagementPage />} />
+              <Route path="/plants" element={<PlantDataPage />} />
               <Route path="/workers" element={<WorkerManagementPage user={user} />} />
               <Route path="/inventory" element={<InventoryPage user={user} />} />
               <Route path="/financial" element={<FinancialPage user={user} />} />
               <Route path="/analytics" element={<AnalyticsPage user={user} />} />
 
               {/* Role-specific pages */}
-              {(user.role === UserRole.SALES || user.role === UserRole.ADMIN) && (
+              {(user.role.toLowerCase() === 'sales' || user.role.toLowerCase() === 'admin') && (
                 <Route path="/customers" element={<CustomerManagementPage user={user} />} />
               )}
 
