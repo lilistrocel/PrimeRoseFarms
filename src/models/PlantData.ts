@@ -13,8 +13,18 @@ export interface IPlantData {
   variety: string;
   category: 'vegetable' | 'fruit' | 'herb' | 'flower' | 'grain' | 'legume' | 'other';
   
-  // Growing Requirements
+  // Basic Plant Information
+  family: string;
+  growthCharacteristics: {
+    height: number; // cm
+    spread: number; // cm
+    rootDepth: number; // cm
+    lifecycle: 'annual' | 'perennial' | 'biennial';
+  };
+  
+  // Advanced Growing Requirements
   growingRequirements: {
+    soilType: string;
     temperature: {
       min: number; // Celsius
       max: number; // Celsius
@@ -25,6 +35,7 @@ export interface IPlantData {
       max: number; // Percentage
       optimal: number; // Percentage
     };
+    lightRequirements: 'full_sun' | 'partial_shade' | 'shade';
     lightHours: {
       min: number; // Hours per day
       max: number; // Hours per day
@@ -36,13 +47,43 @@ export interface IPlantData {
       optimal: number;
     };
     waterRequirements: {
+      level: 'low' | 'moderate' | 'high';
       daily: number; // Liters per plant per day
       frequency: 'daily' | 'every_other_day' | 'twice_weekly' | 'weekly';
     };
   };
   
-  // Growth Timeline
+  // Detailed Fertilizer Schedule
+  fertilizerSchedule: Array<{
+    day: number; // Days after planting
+    fertilizerType: string; // NPK ratios, micronutrients
+    applicationRate: number; // ml or g per plant
+    frequency: 'daily' | 'weekly' | 'bi_weekly' | 'monthly';
+    growthStage: 'seedling' | 'vegetative' | 'flowering' | 'fruiting' | 'harvest';
+    applicationMethod: 'foliar_spray' | 'soil_drench' | 'injection' | 'broadcast';
+    notes?: string;
+  }>;
+  
+  // Detailed Pesticide/Chemical Schedule
+  pesticideSchedule: Array<{
+    day: number; // Days after planting
+    chemicalType: string; // Pesticide, fungicide, herbicide
+    applicationRate: number; // ml or g per plant
+    frequency: 'preventive' | 'curative' | 'as_needed';
+    growthStage: 'seedling' | 'vegetative' | 'flowering' | 'fruiting' | 'harvest';
+    applicationMethod: 'foliar_spray' | 'dust' | 'injection' | 'soil_drench';
+    safetyRequirements: string; // PPE needed
+    reEntryInterval: number; // Hours
+    harvestRestriction: number; // Days before harvest
+    notes?: string;
+  }>;
+  
+  // Enhanced Growth Timeline
   growthTimeline: {
+    germinationTime: number; // Days
+    daysToMaturity: number; // Days
+    harvestWindow: number; // Days
+    seasonalPlanting: string[]; // Months
     germinationDays: number;
     seedlingDays: number;
     vegetativeDays: number;
@@ -51,12 +92,19 @@ export interface IPlantData {
     totalDays: number;
   };
   
-  // Yield Information
+  // Enhanced Yield Information
   yieldInfo: {
     expectedYieldPerPlant: number; // kg or units
+    yieldPerSquareMeter: number; // kg per m²
     yieldUnit: 'kg' | 'units' | 'bunches' | 'heads';
     harvestWindow: number; // Days
     shelfLife: number; // Days
+    qualityMetrics: {
+      size: string; // Size description
+      color: string; // Expected color
+      texture: string; // Expected texture
+      brix: number; // Sugar content for fruits
+    };
   };
   
   // Resource Requirements
@@ -143,8 +191,25 @@ const plantDataSchema = new Schema<IPlantDataDocument>({
     required: true,
     enum: ['vegetable', 'fruit', 'herb', 'flower', 'grain', 'legume', 'other']
   },
+  family: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: 100
+  },
+  growthCharacteristics: {
+    height: { type: Number, required: true, min: 0 },
+    spread: { type: Number, required: true, min: 0 },
+    rootDepth: { type: Number, required: true, min: 0 },
+    lifecycle: {
+      type: String,
+      required: true,
+      enum: ['annual', 'perennial', 'biennial']
+    }
+  },
   
   growingRequirements: {
+    soilType: { type: String, required: true, trim: true },
     temperature: {
       min: { type: Number, required: true, min: -50, max: 50 },
       max: { type: Number, required: true, min: -50, max: 50 },
@@ -154,6 +219,11 @@ const plantDataSchema = new Schema<IPlantDataDocument>({
       min: { type: Number, required: true, min: 0, max: 100 },
       max: { type: Number, required: true, min: 0, max: 100 },
       optimal: { type: Number, required: true, min: 0, max: 100 }
+    },
+    lightRequirements: {
+      type: String,
+      required: true,
+      enum: ['full_sun', 'partial_shade', 'shade']
     },
     lightHours: {
       min: { type: Number, required: true, min: 0, max: 24 },
@@ -166,6 +236,11 @@ const plantDataSchema = new Schema<IPlantDataDocument>({
       optimal: { type: Number, required: true, min: 0, max: 14 }
     },
     waterRequirements: {
+      level: {
+        type: String,
+        required: true,
+        enum: ['low', 'moderate', 'high']
+      },
       daily: { type: Number, required: true, min: 0 },
       frequency: {
         type: String,
@@ -175,7 +250,60 @@ const plantDataSchema = new Schema<IPlantDataDocument>({
     }
   },
   
+  // Fertilizer Schedule Schema
+  fertilizerSchedule: [{
+    day: { type: Number, required: true, min: 0 },
+    fertilizerType: { type: String, required: true, trim: true },
+    applicationRate: { type: Number, required: true, min: 0 },
+    frequency: {
+      type: String,
+      required: true,
+      enum: ['daily', 'weekly', 'bi_weekly', 'monthly']
+    },
+    growthStage: {
+      type: String,
+      required: true,
+      enum: ['seedling', 'vegetative', 'flowering', 'fruiting', 'harvest']
+    },
+    applicationMethod: {
+      type: String,
+      required: true,
+      enum: ['foliar_spray', 'soil_drench', 'injection', 'broadcast']
+    },
+    notes: { type: String, trim: true }
+  }],
+  
+  // Pesticide Schedule Schema
+  pesticideSchedule: [{
+    day: { type: Number, required: true, min: 0 },
+    chemicalType: { type: String, required: true, trim: true },
+    applicationRate: { type: Number, required: true, min: 0 },
+    frequency: {
+      type: String,
+      required: true,
+      enum: ['preventive', 'curative', 'as_needed']
+    },
+    growthStage: {
+      type: String,
+      required: true,
+      enum: ['seedling', 'vegetative', 'flowering', 'fruiting', 'harvest']
+    },
+    applicationMethod: {
+      type: String,
+      required: true,
+      enum: ['foliar_spray', 'dust', 'injection', 'soil_drench']
+    },
+    safetyRequirements: { type: String, required: true, trim: true },
+    reEntryInterval: { type: Number, required: true, min: 0 },
+    harvestRestriction: { type: Number, required: true, min: 0 },
+    notes: { type: String, trim: true }
+  }],
+  
   growthTimeline: {
+    germinationTime: { type: Number, required: true, min: 0 },
+    daysToMaturity: { type: Number, required: true, min: 0 },
+    harvestWindow: { type: Number, required: true, min: 0 },
+    seasonalPlanting: [{ type: String, enum: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] }],
     germinationDays: { type: Number, required: true, min: 0 },
     seedlingDays: { type: Number, required: true, min: 0 },
     vegetativeDays: { type: Number, required: true, min: 0 },
@@ -186,13 +314,20 @@ const plantDataSchema = new Schema<IPlantDataDocument>({
   
   yieldInfo: {
     expectedYieldPerPlant: { type: Number, required: true, min: 0 },
+    yieldPerSquareMeter: { type: Number, required: true, min: 0 },
     yieldUnit: {
       type: String,
       required: true,
       enum: ['kg', 'units', 'bunches', 'heads']
     },
     harvestWindow: { type: Number, required: true, min: 0 },
-    shelfLife: { type: Number, required: true, min: 0 }
+    shelfLife: { type: Number, required: true, min: 0 },
+    qualityMetrics: {
+      size: { type: String, required: true, trim: true },
+      color: { type: String, required: true, trim: true },
+      texture: { type: String, required: true, trim: true },
+      brix: { type: Number, required: true, min: 0, max: 30 }
+    }
   },
   
   resourceRequirements: {
@@ -350,8 +485,7 @@ plantDataSchema.statics.findByGrowingConditions = function(temperature: number, 
 // Transform to JSON
 plantDataSchema.set('toJSON', {
   transform: function(doc, ret) {
-    ret.id = ret._id;
-    delete ret._id;
+    // Keep _id as _id for frontend compatibility
     delete (ret as any).__v;
     return ret;
   }

@@ -1,9 +1,34 @@
 ---
 alwaysApply: true
 ---
-# Coding Rules and Guidelines - PrimeRoseFarms
+# PrimeRoseFarms AI Agent Rules
 
-This document establishes comprehensive coding standards and guidelines to ensure consistency and alignment between the development team and AI assistant for the PrimeRoseFarms agricultural management system.
+This document establishes comprehensive rules for the AI assistant to ensure consistency and alignment with the PrimeRoseFarms agricultural management system.
+
+## CRITICAL: Documentation-First Approach
+
+### MANDATORY: Check Core Documentation FIRST
+Before starting any task, the AI agent MUST:
+
+1. **ALWAYS READ FIRST:**
+   - `ProcessFlow.md` - Understand business processes and data flows
+   - `DevLog.md` - Review current development status and recent changes
+   - `SystemArchitecture.md` - Understand system structure and communication patterns
+   - `API_DOCUMENTATION.md` - Review existing APIs and business process endpoints
+
+2. **ALIGN WITH EXISTING SYSTEM:**
+   - Follow established business process workflows
+   - Maintain consistency with current architecture
+   - Build upon existing implementations
+   - Respect current development patterns and decisions
+
+### MANDATORY: Update Documentation LAST
+After completing any task, the AI agent MUST:
+
+1. **UPDATE DevLog.md** - Record what was accomplished, decisions made, and next steps
+2. **UPDATE SystemArchitecture.md** - Document any structural changes or new components
+3. **UPDATE API_DOCUMENTATION.md** - Document new endpoints or modified business processes
+4. **UPDATE ProcessFlow.md** - Update business process documentation if workflows changed
 
 ## General Development Rules
 
@@ -12,111 +37,133 @@ This document establishes comprehensive coding standards and guidelines to ensur
 3. **Terminal preference** - Use PowerShell as the default terminal in Windows for development operations
 4. **Documentation maintenance** - Always keep documentation files updated and comprehensive
 
-## Documentation Requirements
-
-5. **DevLog.md** - Use this file to track and remember what is being coded, including progress, decisions, and changes. Update after each milestone or significant development session.
-6. **SystemArchitecture.md** - Use this file to track how the app/apps are structured and how communication between components is implemented
-7. **API_DOCUMENTATION.md** - Use this file to document all API endpoints, business processes, and integration patterns
-
-## File Maintenance Rules
-
-8. **Mandatory documentation updates** - Always update SystemArchitecture.md when making structural changes
-9. **Development logging** - Always update DevLog.md when making code changes or decisions
-10. **API documentation** - Update API_DOCUMENTATION.md when adding new endpoints or modifying existing ones
-11. **Keep documentation current** - All documentation files must be comprehensive and up-to-date
-
 ## Environment Configuration Rules
 
-12. **.env file access restriction** - The AI assistant does not have direct access to read or modify the .env file. When environment variable changes are needed, the AI must provide the exact content/changes to the user and ask them to update the .env file manually. This applies to both the main .env file in the root directory and the client/.env file in the client directory.
+5. **.env file access restriction** - The AI assistant does not have direct access to read or modify the .env file. When environment variable changes are needed, the AI must provide the exact content/changes to the user and ask them to update the .env file manually. This applies to both the main .env file in the root directory and the client/.env file in the client directory.
 
 ## Project-Specific Rules
 
 ### Architecture and Design
-13. **Business process-driven design** - All APIs and interfaces must be designed around actual business workflows rather than generic CRUD operations
-14. **Role-based access control** - Implement granular permissions with farm-specific, block-level, and time-based restrictions
-15. **Multi-tenant architecture** - Design all components to support multiple farms with proper data isolation
-16. **Real-time integration** - Implement WebSocket connections for live sensor data, task updates, and alerts
+6. **Business process-driven design** - All APIs and interfaces must be designed around actual business workflows rather than generic CRUD operations
+7. **Role-based access control** - Implement granular permissions with farm-specific, block-level, and time-based restrictions
+8. **Multi-tenant architecture** - Design all components to support multiple farms with proper data isolation
+9. **Real-time integration** - Implement WebSocket connections for live sensor data, task updates, and alerts
 
 ### Database and Models
-17. **TypeScript safety** - All database models must have zero TypeScript errors with proper type safety
-18. **Business logic integration** - Each model must include comprehensive business logic methods and validation rules
-19. **Encryption compliance** - Implement field-level encryption for sensitive data using AES-256-GCM
-20. **Audit trail requirements** - All data modifications must include created/modified tracking with user attribution
+10. **TypeScript safety** - All database models must have zero TypeScript errors with proper type safety
+11. **Business logic integration** - Each model must include comprehensive business logic methods and validation rules
+12. **Encryption compliance** - Implement field-level encryption for sensitive data using AES-256-GCM
+13. **Audit trail requirements** - All data modifications must include created/modified tracking with user attribution
 
 ### API Development
-21. **Process-specific endpoints** - Create Manager, Worker, Sales, and Sensor APIs that serve actual business workflows
-22. **Authentication middleware** - All protected endpoints must use proper authentication and authorization middleware
-23. **Error handling** - Implement comprehensive error handling with consistent response formats
-24. **Performance optimization** - Design APIs for specific data access patterns with proper indexing
+14. **Process-specific endpoints** - Create Manager, Worker, Sales, and Sensor APIs that serve actual business workflows
+15. **Authentication middleware** - All protected endpoints must use proper authentication and authorization middleware
+16. **Error handling** - Implement comprehensive error handling with consistent response formats
+17. **Performance optimization** - Design APIs for specific data access patterns with proper indexing
 
 ### Frontend Development
-25. **Role-based interfaces** - Implement desktop interfaces for management roles and mobile interfaces for field workers
-26. **Material-UI consistency** - Use Material-UI components with consistent design patterns
-27. **TypeScript integration** - All frontend components must be fully type-safe
-28. **Responsive design** - Ensure all interfaces work on desktop, tablet, and mobile devices
+18. **Role-based interfaces** - Implement desktop interfaces for management roles and mobile interfaces for field workers
+19. **Material-UI consistency** - Use Material-UI components with consistent design patterns
+20. **TypeScript integration** - All frontend components must be fully type-safe
+21. **Responsive design** - Ensure all interfaces work on desktop, tablet, and mobile devices
 
 ### Testing and Quality
-29. **Comprehensive testing** - Implement test suites for all major components with Jest framework
-30. **Test mode system** - Maintain universal test mode switch for development flexibility
-31. **Performance monitoring** - Implement logging and monitoring for slow operations and system health
-32. **Security validation** - Test all authentication, authorization, and encryption features
+22. **Comprehensive testing** - Implement test suites for all major components with Jest framework
+23. **Test mode system** - Maintain universal test mode switch for development flexibility
+24. **Performance monitoring** - Implement logging and monitoring for slow operations and system health
+25. **Security validation** - Test all authentication, authorization, and encryption features
 
 ### Development Workflow
-33. **Module-based development** - Develop features in logical modules (User Management, Farm Management, Plant Data, etc.)
-34. **Milestone tracking** - Update DevLog.md after completing each module or milestone
-35. **Demo user system** - Maintain demo users for all role types for testing and validation
-36. **Script automation** - Use PowerShell scripts for development startup, shutdown, and testing
+26. **Module-based development** - Develop features in logical modules (User Management, Farm Management, Plant Data, etc.)
+27. **Milestone tracking** - Update DevLog.md after completing each module or milestone
+28. **Demo user system** - Maintain demo users for all role types for testing and validation
+29. **Script automation** - Use PowerShell scripts for development startup, shutdown, and testing
 
 ### Security and Compliance
-37. **Multi-layer encryption** - Implement four-level data protection (Public, Internal, Confidential, Restricted)
-38. **Permission granularity** - Support farm-specific access, block-level restrictions, and customer assignments
-39. **Activity tracking** - Log all user activities with IP addresses and audit trails
-40. **Compliance integration** - Track certifications, training completion, and safety requirements
+30. **Multi-layer encryption** - Implement four-level data protection (Public, Internal, Confidential, Restricted)
+31. **Permission granularity** - Support farm-specific access, block-level restrictions, and customer assignments
+32. **Activity tracking** - Log all user activities with IP addresses and audit trails
+33. **Compliance integration** - Track certifications, training completion, and safety requirements
 
 ### Integration and Communication
-41. **WebSocket implementation** - Use Socket.io for real-time communication between frontend and backend
-42. **CORS configuration** - Properly configure cross-origin resource sharing for development and production
-43. **Token management** - Implement JWT token storage, verification, and refresh mechanisms
-44. **State management** - Use Redux Toolkit for consistent state management across the application
+34. **WebSocket implementation** - Use Socket.io for real-time communication between frontend and backend
+35. **CORS configuration** - Properly configure cross-origin resource sharing for development and production
+36. **Token management** - Implement JWT token storage, verification, and refresh mechanisms
+37. **State management** - Use Redux Toolkit for consistent state management across the application
 
 ### Performance and Optimization
-45. **Database indexing** - Implement comprehensive indexing for optimal query performance
-46. **Caching strategies** - Use appropriate caching for frequently accessed data
-47. **Resource optimization** - Optimize images, scripts, and other resources for production
-48. **Monitoring integration** - Implement performance monitoring and alerting systems
+38. **Database indexing** - Implement comprehensive indexing for optimal query performance
+39. **Caching strategies** - Use appropriate caching for frequently accessed data
+40. **Resource optimization** - Optimize images, scripts, and other resources for production
+41. **Monitoring integration** - Implement performance monitoring and alerting systems
 
 ## Development Environment Specifics
 
 ### PowerShell Usage
-49. **PowerShell scripts** - Use PowerShell for all development automation scripts
-50. **Error handling** - Implement proper error handling in all PowerShell scripts
-51. **Cross-platform compatibility** - Ensure scripts work on Windows 11 Pro environment
+42. **PowerShell scripts** - Use PowerShell for all development automation scripts
+43. **Error handling** - Implement proper error handling in all PowerShell scripts
+44. **Cross-platform compatibility** - Ensure scripts work on Windows 11 Pro environment
 
 ### File Organization
-52. **Modular structure** - Organize code in logical modules with clear separation of concerns
-53. **Import/export consistency** - Use consistent import/export patterns across all modules
-54. **Configuration management** - Centralize all configuration in appropriate config files
+45. **Modular structure** - Organize code in logical modules with clear separation of concerns
+46. **Import/export consistency** - Use consistent import/export patterns across all modules
+47. **Configuration management** - Centralize all configuration in appropriate config files
 
 ### Version Control
-55. **Commit standards** - Use descriptive commit messages that reference specific modules or features
-56. **Branch management** - Use feature branches for new modules or significant changes
-57. **Documentation commits** - Always commit documentation updates with code changes
+48. **Commit standards** - Use descriptive commit messages that reference specific modules or features
+49. **Branch management** - Use feature branches for new modules or significant changes
+50. **Documentation commits** - Always commit documentation updates with code changes
 
 ## Quality Assurance Rules
 
-58. **Code review requirements** - All code must be reviewed for adherence to these rules
-59. **Documentation validation** - Verify all documentation is updated before marking tasks complete
-60. **Integration testing** - Test all modules together to ensure proper integration
-61. **User experience validation** - Test all interfaces with actual demo users before deployment
+51. **Code review requirements** - All code must be reviewed for adherence to these rules
+52. **Documentation validation** - Verify all documentation is updated before marking tasks complete
+53. **Integration testing** - Test all modules together to ensure proper integration
+54. **User experience validation** - Test all interfaces with actual demo users before deployment
+
+## Code Quality and Error Prevention Rules
+
+### TypeScript and React Development
+55. **Import verification** - Always verify that all imported components, icons, and modules actually exist in their respective packages before using them
+56. **Duplicate import prevention** - Never import the same item from multiple sources; use single, correct import statements
+57. **Icon name accuracy** - Use exact Material-UI icon names; verify icon existence before importing (e.g., `Nature` not `Eco`)
+58. **Component replacement completeness** - When replacing components, update BOTH opening AND closing tags to prevent orphaned tags
+59. **Tag matching verification** - Ensure all opening tags have corresponding closing tags with matching component names
+60. **TypeScript error resolution** - Fix TypeScript compilation errors immediately rather than allowing them to accumulate
+61. **Component API validation** - Verify that replacement components support the same props and functionality as original components
+62. **Pre-compilation verification** - Scan for red underlines in IDE and verify import statements before moving to next component
+63. **Copy-paste verification** - Always check and verify imports after copying code from other sources
+64. **Icon assumption prevention** - Never assume icon names; always check Material-UI documentation for correct icon names
+
+### Code Quality Standards
+65. **Zero error tolerance** - All code must compile without TypeScript errors before marking tasks complete
+66. **Immediate error fixing** - Address compilation errors as they occur rather than batching fixes
+67. **Import validation** - Verify all import statements are correct and necessary before committing code
+68. **Component consistency** - Maintain consistent component usage patterns across the application
+69. **Error prevention mindset** - Proactively check for common mistakes rather than reactive error fixing
 
 ## Additional Rules
 
 *This section will be expanded as more rules are added during development*
 
+## CRITICAL REMINDER: Documentation-First Workflow
+
+### Before ANY Task:
+1. **READ** ProcessFlow.md, DevLog.md, SystemArchitecture.md, API_DOCUMENTATION.md
+2. **UNDERSTAND** current system state and business processes
+3. **ALIGN** with existing architecture and patterns
+
+### After ANY Task:
+1. **UPDATE** DevLog.md with accomplishments and decisions
+2. **UPDATE** SystemArchitecture.md with structural changes
+3. **UPDATE** API_DOCUMENTATION.md with new/modified endpoints
+4. **UPDATE** ProcessFlow.md with workflow changes
+
 ---
 
-**Last Updated:** Comprehensive coding rules established based on project architecture
-**Version:** 2.0
+**Last Updated:** Documentation-first approach prioritized for AI agent alignment
+**Version:** 3.0
 **Project:** PrimeRoseFarms Agricultural Management System
 **Environment:** Windows 11 Pro with PowerShell
 **Architecture:** Business process-driven multi-tenant system
+**Focus:** Documentation-driven development with AI agent alignment

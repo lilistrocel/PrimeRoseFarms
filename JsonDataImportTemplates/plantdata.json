@@ -1,0 +1,120 @@
+{
+    "name": "Plant Name",
+    "scientificName": "Scientific name",
+    "variety": "Variety name",
+    "category": "vegetable|fruit|herb|flower|grain|legume|other",
+    "family": "Plant family",
+    
+    "growthCharacteristics": {
+      "height": 100,
+      "spread": 50,
+      "rootDepth": 30,
+      "lifecycle": "annual|perennial|biennial"
+    },
+    
+    "growingRequirements": {
+      "soilType": "Soil type description",
+      "temperature": { "min": 18, "max": 30, "optimal": 24 },
+      "humidity": { "min": 40, "max": 70, "optimal": 60 },
+      "lightRequirements": "full_sun|partial_shade|shade",
+      "lightHours": { "min": 6, "max": 8, "optimal": 7 },
+      "soilPh": { "min": 6.0, "max": 6.8, "optimal": 6.5 },
+      "waterRequirements": {
+        "level": "low|moderate|high",
+        "daily": 2.5,
+        "frequency": "daily|every_other_day|twice_weekly|weekly"
+      }
+    },
+    
+    "fertilizerSchedule": [
+      {
+        "day": 7,
+        "fertilizerType": "NPK ratio or type",
+        "applicationRate": 5,
+        "frequency": "daily|weekly|bi_weekly|monthly",
+        "growthStage": "seedling|vegetative|flowering|fruiting|harvest",
+        "applicationMethod": "foliar_spray|soil_drench|injection|broadcast",
+        "notes": "Optional notes"
+      }
+    ],
+    
+    "pesticideSchedule": [
+      {
+        "day": 14,
+        "chemicalType": "Chemical name",
+        "applicationRate": 10,
+        "frequency": "preventive|curative|as_needed",
+        "growthStage": "seedling|vegetative|flowering|fruiting|harvest",
+        "applicationMethod": "foliar_spray|dust|injection|soil_drench",
+        "safetyRequirements": "Safety equipment needed",
+        "reEntryInterval": 12,
+        "harvestRestriction": 7,
+        "notes": "Optional notes"
+      }
+    ],
+    
+    "growthTimeline": {
+      "germinationTime": 7,
+      "daysToMaturity": 115,
+      "harvestWindow": 30,
+      "seasonalPlanting": ["March", "April", "May"],
+      "germinationDays": 7,
+      "seedlingDays": 14,
+      "vegetativeDays": 35,
+      "floweringDays": 14,
+      "fruitingDays": 45,
+      "totalDays": 115
+    },
+    
+    "yieldInfo": {
+      "expectedYieldPerPlant": 3.5,
+      "yieldPerSquareMeter": 8.5,
+      "yieldUnit": "kg|units|bunches|heads",
+      "harvestWindow": 30,
+      "shelfLife": 14,
+      "qualityMetrics": {
+        "size": "Size description",
+        "color": "Color description",
+        "texture": "Texture description",
+        "brix": 5.0
+      }
+    },
+    
+    "resourceRequirements": {
+      "seedsPerUnit": 1,
+      "fertilizerType": ["Fertilizer types"],
+      "fertilizerAmount": 0.5,
+      "pesticideType": ["Pesticide types"],
+      "pesticideAmount": 10,
+      "spaceRequirement": { "width": 60, "length": 60, "height": 150 }
+    },
+    
+    "marketInfo": {
+      "basePrice": 2.50,
+      "priceUnit": "kg|units|bunches|heads",
+      "seasonality": {
+        "peakSeason": ["June", "July", "August"],
+        "offSeason": ["December", "January"]
+      },
+      "demandLevel": "low|medium|high|very_high"
+    },
+    
+    "qualityStandards": {
+      "size": { "min": 2, "max": 4, "unit": "cm|mm|g" },
+      "color": ["Color options"],
+      "texture": ["Texture options"],
+      "defects": ["Common defects"]
+    },
+    
+    "environmentalImpact": {
+      "waterFootprint": 214,
+      "carbonFootprint": 2.3,
+      "sustainabilityScore": 7
+    },
+    
+    "isActive": true,
+    "createdBy": "system",
+    "lastModifiedBy": "system",
+    "createdAt": "2024-12-19T10:00:00.000Z",
+    "updatedAt": "2024-12-19T10:00:00.000Z"
+  }

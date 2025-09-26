@@ -1,0 +1,287 @@
+[
+  {
+    "name": "Tomato (Cherry)",
+    "scientificName": "Solanum lycopersicum var. cerasiforme",
+    "variety": "Sweet 100",
+    "category": "vegetable",
+    "family": "Solanaceae",
+    
+    "growthCharacteristics": {
+      "height": 180,
+      "spread": 60,
+      "rootDepth": 45,
+      "lifecycle": "annual"
+    },
+    
+    "growingRequirements": {
+      "soilType": "Well-drained loamy soil",
+      "temperature": {
+        "min": 18,
+        "max": 30,
+        "optimal": 24
+      },
+      "humidity": {
+        "min": 40,
+        "max": 70,
+        "optimal": 60
+      },
+      "lightRequirements": "full_sun",
+      "lightHours": {
+        "min": 6,
+        "max": 8,
+        "optimal": 7
+      },
+      "soilPh": {
+        "min": 6.0,
+        "max": 6.8,
+        "optimal": 6.5
+      },
+      "waterRequirements": {
+        "level": "moderate",
+        "daily": 2.5,
+        "frequency": "daily"
+      }
+    },
+    
+    "fertilizerSchedule": [
+      {
+        "day": 7,
+        "fertilizerType": "NPK 10-10-10",
+        "applicationRate": 5,
+        "frequency": "weekly",
+        "growthStage": "seedling",
+        "applicationMethod": "soil_drench",
+        "notes": "Initial establishment"
+      },
+      {
+        "day": 21,
+        "fertilizerType": "NPK 15-30-15",
+        "applicationRate": 10,
+        "frequency": "bi_weekly",
+        "growthStage": "vegetative",
+        "applicationMethod": "foliar_spray",
+        "notes": "Vegetative growth boost"
+      }
+    ],
+    
+    "pesticideSchedule": [
+      {
+        "day": 14,
+        "chemicalType": "Copper fungicide",
+        "applicationRate": 15,
+        "frequency": "preventive",
+        "growthStage": "seedling",
+        "applicationMethod": "foliar_spray",
+        "safetyRequirements": "Gloves, mask, eye protection",
+        "reEntryInterval": 12,
+        "harvestRestriction": 7,
+        "notes": "Preventive blight control"
+      }
+    ],
+    
+    "growthTimeline": {
+      "germinationTime": 7,
+      "daysToMaturity": 75,
+      "harvestWindow": 45,
+      "seasonalPlanting": ["Mar", "Apr", "May", "Jun"],
+      "germinationDays": 7,
+      "seedlingDays": 14,
+      "vegetativeDays": 28,
+      "floweringDays": 14,
+      "fruitingDays": 45,
+      "totalDays": 75
+    },
+    
+    "yieldInfo": {
+      "expectedYieldPerPlant": 3.5,
+      "yieldPerSquareMeter": 8.5,
+      "yieldUnit": "kg",
+      "harvestWindow": 45,
+      "shelfLife": 14,
+      "qualityMetrics": {
+        "size": "Small cherry size (2-3cm diameter)",
+        "color": "Deep red when ripe",
+        "texture": "Firm, smooth skin",
+        "brix": 8.5
+      }
+    },
+    
+    "resourceRequirements": {
+      "seedsPerUnit": 1,
+      "fertilizerType": ["NPK 10-10-10", "NPK 15-30-15", "NPK 5-15-30"],
+      "fertilizerAmount": 0.5,
+      "pesticideType": ["Copper fungicide", "Neem oil"],
+      "pesticideAmount": 15,
+      "spaceRequirement": {
+        "width": 60,
+        "length": 60,
+        "height": 180
+      }
+    },
+    
+    "marketInfo": {
+      "basePrice": 4.50,
+      "priceUnit": "kg",
+      "seasonality": {
+        "peakSeason": ["Jun", "Jul", "Aug", "Sep"],
+        "offSeason": ["Dec", "Jan", "Feb"]
+      },
+      "demandLevel": "high"
+    },
+    
+    "qualityStandards": {
+      "size": {
+        "min": 2,
+        "max": 3,
+        "unit": "cm"
+      },
+      "color": ["Red", "Deep red", "Crimson"],
+      "texture": ["Firm", "Smooth", "Glossy"],
+      "defects": ["Cracks", "Bruises", "Soft spots", "Discoloration"]
+    },
+    
+    "environmentalImpact": {
+      "waterFootprint": 214,
+      "carbonFootprint": 2.3,
+      "sustainabilityScore": 7
+    }
+  },
+  {
+    "name": "Lettuce (Romaine)",
+    "scientificName": "Lactuca sativa var. longifolia",
+    "variety": "Parris Island Cos",
+    "category": "vegetable",
+    "family": "Asteraceae",
+    
+    "growthCharacteristics": {
+      "height": 30,
+      "spread": 25,
+      "rootDepth": 20,
+      "lifecycle": "annual"
+    },
+    
+    "growingRequirements": {
+      "soilType": "Rich, well-drained soil",
+      "temperature": {
+        "min": 4,
+        "max": 24,
+        "optimal": 16
+      },
+      "humidity": {
+        "min": 60,
+        "max": 80,
+        "optimal": 70
+      },
+      "lightRequirements": "partial_shade",
+      "lightHours": {
+        "min": 4,
+        "max": 6,
+        "optimal": 5
+      },
+      "soilPh": {
+        "min": 6.0,
+        "max": 7.0,
+        "optimal": 6.5
+      },
+      "waterRequirements": {
+        "level": "high",
+        "daily": 1.5,
+        "frequency": "daily"
+      }
+    },
+    
+    "fertilizerSchedule": [
+      {
+        "day": 10,
+        "fertilizerType": "NPK 20-20-20",
+        "applicationRate": 3,
+        "frequency": "weekly",
+        "growthStage": "seedling",
+        "applicationMethod": "soil_drench",
+        "notes": "Early growth support"
+      }
+    ],
+    
+    "pesticideSchedule": [
+      {
+        "day": 15,
+        "chemicalType": "Bacillus thuringiensis",
+        "applicationRate": 10,
+        "frequency": "preventive",
+        "growthStage": "vegetative",
+        "applicationMethod": "foliar_spray",
+        "safetyRequirements": "Gloves, mask",
+        "reEntryInterval": 4,
+        "harvestRestriction": 0,
+        "notes": "Organic pest control"
+      }
+    ],
+    
+    "growthTimeline": {
+      "germinationTime": 7,
+      "daysToMaturity": 70,
+      "harvestWindow": 14,
+      "seasonalPlanting": ["Mar", "Apr", "Sep", "Oct"],
+      "germinationDays": 7,
+      "seedlingDays": 14,
+      "vegetativeDays": 49,
+      "floweringDays": 0,
+      "fruitingDays": 0,
+      "totalDays": 70
+    },
+    
+    "yieldInfo": {
+      "expectedYieldPerPlant": 0.8,
+      "yieldPerSquareMeter": 2.5,
+      "yieldUnit": "kg",
+      "harvestWindow": 14,
+      "shelfLife": 7,
+      "qualityMetrics": {
+        "size": "Large romaine head (25-30cm length)",
+        "color": "Dark green outer leaves, light green inner",
+        "texture": "Crisp, crunchy leaves",
+        "brix": 3.2
+      }
+    },
+    
+    "resourceRequirements": {
+      "seedsPerUnit": 1,
+      "fertilizerType": ["NPK 20-20-20"],
+      "fertilizerAmount": 0.2,
+      "pesticideType": ["Bacillus thuringiensis"],
+      "pesticideAmount": 5,
+      "spaceRequirement": {
+        "width": 25,
+        "length": 25,
+        "height": 30
+      }
+    },
+    
+    "marketInfo": {
+      "basePrice": 2.80,
+      "priceUnit": "kg",
+      "seasonality": {
+        "peakSeason": ["Apr", "May", "Oct", "Nov"],
+        "offSeason": ["Jul", "Aug"]
+      },
+      "demandLevel": "very_high"
+    },
+    
+    "qualityStandards": {
+      "size": {
+        "min": 20,
+        "max": 30,
+        "unit": "cm"
+      },
+      "color": ["Dark green", "Light green", "Mixed"],
+      "texture": ["Crisp", "Crunchy", "Fresh"],
+      "defects": ["Wilting", "Yellowing", "Bolting", "Pest damage"]
+    },
+    
+    "environmentalImpact": {
+      "waterFootprint": 287,
+      "carbonFootprint": 1.8,
+      "sustainabilityScore": 8
+    }
+  }
+]

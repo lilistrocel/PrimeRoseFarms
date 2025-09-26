@@ -32,14 +32,14 @@ The Agronomist inputs comprehensive data for each plant type including:
 - **Application Rate:** Milliliters or grams per plant per application
 - **Frequency:** How often to apply (daily, weekly, bi-weekly, etc.)
 - **Growth Stage:** Which growth stage the fertilizer is for (seedling, vegetative, flowering, fruiting)
-- **Application Method:** Foliar spray, soil drench, injection, etc.
+- **Application Method:** Foliar spray, soil drench, injection, broadcast (validated enum values)
 
 **Pesticide/Chemical Schedule:**
 - **Chemical Types:** Specific pesticides, fungicides, herbicides needed
 - **Application Rate:** Milliliters or grams per plant per application
 - **Frequency:** Application schedule (preventive, curative, as needed)
 - **Growth Stage:** When to apply during plant lifecycle
-- **Application Method:** Spray, dust, injection, etc.
+- **Application Method:** Foliar spray, dust, injection, soil drench (validated enum values)
 - **Safety Requirements:** PPE needed, re-entry intervals, harvest restrictions
 
 **Growth Timeline:**
@@ -82,11 +82,20 @@ The Agronomist inputs comprehensive data for each plant type including:
 
 #### Process Flow
 1. **Agronomist Input:** Enters comprehensive plant data including detailed fertilizer and chemical schedules
-2. **System Validation:** Validates data completeness and consistency
-3. **Integration:** Plant data becomes available for block assignment and planning
-4. **Automated Scheduling:** System generates tasks and schedules based on plant requirements
-5. **Monitoring:** Continuous monitoring against plant requirements
-6. **Optimization:** Data analysis for improving plant care protocols
+2. **System Validation:** Validates data completeness and consistency with automatic error correction
+3. **Enum Validation:** Automatic validation and correction of application methods and month names
+4. **Integration:** Plant data becomes available for block assignment and planning
+5. **Automated Scheduling:** System generates tasks and schedules based on plant requirements
+6. **Monitoring:** Continuous monitoring against plant requirements
+7. **Optimization:** Data analysis for improving plant care protocols
+
+#### Data Validation & Error Prevention
+- **Enum Validation:** Automatic validation of application methods (foliar_spray, soil_drench, injection, broadcast)
+- **Month Validation:** Automatic correction of month names to abbreviated format (Jan, Feb, Mar, etc.)
+- **Error Correction:** Invalid enum values are automatically corrected to valid defaults
+- **Bulk Import:** JSON import system with comprehensive validation and error correction
+- **Form Validation:** Real-time validation during data entry with immediate feedback
+- **Type Safety:** Full TypeScript support with comprehensive type checking
 
 #### Benefits
 - **Standardization:** Consistent plant care across all blocks

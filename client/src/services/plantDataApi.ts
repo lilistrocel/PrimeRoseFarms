@@ -1,356 +1,531 @@
 import axios from 'axios';
-import { IPlantData } from '../types';
-import { testModeService } from '../config/testMode';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
-// Mock plant data for development - comprehensive plant specifications
-const mockPlantData: IPlantData[] = [
-  {
-    _id: 'plant-1',
-    name: 'Tomato (Cherry)',
-    scientificName: 'Solanum lycopersicum var. cerasiforme',
-    family: 'Solanaceae',
-    variety: 'Sweet 100',
-    growthCharacteristics: {
-      height: 1.5,
-      spread: 0.8,
-      rootDepth: 0.3,
-      lifecycle: 'annual'
-    },
-    growingRequirements: {
-      soilType: 'loamy',
-      phRange: { min: 6.0, max: 6.8 },
-      temperatureRange: { min: 18, max: 30, optimal: 24 },
-      humidityRange: { min: 50, max: 70 },
-      lightRequirements: 'full_sun',
-      waterRequirements: 'moderate'
-    },
-    fertilizerSchedule: [
-      {
-        day: 0,
-        fertilizerType: 'NPK 10-10-10',
-        applicationRate: 5,
-        frequency: 'weekly',
-        growthStage: 'seedling',
-        applicationMethod: 'soil_drench'
-      },
-      {
-        day: 14,
-        fertilizerType: 'NPK 15-15-15',
-        applicationRate: 8,
-        frequency: 'bi_weekly',
-        growthStage: 'vegetative',
-        applicationMethod: 'foliar_spray'
-      },
-      {
-        day: 42,
-        fertilizerType: 'NPK 5-10-15',
-        applicationRate: 10,
-        frequency: 'weekly',
-        growthStage: 'flowering',
-        applicationMethod: 'soil_drench'
-      }
-    ],
-    pesticideSchedule: [
-      {
-        day: 7,
-        chemicalType: 'Neem Oil',
-        applicationRate: 2,
-        frequency: 'preventive',
-        growthStage: 'seedling',
-        applicationMethod: 'foliar_spray',
-        safetyRequirements: 'gloves, mask',
-        reEntryInterval: 24,
-        harvestRestriction: 0
-      },
-      {
-        day: 28,
-        chemicalType: 'Bacillus thuringiensis',
-        applicationRate: 1.5,
-        frequency: 'as_needed',
-        growthStage: 'vegetative',
-        applicationMethod: 'foliar_spray',
-        safetyRequirements: 'gloves, protective clothing',
-        reEntryInterval: 12,
-        harvestRestriction: 0
-      }
-    ],
-    growthTimeline: {
-      germinationTime: 7,
-      daysToMaturity: 75,
-      harvestWindow: 14,
-      seasonalPlanting: ['spring', 'summer']
-    },
-    yieldInformation: {
-      expectedYieldPerPlant: 2.5,
-      yieldPerSquareMeter: 8.0,
-      qualityMetrics: {
-        size: '15-20mm diameter',
-        color: 'deep red',
-        texture: 'firm, smooth',
-        brix: 8.5
-      }
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    isActive: true
-  },
-  {
-    _id: 'plant-2',
-    name: 'Lettuce (Romaine)',
-    scientificName: 'Lactuca sativa var. longifolia',
-    family: 'Asteraceae',
-    variety: 'Parris Island',
-    growthCharacteristics: {
-      height: 0.3,
-      spread: 0.25,
-      rootDepth: 0.15,
-      lifecycle: 'annual'
-    },
-    growingRequirements: {
-      soilType: 'well_drained',
-      phRange: { min: 6.0, max: 7.0 },
-      temperatureRange: { min: 4, max: 24, optimal: 18 },
-      humidityRange: { min: 60, max: 80 },
-      lightRequirements: 'partial_shade',
-      waterRequirements: 'high'
-    },
-    fertilizerSchedule: [
-      {
-        day: 0,
-        fertilizerType: 'NPK 20-10-10',
-        applicationRate: 3,
-        frequency: 'weekly',
-        growthStage: 'seedling',
-        applicationMethod: 'soil_drench'
-      },
-      {
-        day: 21,
-        fertilizerType: 'NPK 15-5-10',
-        applicationRate: 4,
-        frequency: 'bi_weekly',
-        growthStage: 'vegetative',
-        applicationMethod: 'foliar_spray'
-      }
-    ],
-    pesticideSchedule: [
-      {
-        day: 14,
-        chemicalType: 'Pyrethrin',
-        applicationRate: 1,
-        frequency: 'preventive',
-        growthStage: 'vegetative',
-        applicationMethod: 'foliar_spray',
-        safetyRequirements: 'gloves, mask',
-        reEntryInterval: 12,
-        harvestRestriction: 1
-      }
-    ],
-    growthTimeline: {
-      germinationTime: 5,
-      daysToMaturity: 45,
-      harvestWindow: 7,
-      seasonalPlanting: ['spring', 'fall']
-    },
-    yieldInformation: {
-      expectedYieldPerPlant: 0.8,
-      yieldPerSquareMeter: 12.0,
-      qualityMetrics: {
-        size: '25-30cm length',
-        color: 'dark green',
-        texture: 'crisp, tender',
-        brix: 3.2
-      }
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    isActive: true
-  },
-  {
-    _id: 'plant-3',
-    name: 'Basil (Sweet)',
-    scientificName: 'Ocimum basilicum',
-    family: 'Lamiaceae',
-    variety: 'Genovese',
-    growthCharacteristics: {
-      height: 0.6,
-      spread: 0.4,
-      rootDepth: 0.2,
-      lifecycle: 'annual'
-    },
-    growingRequirements: {
-      soilType: 'well_drained',
-      phRange: { min: 6.0, max: 7.5 },
-      temperatureRange: { min: 15, max: 28, optimal: 22 },
-      humidityRange: { min: 40, max: 60 },
-      lightRequirements: 'full_sun',
-      waterRequirements: 'moderate'
-    },
-    fertilizerSchedule: [
-      {
-        day: 0,
-        fertilizerType: 'NPK 10-5-5',
-        applicationRate: 2,
-        frequency: 'bi_weekly',
-        growthStage: 'seedling',
-        applicationMethod: 'soil_drench'
-      },
-      {
-        day: 30,
-        fertilizerType: 'NPK 5-10-10',
-        applicationRate: 3,
-        frequency: 'monthly',
-        growthStage: 'vegetative',
-        applicationMethod: 'foliar_spray'
-      }
-    ],
-    pesticideSchedule: [
-      {
-        day: 21,
-        chemicalType: 'Neem Oil',
-        applicationRate: 1.5,
-        frequency: 'preventive',
-        growthStage: 'vegetative',
-        applicationMethod: 'foliar_spray',
-        safetyRequirements: 'gloves',
-        reEntryInterval: 24,
-        harvestRestriction: 0
-      }
-    ],
-    growthTimeline: {
-      germinationTime: 10,
-      daysToMaturity: 60,
-      harvestWindow: 30,
-      seasonalPlanting: ['spring', 'summer']
-    },
-    yieldInformation: {
-      expectedYieldPerPlant: 0.3,
-      yieldPerSquareMeter: 4.0,
-      qualityMetrics: {
-        size: '5-8cm leaves',
-        color: 'bright green',
-        texture: 'tender, aromatic',
-        brix: 4.8
-      }
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    isActive: true
-  }
-];
+// Plant Data Interface
+export interface IPlantData {
+  _id?: string;
+  name: string;
+  scientificName: string;
+  variety: string;
+  category: 'vegetable' | 'fruit' | 'herb' | 'flower' | 'grain' | 'legume' | 'other';
+  
+  // Basic Plant Information
+  family: string;
+  growthCharacteristics: {
+    height: number; // cm
+    spread: number; // cm
+    rootDepth: number; // cm
+    lifecycle: 'annual' | 'perennial' | 'biennial';
+  };
+  
+  // Advanced Growing Requirements
+  growingRequirements: {
+    soilType: string;
+    temperature: {
+      min: number;
+      max: number;
+      optimal: number;
+    };
+    humidity: {
+      min: number;
+      max: number;
+      optimal: number;
+    };
+    lightRequirements: 'full_sun' | 'partial_shade' | 'shade';
+    lightHours: {
+      min: number;
+      max: number;
+      optimal: number;
+    };
+    soilPh: {
+      min: number;
+      max: number;
+      optimal: number;
+    };
+    waterRequirements: {
+      level: 'low' | 'moderate' | 'high';
+      daily: number;
+      frequency: 'daily' | 'every_other_day' | 'twice_weekly' | 'weekly';
+    };
+  };
+  
+  // Detailed Fertilizer Schedule
+  fertilizerSchedule: Array<{
+    day: number; // Days after planting
+    fertilizerType: string; // NPK ratios, micronutrients
+    applicationRate: number; // ml or g per plant
+    frequency: 'daily' | 'weekly' | 'bi_weekly' | 'monthly';
+    growthStage: 'seedling' | 'vegetative' | 'flowering' | 'fruiting' | 'harvest';
+    applicationMethod: 'foliar_spray' | 'soil_drench' | 'injection' | 'broadcast';
+    notes?: string;
+  }>;
+  
+  // Detailed Pesticide/Chemical Schedule
+  pesticideSchedule: Array<{
+    day: number; // Days after planting
+    chemicalType: string; // Pesticide, fungicide, herbicide
+    applicationRate: number; // ml or g per plant
+    frequency: 'preventive' | 'curative' | 'as_needed';
+    growthStage: 'seedling' | 'vegetative' | 'flowering' | 'fruiting' | 'harvest';
+    applicationMethod: 'foliar_spray' | 'dust' | 'injection' | 'soil_drench';
+    safetyRequirements: string; // PPE needed
+    reEntryInterval: number; // Hours
+    harvestRestriction: number; // Days before harvest
+    notes?: string;
+  }>;
+  
+  // Enhanced Growth Timeline
+  growthTimeline: {
+    germinationTime: number; // Days
+    daysToMaturity: number; // Days
+    harvestWindow: number; // Days
+    seasonalPlanting: string[]; // Months
+    germinationDays: number;
+    seedlingDays: number;
+    vegetativeDays: number;
+    floweringDays: number;
+    fruitingDays: number;
+    totalDays: number;
+  };
+  
+  // Enhanced Yield Information
+  yieldInfo: {
+    expectedYieldPerPlant: number;
+    yieldPerSquareMeter: number; // kg per m²
+    yieldUnit: 'kg' | 'units' | 'bunches' | 'heads';
+    harvestWindow: number;
+    shelfLife: number;
+    qualityMetrics: {
+      size: string; // Size description
+      color: string; // Expected color
+      texture: string; // Expected texture
+      brix: number; // Sugar content for fruits
+    };
+  };
+  
+  // Resource Requirements
+  resourceRequirements: {
+    seedsPerUnit: number;
+    fertilizerType: string[];
+    fertilizerAmount: number;
+    pesticideType: string[];
+    pesticideAmount: number;
+    spaceRequirement: {
+      width: number;
+      length: number;
+      height: number;
+    };
+  };
+  
+  // Market Information
+  marketInfo: {
+    basePrice: number;
+    priceUnit: 'kg' | 'units' | 'bunches' | 'heads';
+    seasonality: {
+      peakSeason: string[];
+      offSeason: string[];
+    };
+    demandLevel: 'low' | 'medium' | 'high' | 'very_high';
+  };
+  
+  // Quality Standards
+  qualityStandards: {
+    size: {
+      min: number;
+      max: number;
+      unit: 'cm' | 'mm' | 'g';
+    };
+    color: string[];
+    texture: string[];
+    defects: string[];
+  };
+  
+  // Environmental Impact
+  environmentalImpact: {
+    waterFootprint: number;
+    carbonFootprint: number;
+    sustainabilityScore: number;
+  };
+  
+  // Metadata
+  isActive: boolean;
+  createdBy: string;
+  lastModifiedBy: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IPlantDataFilters {
+  page?: number;
+  limit?: number;
+  category?: string;
+  search?: string;
+  isActive?: boolean | 'all';
+}
+
+export interface IPlantDataResponse {
+  success: boolean;
+  data: {
+    plants: IPlantData[];
+    pagination: {
+      currentPage: number;
+      totalPages: number;
+      totalItems: number;
+      itemsPerPage: number;
+    };
+  };
+}
+
+export interface IPlantDataSingleResponse {
+  success: boolean;
+  data: {
+    plant: IPlantData;
+  };
+}
+
+export interface ICategoriesResponse {
+  success: boolean;
+  data: {
+    categories: string[];
+  };
+}
 
 class PlantDataApi {
   private getAuthHeader() {
     const token = localStorage.getItem('token');
-    return {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    };
+    return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
-  async getPlantData(farmId?: string): Promise<IPlantData[]> {
-    if (testModeService.isTestMode() && !testModeService.useRealData('plant-data')) {
-      console.log('🔧 Using mock plant data for plant-data');
-      return Promise.resolve(farmId ? mockPlantData.filter(p => p.isActive) : mockPlantData);
-    }
-    console.log('🔧 Using real plant data from API for plant-data');
+  /**
+   * Get all plant data with filtering and pagination
+   */
+  async getPlantData(filters: IPlantDataFilters = {}): Promise<IPlantDataResponse> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/v1/plants`, {
-        headers: this.getAuthHeader(),
-        params: { farmId }
-      });
-      return response.data.data;
-    } catch (error) {
-      console.error('Error fetching plant data:', error);
-      throw error;
-    }
-  }
-
-  async createPlantData(plantData: Omit<IPlantData, '_id' | 'createdAt' | 'updatedAt' | 'isActive'>): Promise<IPlantData> {
-    if (testModeService.isTestMode() && !testModeService.useRealData('plant-data')) {
-      console.log('🔧 Using mock plant creation');
-      const newPlant = { 
-        ...plantData, 
-        _id: `mock-${Date.now()}`, 
-        isActive: true, 
-        createdAt: new Date().toISOString(), 
-        updatedAt: new Date().toISOString() 
-      } as IPlantData;
-      mockPlantData.push(newPlant);
-      return Promise.resolve(newPlant);
-    }
-    try {
-      const response = await axios.post(`${API_BASE_URL}/api/v1/plants`, plantData, {
-        headers: this.getAuthHeader()
-      });
-      return response.data.data;
-    } catch (error) {
-      console.error('Error creating plant data:', error);
-      throw error;
-    }
-  }
-
-  async updatePlantData(id: string, plantData: Partial<IPlantData>): Promise<IPlantData> {
-    if (testModeService.isTestMode() && !testModeService.useRealData('plant-data')) {
-      console.log('🔧 Using mock plant update');
-      const index = mockPlantData.findIndex(p => p._id === id);
-      if (index > -1) {
-        mockPlantData[index] = { ...mockPlantData[index], ...plantData, updatedAt: new Date().toISOString() };
-        return Promise.resolve(mockPlantData[index]);
+      const params = new URLSearchParams();
+      
+      if (filters.page) params.append('page', filters.page.toString());
+      if (filters.limit) params.append('limit', filters.limit.toString());
+      if (filters.category) params.append('category', filters.category);
+      if (filters.search) params.append('search', filters.search);
+      if (filters.isActive !== undefined) {
+        params.append('isActive', filters.isActive === 'all' ? 'all' : filters.isActive.toString());
       }
-      throw new Error('Mock plant not found');
-    }
-    try {
-      const response = await axios.put(`${API_BASE_URL}/api/v1/plants/${id}`, plantData, {
+
+      const response = await axios.get(`${API_BASE_URL}/api/v1/plant-data?${params.toString()}`, {
         headers: this.getAuthHeader()
       });
-      return response.data.data;
-    } catch (error) {
-      console.error('Error updating plant data:', error);
-      throw error;
+
+      return response.data;
+    } catch (error: any) {
+      console.error('Failed to get plant data:', error);
+      throw new Error(error.response?.data?.message || 'Failed to get plant data');
     }
   }
 
-  async deletePlantData(id: string): Promise<void> {
-    if (testModeService.isTestMode() && !testModeService.useRealData('plant-data')) {
-      console.log('🔧 Using mock plant deletion');
-      const index = mockPlantData.findIndex(p => p._id === id);
-      if (index > -1) {
-        mockPlantData.splice(index, 1);
-        return Promise.resolve();
-      }
-      throw new Error('Mock plant not found');
-    }
+  /**
+   * Get specific plant data by ID
+   */
+  async getPlantDataById(id: string): Promise<IPlantDataSingleResponse> {
     try {
-      await axios.delete(`${API_BASE_URL}/api/v1/plants/${id}`, {
+      const response = await axios.get(`${API_BASE_URL}/api/v1/plant-data/${id}`, {
         headers: this.getAuthHeader()
       });
-    } catch (error) {
-      console.error('Error deleting plant data:', error);
-      throw error;
+
+      return response.data;
+    } catch (error: any) {
+      console.error('Failed to get plant data by ID:', error);
+      throw new Error(error.response?.data?.message || 'Failed to get plant data');
     }
   }
 
-  async getPlantDataById(id: string): Promise<IPlantData> {
-    if (testModeService.isTestMode() && !testModeService.useRealData('plant-data')) {
-      console.log('🔧 Using mock plant data by ID');
-      const plant = mockPlantData.find(p => p._id === id);
-      if (!plant) {
-        throw new Error('Mock plant not found');
-      }
-      return Promise.resolve(plant);
-    }
+  /**
+   * Create new plant data
+   */
+  async createPlantData(plantData: Partial<IPlantData>): Promise<IPlantDataSingleResponse> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/v1/plants/${id}`, {
+      console.log('API: Sending plant data:', plantData);
+      const response = await axios.post(`${API_BASE_URL}/api/v1/plant-data`, plantData, {
         headers: this.getAuthHeader()
       });
-      return response.data.data;
-    } catch (error) {
-      console.error('Error fetching plant data by ID:', error);
-      throw error;
+
+      return response.data;
+    } catch (error: any) {
+      console.error('Failed to create plant data:', error);
+      throw new Error(error.response?.data?.message || 'Failed to create plant data');
     }
+  }
+
+  /**
+   * Update plant data
+   */
+  async updatePlantData(id: string, plantData: Partial<IPlantData>): Promise<IPlantDataSingleResponse> {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/api/v1/plant-data/${id}`, plantData, {
+        headers: this.getAuthHeader()
+      });
+
+      return response.data;
+    } catch (error: any) {
+      console.error('Failed to update plant data:', error);
+      throw new Error(error.response?.data?.message || 'Failed to update plant data');
+    }
+  }
+
+  /**
+   * Soft delete plant data (set isActive to false)
+   */
+  async deletePlantData(id: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await axios.delete(`${API_BASE_URL}/api/v1/plant-data/${id}`, {
+        headers: this.getAuthHeader()
+      });
+
+      return response.data;
+    } catch (error: any) {
+      console.error('Failed to delete plant data:', error);
+      throw new Error(error.response?.data?.message || 'Failed to delete plant data');
+    }
+  }
+
+  /**
+   * Get all plant categories
+   */
+  async getCategories(): Promise<ICategoriesResponse> {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/v1/plant-data/categories`, {
+        headers: this.getAuthHeader()
+      });
+
+      return response.data;
+    } catch (error: any) {
+      console.error('Failed to get plant categories:', error);
+      throw new Error(error.response?.data?.message || 'Failed to get plant categories');
+    }
+  }
+
+  /**
+   * Get mock plant data for development/testing
+   */
+  getMockPlantData(): IPlantData[] {
+    return [
+      {
+        _id: '1',
+        name: 'Tomato',
+        scientificName: 'Solanum lycopersicum',
+        variety: 'Cherry',
+        category: 'vegetable',
+        family: 'Solanaceae',
+        growthCharacteristics: {
+          height: 150,
+          spread: 60,
+          rootDepth: 45,
+          lifecycle: 'annual'
+        },
+        growingRequirements: {
+          soilType: 'Well-drained loamy soil',
+          temperature: { min: 18, max: 30, optimal: 24 },
+          humidity: { min: 40, max: 70, optimal: 60 },
+          lightRequirements: 'full_sun',
+          lightHours: { min: 6, max: 8, optimal: 7 },
+          soilPh: { min: 6.0, max: 6.8, optimal: 6.5 },
+          waterRequirements: { level: 'moderate', daily: 2.5, frequency: 'daily' }
+        },
+        fertilizerSchedule: [
+          {
+            day: 0,
+            fertilizerType: 'NPK 15-15-15',
+            applicationRate: 5,
+            frequency: 'weekly',
+            growthStage: 'seedling',
+            applicationMethod: 'soil_drench',
+            notes: 'Initial fertilization after transplanting'
+          },
+          {
+            day: 14,
+            fertilizerType: 'NPK 20-10-10',
+            applicationRate: 10,
+            frequency: 'bi_weekly',
+            growthStage: 'vegetative',
+            applicationMethod: 'foliar_spray',
+            notes: 'Boost vegetative growth'
+          }
+        ],
+        pesticideSchedule: [
+          {
+            day: 7,
+            chemicalType: 'Neem Oil',
+            applicationRate: 15,
+            frequency: 'preventive',
+            growthStage: 'seedling',
+            applicationMethod: 'foliar_spray',
+            safetyRequirements: 'Gloves, mask, long sleeves',
+            reEntryInterval: 12,
+            harvestRestriction: 0,
+            notes: 'Preventive pest control'
+          }
+        ],
+        growthTimeline: {
+          germinationTime: 7,
+          daysToMaturity: 115,
+          harvestWindow: 30,
+          seasonalPlanting: ['Mar', 'Apr', 'May'],
+          germinationDays: 7,
+          seedlingDays: 14,
+          vegetativeDays: 35,
+          floweringDays: 14,
+          fruitingDays: 45,
+          totalDays: 115
+        },
+        yieldInfo: {
+          expectedYieldPerPlant: 3.5,
+          yieldPerSquareMeter: 8.5,
+          yieldUnit: 'kg',
+          harvestWindow: 30,
+          shelfLife: 14,
+          qualityMetrics: {
+            size: '2-4cm diameter',
+            color: 'Red',
+            texture: 'Firm and smooth',
+            brix: 6.5
+          }
+        },
+        resourceRequirements: {
+          seedsPerUnit: 1,
+          fertilizerType: ['NPK 15-15-15', 'Compost'],
+          fertilizerAmount: 0.5,
+          pesticideType: ['Neem Oil', 'Copper Fungicide'],
+          pesticideAmount: 10,
+          spaceRequirement: { width: 60, length: 60, height: 150 }
+        },
+        marketInfo: {
+          basePrice: 2.50,
+          priceUnit: 'kg',
+          seasonality: { peakSeason: ['Jun', 'Jul', 'Aug'], offSeason: ['Dec', 'Jan', 'Feb'] },
+          demandLevel: 'high'
+        },
+        qualityStandards: {
+          size: { min: 2, max: 4, unit: 'cm' },
+          color: ['Red', 'Orange', 'Yellow'],
+          texture: ['Firm', 'Smooth'],
+          defects: ['Cracks', 'Bruises', 'Soft spots']
+        },
+        environmentalImpact: {
+          waterFootprint: 214,
+          carbonFootprint: 2.3,
+          sustainabilityScore: 7
+        },
+        isActive: true,
+        createdBy: 'system',
+        lastModifiedBy: 'system',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        _id: '2',
+        name: 'Lettuce',
+        scientificName: 'Lactuca sativa',
+        variety: 'Romaine',
+        category: 'vegetable',
+        family: 'Asteraceae',
+        growthCharacteristics: {
+          height: 30,
+          spread: 25,
+          rootDepth: 20,
+          lifecycle: 'annual'
+        },
+        growingRequirements: {
+          soilType: 'Rich, well-drained soil',
+          temperature: { min: 10, max: 25, optimal: 18 },
+          humidity: { min: 50, max: 80, optimal: 70 },
+          lightRequirements: 'partial_shade',
+          lightHours: { min: 4, max: 6, optimal: 5 },
+          soilPh: { min: 6.0, max: 7.0, optimal: 6.5 },
+          waterRequirements: { level: 'high', daily: 1.0, frequency: 'daily' }
+        },
+        fertilizerSchedule: [
+          {
+            day: 0,
+            fertilizerType: 'Compost',
+            applicationRate: 2,
+            frequency: 'weekly',
+            growthStage: 'seedling',
+            applicationMethod: 'soil_drench',
+            notes: 'Organic matter for soil health'
+          }
+        ],
+        pesticideSchedule: [
+          {
+            day: 5,
+            chemicalType: 'Neem Oil',
+            applicationRate: 8,
+            frequency: 'preventive',
+            growthStage: 'seedling',
+            applicationMethod: 'foliar_spray',
+            safetyRequirements: 'Gloves, mask',
+            reEntryInterval: 4,
+            harvestRestriction: 0,
+            notes: 'Prevent aphids and other pests'
+          }
+        ],
+        growthTimeline: {
+          germinationTime: 5,
+          daysToMaturity: 40,
+          harvestWindow: 14,
+          seasonalPlanting: ['Mar', 'Apr', 'May', 'Sep', 'Oct'],
+          germinationDays: 5,
+          seedlingDays: 10,
+          vegetativeDays: 25,
+          floweringDays: 0,
+          fruitingDays: 0,
+          totalDays: 40
+        },
+        yieldInfo: {
+          expectedYieldPerPlant: 0.5,
+          yieldPerSquareMeter: 2.0,
+          yieldUnit: 'units',
+          harvestWindow: 14,
+          shelfLife: 7,
+          qualityMetrics: {
+            size: '15-25cm length',
+            color: 'Green',
+            texture: 'Crisp and fresh',
+            brix: 2.0
+          }
+        },
+        resourceRequirements: {
+          seedsPerUnit: 1,
+          fertilizerType: ['Compost', 'Fish Emulsion'],
+          fertilizerAmount: 0.2,
+          pesticideType: ['Neem Oil'],
+          pesticideAmount: 5,
+          spaceRequirement: { width: 30, length: 30, height: 30 }
+        },
+        marketInfo: {
+          basePrice: 1.20,
+          priceUnit: 'units',
+          seasonality: { peakSeason: ['Mar', 'Apr', 'May'], offSeason: ['Jul', 'Aug'] },
+          demandLevel: 'very_high'
+        },
+        qualityStandards: {
+          size: { min: 15, max: 25, unit: 'cm' },
+          color: ['Green', 'Red'],
+          texture: ['Crisp', 'Fresh'],
+          defects: ['Wilting', 'Brown spots', 'Yellowing']
+        },
+        environmentalImpact: {
+          waterFootprint: 130,
+          carbonFootprint: 0.8,
+          sustainabilityScore: 8
+        },
+        isActive: true,
+        createdBy: 'system',
+        lastModifiedBy: 'system',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
   }
 }
 
-export const plantDataApi = new PlantDataApi();
+export default new PlantDataApi();
