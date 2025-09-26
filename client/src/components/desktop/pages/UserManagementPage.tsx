@@ -269,14 +269,25 @@ const UserManagementPage: React.FC = () => {
   }
 
   return (
-    <Box p={3}>
-      {/* Header */}
-      <Box display="flex" justifyContent="between" alignItems="center" mb={3}>
+    <Box sx={{ minHeight: '100vh', pb: 4 }}>
+      {/* Header Section */}
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        mb: 4,
+        pb: 2,
+        borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
+      }}>
         <Box>
-          <Typography variant="h4" component="h1" gutterBottom>
+          <Typography variant="h4" component="h1" sx={{ 
+            fontWeight: 700, 
+            color: '#FFFFFF',
+            mb: 1
+          }}>
             User Management
           </Typography>
-          <Typography variant="body1" color="textSecondary">
+          <Typography variant="body1" color="text.secondary">
             Manage farm users, roles, and permissions
           </Typography>
           {testModeService.isTestMode() && (

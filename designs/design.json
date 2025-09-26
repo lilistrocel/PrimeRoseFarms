@@ -1,0 +1,307 @@
+{
+  "designSystem": {
+    "name": "Modern Design System",
+    "version": "1.0.0",
+    "description": "A comprehensive design system extracted from a modern interface",
+    
+    "colorPalette": {
+      "primary": {
+        "background": {
+          "main": "#0F0F23",
+          "secondary": "#1A1A2E",
+          "tertiary": "#16213E"
+        },
+        "surface": {
+          "card": "#1E1E2E",
+          "sidebar": "#0F0F23",
+          "header": "#1A1A2E"
+        }
+      },
+      "accent": {
+        "pink": {
+          "primary": "#E91E63",
+          "secondary": "#F48FB1",
+          "light": "#FCE4EC"
+        },
+        "cyan": {
+          "primary": "#00BCD4",
+          "secondary": "#4DD0E1",
+          "light": "#B2EBF2"
+        },
+        "green": {
+          "primary": "#4CAF50",
+          "secondary": "#81C784",
+          "light": "#C8E6C9"
+        },
+        "purple": {
+          "primary": "#9C27B0",
+          "secondary": "#BA68C8",
+          "light": "#E1BEE7"
+        }
+      },
+      "text": {
+        "primary": "#FFFFFF",
+        "secondary": "#B0B0B0",
+        "tertiary": "#808080",
+        "disabled": "#4A4A4A"
+      },
+      "status": {
+        "success": "#4CAF50",
+        "warning": "#FF9800",
+        "error": "#F44336",
+        "info": "#2196F3"
+      }
+    },
+
+    "typography": {
+      "fontFamily": {
+        "primary": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "monospace": "'Fira Code', 'JetBrains Mono', monospace"
+      },
+      "fontSizes": {
+        "xs": "0.75rem",
+        "sm": "0.875rem",
+        "base": "1rem",
+        "lg": "1.125rem",
+        "xl": "1.25rem",
+        "2xl": "1.5rem",
+        "3xl": "1.875rem",
+        "4xl": "2.25rem"
+      },
+      "fontWeights": {
+        "light": 300,
+        "normal": 400,
+        "medium": 500,
+        "semibold": 600,
+        "bold": 700,
+        "extrabold": 800
+      },
+      "lineHeights": {
+        "tight": 1.2,
+        "normal": 1.5,
+        "relaxed": 1.75
+      }
+    },
+
+    "spacing": {
+      "scale": "0.25rem",
+      "values": {
+        "0": "0",
+        "1": "0.25rem",
+        "2": "0.5rem",
+        "3": "0.75rem",
+        "4": "1rem",
+        "5": "1.25rem",
+        "6": "1.5rem",
+        "8": "2rem",
+        "10": "2.5rem",
+        "12": "3rem",
+        "16": "4rem",
+        "20": "5rem",
+        "24": "6rem"
+      }
+    },
+
+    "layout": {
+      "grid": {
+        "columns": 12,
+        "gutter": "1.5rem",
+        "breakpoints": {
+          "xs": "0px",
+          "sm": "600px",
+          "md": "960px",
+          "lg": "1280px",
+          "xl": "1920px"
+        }
+      },
+      "containers": {
+        "maxWidth": "1200px",
+        "padding": "1rem"
+      },
+      "sidebar": {
+        "width": "280px",
+        "collapsedWidth": "64px"
+      }
+    },
+
+    "components": {
+      "card": {
+        "background": "linear-gradient(135deg, #1E1E2E 0%, #2A2A3E 100%)",
+        "borderRadius": "16px",
+        "padding": "1.5rem",
+        "boxShadow": "0 4px 20px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(233, 30, 99, 0.1)",
+        "border": "1px solid rgba(255, 255, 255, 0.1)",
+        "backdropFilter": "blur(20px)",
+        "hover": {
+          "transform": "translateY(-2px)",
+          "boxShadow": "0 8px 32px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(233, 30, 99, 0.15)"
+        }
+      },
+
+      "button": {
+        "primary": {
+          "background": "linear-gradient(135deg, #E91E63 0%, #C2185B 100%)",
+          "color": "#FFFFFF",
+          "borderRadius": "12px",
+          "padding": "0.75rem 1.5rem",
+          "fontWeight": 600,
+          "boxShadow": "0 4px 16px rgba(233, 30, 99, 0.3)",
+          "hover": {
+            "transform": "translateY(-1px)",
+            "boxShadow": "0 6px 20px rgba(233, 30, 99, 0.4)"
+          }
+        },
+        "secondary": {
+          "background": "rgba(255, 255, 255, 0.1)",
+          "color": "#FFFFFF",
+          "border": "1px solid rgba(255, 255, 255, 0.2)",
+          "borderRadius": "12px",
+          "padding": "0.75rem 1.5rem",
+          "hover": {
+            "background": "rgba(255, 255, 255, 0.15)"
+          }
+        }
+      },
+
+      "input": {
+        "background": "rgba(255, 255, 255, 0.05)",
+        "border": "1px solid rgba(255, 255, 255, 0.1)",
+        "borderRadius": "12px",
+        "padding": "0.75rem 1rem",
+        "color": "#FFFFFF",
+        "placeholder": "#808080",
+        "focus": {
+          "border": "2px solid #E91E63",
+          "boxShadow": "0 0 0 3px rgba(233, 30, 99, 0.1)"
+        }
+      },
+
+      "navigation": {
+        "sidebar": {
+          "background": "#0F0F23",
+          "borderRight": "1px solid rgba(255, 255, 255, 0.1)",
+          "item": {
+            "padding": "0.75rem 1rem",
+            "borderRadius": "8px",
+            "margin": "0.25rem 0",
+            "color": "#B0B0B0",
+            "active": {
+              "background": "rgba(233, 30, 99, 0.15)",
+              "color": "#FFFFFF",
+              "borderLeft": "3px solid #E91E63"
+            },
+            "hover": {
+              "background": "rgba(255, 255, 255, 0.05)",
+              "color": "#FFFFFF"
+            }
+          }
+        }
+      },
+
+      "chart": {
+        "background": "transparent",
+        "grid": {
+          "color": "rgba(255, 255, 255, 0.1)",
+          "width": "1px"
+        },
+        "axis": {
+          "color": "#B0B0B0",
+          "fontSize": "0.75rem"
+        },
+        "tooltip": {
+          "background": "rgba(0, 0, 0, 0.8)",
+          "border": "1px solid rgba(255, 255, 255, 0.2)",
+          "borderRadius": "8px",
+          "padding": "0.5rem 0.75rem",
+          "color": "#FFFFFF",
+          "fontSize": "0.875rem"
+        }
+      },
+
+      "progressBar": {
+        "background": "rgba(255, 255, 255, 0.1)",
+        "borderRadius": "8px",
+        "height": "8px",
+        "fill": {
+          "background": "linear-gradient(90deg, #E91E63 0%, #9C27B0 100%)",
+          "borderRadius": "8px"
+        }
+      },
+
+      "avatar": {
+        "size": {
+          "sm": "32px",
+          "md": "48px",
+          "lg": "64px",
+          "xl": "80px"
+        },
+        "borderRadius": "50%",
+        "border": "2px solid rgba(255, 255, 255, 0.2)"
+      },
+
+      "chip": {
+        "background": "rgba(255, 255, 255, 0.1)",
+        "color": "#FFFFFF",
+        "borderRadius": "20px",
+        "padding": "0.25rem 0.75rem",
+        "fontSize": "0.75rem",
+        "fontWeight": 500,
+        "border": "1px solid rgba(255, 255, 255, 0.2)"
+      }
+    },
+
+    "effects": {
+      "shadows": {
+        "sm": "0 2px 4px rgba(0, 0, 0, 0.1)",
+        "md": "0 4px 8px rgba(0, 0, 0, 0.15)",
+        "lg": "0 8px 16px rgba(0, 0, 0, 0.2)",
+        "xl": "0 16px 32px rgba(0, 0, 0, 0.25)",
+        "glow": "0 0 20px rgba(233, 30, 99, 0.3)"
+      },
+      "gradients": {
+        "primary": "linear-gradient(135deg, #E91E63 0%, #9C27B0 50%, #00BCD4 100%)",
+        "surface": "linear-gradient(135deg, #1E1E2E 0%, #2A2A3E 100%)",
+        "glass": "linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)"
+      },
+      "blur": {
+        "sm": "4px",
+        "md": "8px",
+        "lg": "16px",
+        "xl": "24px"
+      }
+    },
+
+    "animations": {
+      "duration": {
+        "fast": "0.15s",
+        "normal": "0.3s",
+        "slow": "0.5s"
+      },
+      "easing": {
+        "easeInOut": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "easeOut": "cubic-bezier(0, 0, 0.2, 1)",
+        "easeIn": "cubic-bezier(0.4, 0, 1, 1)"
+      },
+      "transitions": {
+        "hover": "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        "focus": "all 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
+        "slide": "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+      }
+    },
+
+    "accessibility": {
+      "contrast": {
+        "minimum": "4.5:1",
+        "enhanced": "7:1"
+      },
+      "focus": {
+        "outline": "2px solid #E91E63",
+        "outlineOffset": "2px"
+      },
+      "motion": {
+        "respectsReducedMotion": true,
+        "prefersReducedMotion": "animation: none"
+      }
+    }
+  }
+}

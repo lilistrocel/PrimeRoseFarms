@@ -284,15 +284,48 @@ const FarmManagementPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" component="h1" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <FarmIcon />
-          Farm Management
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Welcome, {user?.firstName} {user?.lastName}
-        </Typography>
+    <Box sx={{ minHeight: '100vh', pb: 4 }}>
+      {/* Header Section */}
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        mb: 4,
+        pb: 2,
+        borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
+      }}>
+        <Box>
+          <Typography variant="h4" component="h1" sx={{ 
+            fontWeight: 700, 
+            color: '#FFFFFF',
+            mb: 1
+          }}>
+            Farm Management
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Manage your farms, blocks, and agricultural operations
+          </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          <Chip 
+            icon={<FarmIcon />} 
+            label={`${farms.length} Farms`} 
+            sx={{ 
+              backgroundColor: '#E91E63', 
+              color: '#FFFFFF',
+              '&:hover': { backgroundColor: '#C2185B' }
+            }}
+          />
+          <Chip 
+            icon={<BlockIcon />} 
+            label={`${blocks.length} Blocks`} 
+            sx={{ 
+              backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+              color: '#FFFFFF',
+              border: '1px solid rgba(255, 255, 255, 0.2)'
+            }}
+          />
+        </Box>
       </Box>
 
       {error && (

@@ -25,7 +25,7 @@ import {
   Paper,
   IconButton,
   Chip,
-  CircularProgress,
+  LinearProgress,
   Alert,
   Accordion,
   AccordionSummary,
@@ -42,17 +42,16 @@ import {
   Schedule as ScheduleIcon,
   Timeline as TimelineIcon,
   Assessment as AssessmentIcon,
-  LocalFlorist as FlowerIcon,
+  LocalFlorist,
   WaterDrop as WaterIcon,
   WbSunny as SunIcon,
   Thermostat as TempIcon
 } from '@mui/icons-material';
-import { useAppSelector } from '../../../store';
+// import { useAppSelector } from '../../../store';
 import { IPlantData } from '../../../types';
 import { plantDataApi } from '../../../services/plantDataApi';
 
 const PlantDataPage: React.FC = () => {
-  const user = useAppSelector(state => state.auth.user);
   const [activeTab, setActiveTab] = useState(0);
   const [plantData, setPlantData] = useState<IPlantData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -218,45 +217,68 @@ const PlantDataPage: React.FC = () => {
     }
   };
 
-  const addFertilizerSchedule = () => {
-    const newSchedule = {
-      day: 0,
-      fertilizerType: '',
-      applicationRate: 0,
-      frequency: 'weekly' as const,
-      growthStage: 'seedling' as const,
-      applicationMethod: 'soil_drench' as const
-    };
-    setPlantForm({
-      ...plantForm,
-      fertilizerSchedule: [...(plantForm.fertilizerSchedule || []), newSchedule]
-    });
-  };
-
-  const addPesticideSchedule = () => {
-    const newSchedule = {
-      day: 0,
-      chemicalType: '',
-      applicationRate: 0,
-      frequency: 'preventive' as const,
-      growthStage: 'seedling' as const,
-      applicationMethod: 'foliar_spray' as const,
-      safetyRequirements: '',
-      reEntryInterval: 24,
-      harvestRestriction: 0
-    };
-    setPlantForm({
-      ...plantForm,
-      pesticideSchedule: [...(plantForm.pesticideSchedule || []), newSchedule]
-    });
-  };
 
   return (
-    <Box sx={{ flexGrow: 1, p: 3 }}>
-      <Typography variant="h4" gutterBottom>Plant Data Management</Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        Define plant specifications, care requirements, and growth schedules per Process Flow #1.
-      </Typography>
+    <Box sx={{ minHeight: '100vh', pb: 4 }}>
+      {/* Hero Section */}
+      <Box sx={{ 
+        background: 'linear-gradient(135deg, rgba(0,212,170,0.1) 0%, rgba(255,107,107,0.05) 100%)',
+        borderRadius: 3,
+        p: 4,
+        mb: 4,
+        border: '1px solid rgba(0,212,170,0.2)',
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: '200px',
+          height: '200px',
+          background: 'radial-gradient(circle, rgba(0,212,170,0.1) 0%, transparent 70%)',
+          borderRadius: '50%',
+          transform: 'translate(50%, -50%)',
+        }
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+          <Box>
+            <Typography variant="h4" component="h1" sx={{ 
+              fontWeight: 700, 
+              color: '#FFFFFF',
+              mb: 1
+            }}>
+              Plant Data Management
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+              Define plant specifications, care requirements, and growth schedules
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+              <Chip 
+                icon={<ScienceIcon />} 
+                label={`${plantData.length} Plant Varieties`} 
+                color="primary" 
+                variant="outlined"
+                sx={{ borderColor: '#00D4AA', color: '#00D4AA' }}
+              />
+              <Chip 
+                icon={<ScheduleIcon />} 
+                label="Growth Schedules" 
+                variant="outlined"
+                sx={{ borderColor: 'rgba(255,255,255,0.3)', color: 'text.secondary' }}
+              />
+            </Box>
+          </Box>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="h2" sx={{ fontWeight: 700, color: '#00D4AA', mb: 0 }}>
+              {plantData.length}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Active Plants
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
       
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
@@ -264,40 +286,261 @@ const PlantDataPage: React.FC = () => {
         </Alert>
       )}
 
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={activeTab} onChange={handleTabChange} aria-label="plant data management tabs">
-          <Tab 
-            icon={<PlantIcon />} 
-            label="Plant Overview" 
-            iconPosition="start"
-          />
-          <Tab 
-            icon={<ScienceIcon />} 
-            label="Growing Requirements" 
-            iconPosition="start"
-          />
-          <Tab 
-            icon={<ScheduleIcon />} 
-            label="Fertilizer Schedule" 
-            iconPosition="start"
-          />
-          <Tab 
-            icon={<ScienceIcon />} 
-            label="Pesticide Schedule" 
-            iconPosition="start"
-          />
-          <Tab 
-            icon={<TimelineIcon />} 
-            label="Growth Timeline" 
-            iconPosition="start"
-          />
-          <Tab 
-            icon={<AssessmentIcon />} 
-            label="Yield Information" 
-            iconPosition="start"
-          />
-        </Tabs>
+      {/* Quick Stats Grid */}
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mb: 4 }}>
+        <Card sx={{ 
+          flex: '1 1 200px', 
+          minWidth: '200px',
+          background: 'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%)',
+          border: '1px solid rgba(0,212,170,0.2)',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '3px',
+            background: 'linear-gradient(90deg, #00D4AA, #4DD0E1)',
+          }
+        }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: '#00D4AA' }}>
+                {plantData.length}
+              </Typography>
+              <LocalFlorist sx={{ color: '#00D4AA', fontSize: '2rem' }} />
+            </Box>
+            <Typography variant="body2" color="text.secondary">Plant Varieties</Typography>
+            <Typography variant="caption" sx={{ color: '#4CAF50' }}>Active in system</Typography>
+          </CardContent>
+        </Card>
+
+        <Card sx={{ 
+          flex: '1 1 200px', 
+          minWidth: '200px',
+          background: 'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%)',
+          border: '1px solid rgba(255,107,107,0.2)',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '3px',
+            background: 'linear-gradient(90deg, #FF6B6B, #FF8A80)',
+          }
+        }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: '#FF6B6B' }}>
+                {plantData.reduce((acc, plant) => acc + (plant.fertilizerSchedule?.length || 0), 0)}
+              </Typography>
+              <ScheduleIcon sx={{ color: '#FF6B6B', fontSize: '2rem' }} />
+            </Box>
+            <Typography variant="body2" color="text.secondary">Fertilizer Schedules</Typography>
+            <Typography variant="caption" sx={{ color: '#4CAF50' }}>Across all plants</Typography>
+          </CardContent>
+        </Card>
+
+        <Card sx={{ 
+          flex: '1 1 200px', 
+          minWidth: '200px',
+          background: 'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%)',
+          border: '1px solid rgba(33,150,243,0.2)',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '3px',
+            background: 'linear-gradient(90deg, #2196F3, #64B5F6)',
+          }
+        }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: '#2196F3' }}>
+                {plantData.reduce((acc, plant) => acc + (plant.pesticideSchedule?.length || 0), 0)}
+              </Typography>
+              <ScienceIcon sx={{ color: '#2196F3', fontSize: '2rem' }} />
+            </Box>
+            <Typography variant="body2" color="text.secondary">Pesticide Schedules</Typography>
+            <Typography variant="caption" sx={{ color: '#4CAF50' }}>Safety protocols</Typography>
+          </CardContent>
+        </Card>
+
+        <Card sx={{ 
+          flex: '1 1 200px', 
+          minWidth: '200px',
+          background: 'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%)',
+          border: '1px solid rgba(76,175,80,0.2)',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '3px',
+            background: 'linear-gradient(90deg, #4CAF50, #81C784)',
+          }
+        }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: '#4CAF50' }}>
+                {Math.round(plantData.reduce((acc, plant) => acc + (plant.growthTimeline?.daysToMaturity || 0), 0) / plantData.length) || 0}
+              </Typography>
+              <TimelineIcon sx={{ color: '#4CAF50', fontSize: '2rem' }} />
+            </Box>
+            <Typography variant="body2" color="text.secondary">Avg. Maturity (Days)</Typography>
+            <Typography variant="caption" sx={{ color: '#4CAF50' }}>Growth timeline</Typography>
+          </CardContent>
+        </Card>
       </Box>
+
+      {/* Main Content Grid */}
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mb: 4 }}>
+        {/* Plant Categories */}
+        <Card sx={{ 
+          flex: '1 1 300px', 
+          minWidth: '300px',
+          background: 'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%)',
+          border: '1px solid rgba(255,255,255,0.1)',
+        }}>
+          <CardContent>
+            <Typography variant="h6" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <ScienceIcon color="primary" />
+              Plant Categories
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {[
+                { name: 'Vegetables', count: plantData.filter(p => p.family === 'Solanaceae' || p.family === 'Asteraceae').length, color: '#00D4AA' },
+                { name: 'Herbs', count: plantData.filter(p => p.family === 'Lamiaceae').length, color: '#FF6B6B' },
+                { name: 'Fruits', count: plantData.filter(p => p.name.toLowerCase().includes('tomato')).length, color: '#2196F3' },
+                { name: 'Leafy Greens', count: plantData.filter(p => p.name.toLowerCase().includes('lettuce')).length, color: '#4CAF50' },
+              ].map((category, index) => (
+                <Box key={index} sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'space-between',
+                  p: 2, 
+                  borderRadius: 2,
+                  background: 'rgba(255,255,255,0.02)',
+                  border: '1px solid rgba(255,255,255,0.05)',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    background: 'rgba(255,255,255,0.05)',
+                    transform: 'translateX(4px)',
+                  }
+                }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Box sx={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: category.color }} />
+                    <Typography variant="body2">{category.name}</Typography>
+                  </Box>
+                  <Typography variant="h6" sx={{ color: category.color, fontWeight: 700 }}>
+                    {category.count}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions */}
+        <Card sx={{ 
+          flex: '1 1 300px', 
+          minWidth: '300px',
+          background: 'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%)',
+          border: '1px solid rgba(255,255,255,0.1)',
+        }}>
+          <CardContent>
+            <Typography variant="h6" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <AssessmentIcon color="primary" />
+              Quick Actions
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {[
+                { icon: <AddIcon />, text: "Add New Plant", color: "#00D4AA", action: () => { setSelectedPlant(null); setPlantForm({}); setPlantDialogOpen(true); } },
+                { icon: <ScienceIcon />, text: "View Requirements", color: "#FF6B6B", action: () => setActiveTab(1) },
+                { icon: <ScheduleIcon />, text: "Fertilizer Schedule", color: "#2196F3", action: () => setActiveTab(2) },
+                { icon: <TimelineIcon />, text: "Growth Timeline", color: "#4CAF50", action: () => setActiveTab(4) },
+                { icon: <AssessmentIcon />, text: "Yield Analysis", color: "#FFB74D", action: () => setActiveTab(5) },
+              ].map((action, index) => (
+                <Button
+                  key={index}
+                  variant="outlined"
+                  startIcon={action.icon}
+                  onClick={action.action}
+                  sx={{
+                    justifyContent: 'flex-start',
+                    p: 2,
+                    borderRadius: 2,
+                    borderColor: action.color,
+                    color: action.color,
+                    '&:hover': {
+                      backgroundColor: `${action.color}20`,
+                      borderColor: action.color,
+                      transform: 'translateX(4px)',
+                    },
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  {action.text}
+                </Button>
+              ))}
+            </Box>
+          </CardContent>
+        </Card>
+      </Box>
+
+      {/* Enhanced Tabs Section */}
+      <Card sx={{ 
+        background: 'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%)',
+        border: '1px solid rgba(255,255,255,0.1)',
+        mb: 3
+      }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs value={activeTab} onChange={handleTabChange} aria-label="plant data management tabs">
+            <Tab 
+              icon={<PlantIcon />} 
+              label="Plant Overview" 
+              iconPosition="start"
+            />
+            <Tab 
+              icon={<ScienceIcon />} 
+              label="Growing Requirements" 
+              iconPosition="start"
+            />
+            <Tab 
+              icon={<ScheduleIcon />} 
+              label="Fertilizer Schedule" 
+              iconPosition="start"
+            />
+            <Tab 
+              icon={<ScienceIcon />} 
+              label="Pesticide Schedule" 
+              iconPosition="start"
+            />
+            <Tab 
+              icon={<TimelineIcon />} 
+              label="Growth Timeline" 
+              iconPosition="start"
+            />
+            <Tab 
+              icon={<AssessmentIcon />} 
+              label="Yield Information" 
+              iconPosition="start"
+            />
+          </Tabs>
+        </Box>
+      </Card>
 
       {/* Plant Overview Tab */}
       <TabPanel value={activeTab} index={0}>
@@ -1102,6 +1345,69 @@ const PlantDataPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* System Status Section */}
+      <Card sx={{ 
+        background: 'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%)',
+        border: '1px solid rgba(255,255,255,0.1)',
+      }}>
+        <CardContent>
+          <Typography variant="h6" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <AssessmentIcon color="success" />
+            Plant Data System Status
+          </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+            <Box sx={{ flex: '1 1 200px' }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>Data Integrity</Typography>
+              <LinearProgress 
+                variant="determinate" 
+                value={100} 
+                sx={{ 
+                  height: 8, 
+                  borderRadius: 4,
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  '& .MuiLinearProgress-bar': {
+                    backgroundColor: '#4CAF50',
+                  }
+                }} 
+              />
+              <Typography variant="caption" sx={{ color: '#4CAF50', mt: 0.5, display: 'block' }}>All Data Valid</Typography>
+            </Box>
+            <Box sx={{ flex: '1 1 200px' }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>Schedule Coverage</Typography>
+              <LinearProgress 
+                variant="determinate" 
+                value={85} 
+                sx={{ 
+                  height: 8, 
+                  borderRadius: 4,
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  '& .MuiLinearProgress-bar': {
+                    backgroundColor: '#00D4AA',
+                  }
+                }} 
+              />
+              <Typography variant="caption" sx={{ color: '#00D4AA', mt: 0.5, display: 'block' }}>85% Complete</Typography>
+            </Box>
+            <Box sx={{ flex: '1 1 200px' }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>Growth Tracking</Typography>
+              <LinearProgress 
+                variant="determinate" 
+                value={92} 
+                sx={{ 
+                  height: 8, 
+                  borderRadius: 4,
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  '& .MuiLinearProgress-bar': {
+                    backgroundColor: '#4CAF50',
+                  }
+                }} 
+              />
+              <Typography variant="caption" sx={{ color: '#4CAF50', mt: 0.5, display: 'block' }}>Excellent</Typography>
+            </Box>
+          </Box>
+        </CardContent>
+      </Card>
     </Box>
   );
 };

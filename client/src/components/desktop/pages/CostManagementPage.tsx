@@ -272,11 +272,49 @@ const CostManagementPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, p: 3 }}>
-      <Typography variant="h4" gutterBottom>Cost Management</Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        Define and maintain operational costs for accurate budgeting and profitability analysis per Process Flow #12.
-      </Typography>
+    <Box sx={{ minHeight: '100vh', pb: 4 }}>
+      {/* Header Section */}
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        mb: 4,
+        pb: 2,
+        borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
+      }}>
+        <Box>
+          <Typography variant="h4" component="h1" sx={{ 
+            fontWeight: 700, 
+            color: '#FFFFFF',
+            mb: 1
+          }}>
+            Cost Management
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Define and maintain operational costs for accurate budgeting and profitability analysis
+          </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          <Chip 
+            icon={<MoneyIcon />} 
+            label="Cost Tracking" 
+            sx={{ 
+              backgroundColor: '#E91E63', 
+              color: '#FFFFFF',
+              '&:hover': { backgroundColor: '#C2185B' }
+            }}
+          />
+          <Chip 
+            icon={<LaborIcon />} 
+            label="Labor Costs" 
+            sx={{ 
+              backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+              color: '#FFFFFF',
+              border: '1px solid rgba(255, 255, 255, 0.2)'
+            }}
+          />
+        </Box>
+      </Box>
       
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>

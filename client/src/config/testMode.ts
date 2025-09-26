@@ -14,11 +14,10 @@ export interface TestModeConfig {
 
 // Default test mode configuration
 const defaultTestConfig: TestModeConfig = {
-  enabled: process.env.REACT_APP_TEST_MODE === 'true',
+  enabled: process.env.REACT_APP_TEST_MODE !== 'false', // Default to true unless explicitly disabled
   mockLevel: (process.env.REACT_APP_TEST_LEVEL as 'basic' | 'advanced' | 'full') || 'advanced',
   realDataModules: process.env.REACT_APP_REAL_DATA_MODULES?.split(',') || [
-    'user-management',
-    'authentication'
+    // No modules use real data by default in test mode
   ],
   mockDataSets: {}
 };

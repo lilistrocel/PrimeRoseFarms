@@ -1,0 +1,122 @@
+---
+alwaysApply: true
+---
+# Coding Rules and Guidelines - PrimeRoseFarms
+
+This document establishes comprehensive coding standards and guidelines to ensure consistency and alignment between the development team and AI assistant for the PrimeRoseFarms agricultural management system.
+
+## General Development Rules
+
+1. **No emojis in code or logs** - Keep all code and log messages clean and professional without emoji usage
+2. **Windows environment** - The development environment is Windows 11 Pro with PowerShell as the primary shell
+3. **Terminal preference** - Use PowerShell as the default terminal in Windows for development operations
+4. **Documentation maintenance** - Always keep documentation files updated and comprehensive
+
+## Documentation Requirements
+
+5. **DevLog.md** - Use this file to track and remember what is being coded, including progress, decisions, and changes. Update after each milestone or significant development session.
+6. **SystemArchitecture.md** - Use this file to track how the app/apps are structured and how communication between components is implemented
+7. **API_DOCUMENTATION.md** - Use this file to document all API endpoints, business processes, and integration patterns
+
+## File Maintenance Rules
+
+8. **Mandatory documentation updates** - Always update SystemArchitecture.md when making structural changes
+9. **Development logging** - Always update DevLog.md when making code changes or decisions
+10. **API documentation** - Update API_DOCUMENTATION.md when adding new endpoints or modifying existing ones
+11. **Keep documentation current** - All documentation files must be comprehensive and up-to-date
+
+## Environment Configuration Rules
+
+12. **.env file access restriction** - The AI assistant does not have direct access to read or modify the .env file. When environment variable changes are needed, the AI must provide the exact content/changes to the user and ask them to update the .env file manually. This applies to both the main .env file in the root directory and the client/.env file in the client directory.
+
+## Project-Specific Rules
+
+### Architecture and Design
+13. **Business process-driven design** - All APIs and interfaces must be designed around actual business workflows rather than generic CRUD operations
+14. **Role-based access control** - Implement granular permissions with farm-specific, block-level, and time-based restrictions
+15. **Multi-tenant architecture** - Design all components to support multiple farms with proper data isolation
+16. **Real-time integration** - Implement WebSocket connections for live sensor data, task updates, and alerts
+
+### Database and Models
+17. **TypeScript safety** - All database models must have zero TypeScript errors with proper type safety
+18. **Business logic integration** - Each model must include comprehensive business logic methods and validation rules
+19. **Encryption compliance** - Implement field-level encryption for sensitive data using AES-256-GCM
+20. **Audit trail requirements** - All data modifications must include created/modified tracking with user attribution
+
+### API Development
+21. **Process-specific endpoints** - Create Manager, Worker, Sales, and Sensor APIs that serve actual business workflows
+22. **Authentication middleware** - All protected endpoints must use proper authentication and authorization middleware
+23. **Error handling** - Implement comprehensive error handling with consistent response formats
+24. **Performance optimization** - Design APIs for specific data access patterns with proper indexing
+
+### Frontend Development
+25. **Role-based interfaces** - Implement desktop interfaces for management roles and mobile interfaces for field workers
+26. **Material-UI consistency** - Use Material-UI components with consistent design patterns
+27. **TypeScript integration** - All frontend components must be fully type-safe
+28. **Responsive design** - Ensure all interfaces work on desktop, tablet, and mobile devices
+
+### Testing and Quality
+29. **Comprehensive testing** - Implement test suites for all major components with Jest framework
+30. **Test mode system** - Maintain universal test mode switch for development flexibility
+31. **Performance monitoring** - Implement logging and monitoring for slow operations and system health
+32. **Security validation** - Test all authentication, authorization, and encryption features
+
+### Development Workflow
+33. **Module-based development** - Develop features in logical modules (User Management, Farm Management, Plant Data, etc.)
+34. **Milestone tracking** - Update DevLog.md after completing each module or milestone
+35. **Demo user system** - Maintain demo users for all role types for testing and validation
+36. **Script automation** - Use PowerShell scripts for development startup, shutdown, and testing
+
+### Security and Compliance
+37. **Multi-layer encryption** - Implement four-level data protection (Public, Internal, Confidential, Restricted)
+38. **Permission granularity** - Support farm-specific access, block-level restrictions, and customer assignments
+39. **Activity tracking** - Log all user activities with IP addresses and audit trails
+40. **Compliance integration** - Track certifications, training completion, and safety requirements
+
+### Integration and Communication
+41. **WebSocket implementation** - Use Socket.io for real-time communication between frontend and backend
+42. **CORS configuration** - Properly configure cross-origin resource sharing for development and production
+43. **Token management** - Implement JWT token storage, verification, and refresh mechanisms
+44. **State management** - Use Redux Toolkit for consistent state management across the application
+
+### Performance and Optimization
+45. **Database indexing** - Implement comprehensive indexing for optimal query performance
+46. **Caching strategies** - Use appropriate caching for frequently accessed data
+47. **Resource optimization** - Optimize images, scripts, and other resources for production
+48. **Monitoring integration** - Implement performance monitoring and alerting systems
+
+## Development Environment Specifics
+
+### PowerShell Usage
+49. **PowerShell scripts** - Use PowerShell for all development automation scripts
+50. **Error handling** - Implement proper error handling in all PowerShell scripts
+51. **Cross-platform compatibility** - Ensure scripts work on Windows 11 Pro environment
+
+### File Organization
+52. **Modular structure** - Organize code in logical modules with clear separation of concerns
+53. **Import/export consistency** - Use consistent import/export patterns across all modules
+54. **Configuration management** - Centralize all configuration in appropriate config files
+
+### Version Control
+55. **Commit standards** - Use descriptive commit messages that reference specific modules or features
+56. **Branch management** - Use feature branches for new modules or significant changes
+57. **Documentation commits** - Always commit documentation updates with code changes
+
+## Quality Assurance Rules
+
+58. **Code review requirements** - All code must be reviewed for adherence to these rules
+59. **Documentation validation** - Verify all documentation is updated before marking tasks complete
+60. **Integration testing** - Test all modules together to ensure proper integration
+61. **User experience validation** - Test all interfaces with actual demo users before deployment
+
+## Additional Rules
+
+*This section will be expanded as more rules are added during development*
+
+---
+
+**Last Updated:** Comprehensive coding rules established based on project architecture
+**Version:** 2.0
+**Project:** PrimeRoseFarms Agricultural Management System
+**Environment:** Windows 11 Pro with PowerShell
+**Architecture:** Business process-driven multi-tenant system

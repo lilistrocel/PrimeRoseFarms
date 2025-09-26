@@ -65,7 +65,7 @@ const LoginScreen: React.FC = () => {
       justifyContent="center"
       minHeight="100vh"
       sx={{
-        background: 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)',
+        background: '#0F0F23',
         padding: isMobileDevice ? 2 : 3,
       }}
     >
@@ -73,22 +73,47 @@ const LoginScreen: React.FC = () => {
         sx={{
           width: '100%',
           maxWidth: isMobileDevice ? 350 : 400,
-          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          background: '#1E1E2E',
+          border: '1px solid rgba(255, 255, 255, 0.05)',
+          borderRadius: 2,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         }}
       >
         <CardContent sx={{ padding: isMobileDevice ? 3 : 4 }}>
           {/* Logo and Title */}
           <Box textAlign="center" mb={4}>
+            <Box
+              sx={{
+                height: '60px',
+                width: '60px',
+                background: '#E91E63',
+                borderRadius: 2,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '2rem',
+                fontWeight: 'bold',
+                color: '#FFFFFF',
+                marginBottom: 2,
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  transform: 'scale(1.05)',
+                  background: '#C2185B',
+                }
+              }}
+            >
+              🌱
+            </Box>
             <Typography
               variant={isMobileDevice ? "h5" : "h4"}
               component="h1"
               fontWeight="bold"
-              color="primary"
+              color="#E91E63"
               gutterBottom
             >
-              🌱 PrimeRose Farms
+              PrimeRose Farms
             </Typography>
-            <Typography variant="body2" color="textSecondary">
+            <Typography variant="body2" sx={{ color: '#B0B0B0' }}>
               Agricultural Farm Management System
             </Typography>
           </Box>
@@ -118,11 +143,34 @@ const LoginScreen: React.FC = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Email color="action" />
+                    <Email sx={{ color: '#B0B0B0' }} />
                   </InputAdornment>
                 ),
               }}
-              sx={{ mb: 2 }}
+              sx={{ 
+                mb: 2,
+                '& .MuiOutlinedInput-root': {
+                  color: '#FFFFFF',
+                  '& .MuiOutlinedInput-input': {
+                    color: '#FFFFFF',
+                  },
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#E91E63',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#E91E63',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#B0B0B0',
+                  '&.Mui-focused': {
+                    color: '#E91E63',
+                  },
+                },
+              }}
             />
 
             <TextField
@@ -137,7 +185,7 @@ const LoginScreen: React.FC = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Lock color="action" />
+                    <Lock sx={{ color: '#B0B0B0' }} />
                   </InputAdornment>
                 ),
                 endAdornment: (
@@ -147,13 +195,37 @@ const LoginScreen: React.FC = () => {
                       onClick={togglePasswordVisibility}
                       edge="end"
                       disabled={loading}
+                      sx={{ color: '#B0B0B0' }}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 ),
               }}
-              sx={{ mb: 3 }}
+              sx={{ 
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  color: '#FFFFFF',
+                  '& .MuiOutlinedInput-input': {
+                    color: '#FFFFFF',
+                  },
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#E91E63',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#E91E63',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#B0B0B0',
+                  '&.Mui-focused': {
+                    color: '#E91E63',
+                  },
+                },
+              }}
             />
 
             <Button
@@ -167,6 +239,15 @@ const LoginScreen: React.FC = () => {
                 fontSize: '1.1rem',
                 fontWeight: 'bold',
                 textTransform: 'none',
+                backgroundColor: '#E91E63',
+                color: '#FFFFFF',
+                '&:hover': {
+                  backgroundColor: '#C2185B',
+                },
+                '&:disabled': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  color: 'rgba(255, 255, 255, 0.3)',
+                },
               }}
             >
               {loading ? 'Signing In...' : 'Sign In'}
@@ -174,17 +255,21 @@ const LoginScreen: React.FC = () => {
           </form>
 
           {/* Demo Account Info */}
-          <Box mt={3} p={2} bgcolor="grey.50" borderRadius={1}>
-            <Typography variant="caption" color="textSecondary" display="block">
+          <Box mt={3} p={2} sx={{ 
+            background: 'rgba(255, 255, 255, 0.02)', 
+            borderRadius: 1,
+            border: '1px solid rgba(255, 255, 255, 0.05)'
+          }}>
+            <Typography variant="caption" sx={{ color: '#B0B0B0', fontWeight: 600, mb: 1, display: 'block' }}>
               Demo Accounts Available:
             </Typography>
-            <Typography variant="caption" color="textSecondary" display="block">
+            <Typography variant="caption" sx={{ color: '#B0B0B0', display: 'block' }}>
               • Manager: manager@primerose.com
             </Typography>
-            <Typography variant="caption" color="textSecondary" display="block">
+            <Typography variant="caption" sx={{ color: '#B0B0B0', display: 'block' }}>
               • Worker: worker@primerose.com
             </Typography>
-            <Typography variant="caption" color="textSecondary" display="block">
+            <Typography variant="caption" sx={{ color: '#B0B0B0', display: 'block' }}>
               Password: demo123
             </Typography>
           </Box>
