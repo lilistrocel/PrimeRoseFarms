@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { User } from '../models/User';
-import { generateToken, generateRefreshToken, verifyRefreshToken } from '../middleware/auth';
+import { generateToken, generateRefreshToken, verifyRefreshToken, authenticate } from '../middleware/auth';
 import { logger, LogCategory } from '../utils/logger';
 import { UserRole } from '../types';
 
@@ -255,7 +255,7 @@ router.post('/logout', async (req: Request, res: Response): Promise<Response<any
 });
 
 // Get current user profile
-router.get('/me', async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
+router.get('/me', authenticate, async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   try {
     const user = await User.findById(req.user?.userId).select('-password');
     if (!user) {
