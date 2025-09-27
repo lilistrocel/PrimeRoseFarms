@@ -94,6 +94,9 @@ const FarmManagementPage: React.FC = () => {
   
   // Form states
   const [farmForm, setFarmForm] = useState<Partial<IFarm>>({
+    name: '',
+    farmId: '',
+    farmOwner: '',
     location: {
       address: '',
       city: '',
@@ -106,18 +109,22 @@ const FarmManagementPage: React.FC = () => {
     specifications: {
       totalArea: 0,
       usableArea: 0,
+      maxBlocks: 0,
       establishedDate: '',
       farmType: 'organic',
       certification: [],
       climate: 'temperate',
       soilType: 'loamy'
     },
-    blocks: {
-      total: 0,
-      active: 0,
-      available: 0,
-      inUse: 0,
-      maintenance: 0
+    mapLocation: {
+      mapUrl: '',
+      mapDescription: '',
+      boundaries: {
+        north: 0,
+        south: 0,
+        east: 0,
+        west: 0
+      }
     },
     status: 'active'
   });
@@ -182,7 +189,41 @@ const FarmManagementPage: React.FC = () => {
     try {
       await farmManagementApi.createFarm(farmForm as Omit<IFarm, '_id' | 'createdAt' | 'updatedAt'>);
       setFarmDialogOpen(false);
-      setFarmForm({});
+      setFarmForm({
+        name: '',
+        farmId: '',
+        farmOwner: '',
+        location: {
+          address: '',
+          city: '',
+          state: '',
+          country: '',
+          zipCode: '',
+          coordinates: { latitude: 0, longitude: 0 },
+          timezone: ''
+        },
+        specifications: {
+          totalArea: 0,
+          usableArea: 0,
+          maxBlocks: 0,
+          establishedDate: '',
+          farmType: 'organic',
+          certification: [],
+          climate: 'temperate',
+          soilType: 'loamy'
+        },
+        mapLocation: {
+          mapUrl: '',
+          mapDescription: '',
+          boundaries: {
+            north: 0,
+            south: 0,
+            east: 0,
+            west: 0
+          }
+        },
+        status: 'active'
+      });
       loadData();
     } catch (err) {
       setError('Failed to create farm');
@@ -197,7 +238,41 @@ const FarmManagementPage: React.FC = () => {
       await farmManagementApi.updateFarm(selectedFarm._id, farmForm);
       setFarmDialogOpen(false);
       setSelectedFarm(null);
-      setFarmForm({});
+      setFarmForm({
+        name: '',
+        farmId: '',
+        farmOwner: '',
+        location: {
+          address: '',
+          city: '',
+          state: '',
+          country: '',
+          zipCode: '',
+          coordinates: { latitude: 0, longitude: 0 },
+          timezone: ''
+        },
+        specifications: {
+          totalArea: 0,
+          usableArea: 0,
+          maxBlocks: 0,
+          establishedDate: '',
+          farmType: 'organic',
+          certification: [],
+          climate: 'temperate',
+          soilType: 'loamy'
+        },
+        mapLocation: {
+          mapUrl: '',
+          mapDescription: '',
+          boundaries: {
+            north: 0,
+            south: 0,
+            east: 0,
+            west: 0
+          }
+        },
+        status: 'active'
+      });
       loadData();
     } catch (err) {
       setError('Failed to update farm');
@@ -335,7 +410,21 @@ const FarmManagementPage: React.FC = () => {
       )}
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={activeTab} onChange={handleTabChange} aria-label="farm management tabs">
+        <Tabs 
+          value={activeTab} 
+          onChange={handleTabChange} 
+          aria-label="farm management tabs"
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
+          sx={{
+            '& .MuiTabs-scrollButtons': {
+              '&.Mui-disabled': {
+                opacity: 0.3,
+              },
+            },
+          }}
+        >
           <Tab 
             icon={<PerformanceIcon />} 
             label="Strategic Planning" 
@@ -481,7 +570,41 @@ const FarmManagementPage: React.FC = () => {
             startIcon={<AddIcon />}
             onClick={() => {
               setSelectedFarm(null);
-              setFarmForm({});
+              setFarmForm({
+        name: '',
+        farmId: '',
+        farmOwner: '',
+        location: {
+          address: '',
+          city: '',
+          state: '',
+          country: '',
+          zipCode: '',
+          coordinates: { latitude: 0, longitude: 0 },
+          timezone: ''
+        },
+        specifications: {
+          totalArea: 0,
+          usableArea: 0,
+          maxBlocks: 0,
+          establishedDate: '',
+          farmType: 'organic',
+          certification: [],
+          climate: 'temperate',
+          soilType: 'loamy'
+        },
+        mapLocation: {
+          mapUrl: '',
+          mapDescription: '',
+          boundaries: {
+            north: 0,
+            south: 0,
+            east: 0,
+            west: 0
+          }
+        },
+        status: 'active'
+      });
               setFarmDialogOpen(true);
             }}
           >
@@ -506,28 +629,36 @@ const FarmManagementPage: React.FC = () => {
                   </Box>
                   
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    <strong>Farm ID:</strong> {farm.farmId || 'N/A'} • <strong>Owner:</strong> {farm.farmOwner || 'N/A'}
+                  </Typography>
+                  
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     {farm.location?.city || 'N/A'}, {farm.location?.state || 'N/A'}
                   </Typography>
                   
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    <strong>Coordinates:</strong> {farm.location?.coordinates?.latitude?.toFixed(4) || 'N/A'}, {farm.location?.coordinates?.longitude?.toFixed(4) || 'N/A'}
+                  </Typography>
+                  
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    {farm.specifications?.totalArea || 0} hectares • {farm.specifications?.farmType || 'N/A'}
+                    {farm.specifications?.totalArea || 0} hectares • {farm.specifications?.farmType || 'N/A'} • Max Blocks: {farm.specifications?.maxBlocks || 0}
                   </Typography>
 
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                     <Box>
                       <Typography variant="caption" color="text.secondary">
-                        Blocks
+                        Total Blocks
                       </Typography>
                       <Typography variant="h6">
-                        {farm.blocks?.total || 0}
+                        {blocks.filter(block => block.farmId === farm._id).length}
                       </Typography>
                     </Box>
                     <Box>
                       <Typography variant="caption" color="text.secondary">
-                        Active
+                        In Use
                       </Typography>
                       <Typography variant="h6">
-                        {farm.blocks?.active || 0}
+                        {blocks.filter(block => block.farmId === farm._id && ['preparing', 'planting', 'growing', 'harvesting'].includes(block.status)).length}
                       </Typography>
                     </Box>
                     <Box>
@@ -535,7 +666,7 @@ const FarmManagementPage: React.FC = () => {
                         Available
                       </Typography>
                       <Typography variant="h6">
-                        {farm.blocks?.available || 0}
+                        {blocks.filter(block => block.farmId === farm._id && block.status === 'available').length}
                       </Typography>
                     </Box>
                   </Box>
@@ -870,14 +1001,43 @@ const FarmManagementPage: React.FC = () => {
         </DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 1 }}>
+            {/* Farm Name */}
             <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
               <TextField
                 fullWidth
                 label="Farm Name"
                 value={farmForm.name || ''}
                 onChange={(e) => setFarmForm({ ...farmForm, name: e.target.value })}
+                required
               />
             </Box>
+            
+            {/* Farm ID */}
+            <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
+              <TextField
+                fullWidth
+                label="Farm ID"
+                value={farmForm.farmId || ''}
+                onChange={(e) => setFarmForm({ ...farmForm, farmId: e.target.value })}
+                placeholder="e.g., FARM-001"
+                required
+                helperText="Unique identifier for the farm"
+              />
+            </Box>
+            
+            {/* Farm Owner */}
+            <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
+              <TextField
+                fullWidth
+                label="Farm Owner"
+                value={farmForm.farmOwner || ''}
+                onChange={(e) => setFarmForm({ ...farmForm, farmOwner: e.target.value })}
+                placeholder="Owner's full name"
+                required
+              />
+            </Box>
+            
+            {/* City */}
             <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
               <TextField
                 fullWidth
@@ -896,6 +1056,7 @@ const FarmManagementPage: React.FC = () => {
                     timezone: farmForm.location?.timezone || ''
                   }
                 })}
+                required
               />
             </Box>
             <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
@@ -929,6 +1090,7 @@ const FarmManagementPage: React.FC = () => {
                       ...farmForm.specifications,
                       totalArea: farmForm.specifications?.totalArea || 0,
                       usableArea: farmForm.specifications?.usableArea || 0,
+                      maxBlocks: farmForm.specifications?.maxBlocks || 0,
                       establishedDate: farmForm.specifications?.establishedDate || '',
                       farmType: e.target.value as any,
                       certification: farmForm.specifications?.certification || [],
@@ -958,6 +1120,7 @@ const FarmManagementPage: React.FC = () => {
                     ...farmForm.specifications,
                     totalArea: parseFloat(e.target.value) || 0,
                     usableArea: farmForm.specifications?.usableArea || 0,
+                    maxBlocks: farmForm.specifications?.maxBlocks || 0,
                     establishedDate: farmForm.specifications?.establishedDate || '',
                     farmType: farmForm.specifications?.farmType || 'organic',
                     certification: farmForm.specifications?.certification || [],
@@ -979,6 +1142,7 @@ const FarmManagementPage: React.FC = () => {
                     ...farmForm.specifications,
                     totalArea: farmForm.specifications?.totalArea || 0,
                     usableArea: parseFloat(e.target.value) || 0,
+                    maxBlocks: farmForm.specifications?.maxBlocks || 0,
                     establishedDate: farmForm.specifications?.establishedDate || '',
                     farmType: farmForm.specifications?.farmType || 'organic',
                     certification: farmForm.specifications?.certification || [],
@@ -986,6 +1150,136 @@ const FarmManagementPage: React.FC = () => {
                     soilType: farmForm.specifications?.soilType || 'loamy'
                   }
                 })}
+              />
+            </Box>
+            
+            {/* Total Number of Blocks */}
+            <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
+              <TextField
+                fullWidth
+                label="Total Number of Blocks"
+                type="number"
+                value={farmForm.specifications?.maxBlocks || ''}
+                onChange={(e) => setFarmForm({
+                  ...farmForm,
+                  specifications: { 
+                    ...farmForm.specifications,
+                    totalArea: farmForm.specifications?.totalArea || 0,
+                    usableArea: farmForm.specifications?.usableArea || 0,
+                    maxBlocks: parseInt(e.target.value) || 0,
+                    establishedDate: farmForm.specifications?.establishedDate || '',
+                    farmType: farmForm.specifications?.farmType || 'organic',
+                    certification: farmForm.specifications?.certification || [],
+                    climate: farmForm.specifications?.climate || 'temperate',
+                    soilType: farmForm.specifications?.soilType || 'loamy'
+                  }
+                })}
+                helperText="Maximum blocks that can be assigned to this farm"
+                required
+              />
+            </Box>
+            
+            {/* Farm Coordinates */}
+            <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
+              <TextField
+                fullWidth
+                label="Latitude"
+                type="number"
+                value={farmForm.location?.coordinates?.latitude || ''}
+                onChange={(e) => setFarmForm({ 
+                  ...farmForm, 
+                  location: { 
+                    ...farmForm.location,
+                    address: farmForm.location?.address || '',
+                    city: farmForm.location?.city || '',
+                    state: farmForm.location?.state || '',
+                    country: farmForm.location?.country || '',
+                    zipCode: farmForm.location?.zipCode || '',
+                    coordinates: { 
+                      latitude: parseFloat(e.target.value) || 0,
+                      longitude: farmForm.location?.coordinates?.longitude || 0
+                    },
+                    timezone: farmForm.location?.timezone || ''
+                  }
+                })}
+                placeholder="e.g., 40.7128"
+                helperText="Farm latitude coordinate"
+              />
+            </Box>
+            
+            <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
+              <TextField
+                fullWidth
+                label="Longitude"
+                type="number"
+                value={farmForm.location?.coordinates?.longitude || ''}
+                onChange={(e) => setFarmForm({ 
+                  ...farmForm, 
+                  location: { 
+                    ...farmForm.location,
+                    address: farmForm.location?.address || '',
+                    city: farmForm.location?.city || '',
+                    state: farmForm.location?.state || '',
+                    country: farmForm.location?.country || '',
+                    zipCode: farmForm.location?.zipCode || '',
+                    coordinates: { 
+                      latitude: farmForm.location?.coordinates?.latitude || 0,
+                      longitude: parseFloat(e.target.value) || 0
+                    },
+                    timezone: farmForm.location?.timezone || ''
+                  }
+                })}
+                placeholder="e.g., -74.0060"
+                helperText="Farm longitude coordinate"
+              />
+            </Box>
+            
+            {/* Farm Map Location */}
+            <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
+              <TextField
+                fullWidth
+                label="Farm Map URL"
+                value={farmForm.mapLocation?.mapUrl || ''}
+                onChange={(e) => setFarmForm({
+                  ...farmForm,
+                  mapLocation: {
+                    ...farmForm.mapLocation,
+                    mapUrl: e.target.value,
+                    mapDescription: farmForm.mapLocation?.mapDescription || '',
+                    boundaries: farmForm.mapLocation?.boundaries || {
+                      north: 0,
+                      south: 0,
+                      east: 0,
+                      west: 0
+                    }
+                  }
+                })}
+                placeholder="https://maps.google.com/..."
+                helperText="URL to farm map or satellite image"
+              />
+            </Box>
+            
+            <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
+              <TextField
+                fullWidth
+                label="Map Description"
+                value={farmForm.mapLocation?.mapDescription || ''}
+                onChange={(e) => setFarmForm({
+                  ...farmForm,
+                  mapLocation: {
+                    ...farmForm.mapLocation,
+                    mapUrl: farmForm.mapLocation?.mapUrl || '',
+                    mapDescription: e.target.value,
+                    boundaries: farmForm.mapLocation?.boundaries || {
+                      north: 0,
+                      south: 0,
+                      east: 0,
+                      west: 0
+                    }
+                  }
+                })}
+                placeholder="Description of farm layout"
+                helperText="Brief description of the farm layout"
               />
             </Box>
           </Box>

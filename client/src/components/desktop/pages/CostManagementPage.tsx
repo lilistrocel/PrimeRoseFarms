@@ -323,7 +323,21 @@ const CostManagementPage: React.FC = () => {
       )}
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={activeTab} onChange={handleTabChange} aria-label="cost management tabs">
+        <Tabs 
+          value={activeTab} 
+          onChange={handleTabChange} 
+          aria-label="cost management tabs"
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
+          sx={{
+            '& .MuiTabs-scrollButtons': {
+              '&.Mui-disabled': {
+                opacity: 0.3,
+              },
+            },
+          }}
+        >
           <Tab 
             icon={<LaborIcon />} 
             label="Labor Costs" 

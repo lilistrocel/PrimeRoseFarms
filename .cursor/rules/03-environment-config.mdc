@@ -1,0 +1,31 @@
+---
+alwaysApply: true
+priority: 3
+---
+# Environment Configuration Rules
+
+## General Development Rules
+1. **No emojis in code or logs** - Keep all code and log messages clean and professional without emoji usage
+2. **Windows environment** - The development environment is Windows 11 Pro with PowerShell as the primary shell
+3. **Terminal preference** - Use PowerShell as the default terminal in Windows for development operations
+4. **Documentation maintenance** - Always keep documentation files updated and comprehensive
+
+## Environment Configuration Rules
+5. **.env file access restriction** - The AI assistant does not have direct access to read or modify the .env file. When environment variable changes are needed, the AI must provide the exact content/changes to the user and ask them to update the .env file manually. This applies to both the main .env file in the root directory and the client/.env file in the client directory.
+
+## Development Environment Specifics
+
+### PowerShell Usage
+6. **PowerShell scripts** - Use PowerShell for all development automation scripts
+7. **Error handling** - Implement proper error handling in all PowerShell scripts
+8. **Cross-platform compatibility** - Ensure scripts work on Windows 11 Pro environment
+
+### File Organization
+9. **Modular structure** - Organize code in logical modules with clear separation of concerns
+10. **Import/export consistency** - Use consistent import/export patterns across all modules
+11. **Configuration management** - Centralize all configuration in appropriate config files
+
+### Version Control
+12. **Commit standards** - Use descriptive commit messages that reference specific modules or features
+13. **Branch management** - Use feature branches for new modules or significant changes
+14. **Documentation commits** - Always commit documentation updates with code changes

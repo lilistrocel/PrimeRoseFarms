@@ -18,6 +18,18 @@ export enum DataProtectionLevel {
   RESTRICTED = 4   // Admin credentials, system configurations
 }
 
+// Farming Types
+export enum FarmingType {
+  OPEN_FIELD_SOIL = 'open_field_soil',
+  OPEN_FIELD_DESERT = 'open_field_desert',
+  GREENHOUSE = 'greenhouse',
+  NETHOUSE = 'nethouse',
+  HYDROPONIC = 'hydroponic',
+  AQUAPONIC = 'aquaponic',
+  AEROPONIC = 'aeroponic',
+  SPECIAL = 'special'
+}
+
 // User Interface
 export interface IUser {
   _id?: string;

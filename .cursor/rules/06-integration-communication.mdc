@@ -1,0 +1,17 @@
+---
+alwaysApply: true
+priority: 6
+---
+# Integration and Communication Rules
+
+## Integration and Communication
+1. **WebSocket implementation** - Use Socket.io for real-time communication between frontend and backend
+2. **CORS configuration** - Properly configure cross-origin resource sharing for development and production
+3. **Token management** - Implement JWT token storage, verification, and refresh mechanisms
+4. **State management** - Use Redux Toolkit for consistent state management across the application
+
+## Performance and Optimization
+5. **Database indexing** - Implement comprehensive indexing for optimal query performance
+6. **Caching strategies** - Use appropriate caching for frequently accessed data
+7. **Resource optimization** - Optimize images, scripts, and other resources for production
+8. **Monitoring integration** - Implement performance monitoring and alerting systems

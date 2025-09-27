@@ -4,6 +4,7 @@
     "scientificName": "Solanum lycopersicum var. cerasiforme",
     "variety": "Sweet 100",
     "category": "vegetable",
+    "farmingType": "open_field_soil",
     "family": "Solanaceae",
     
     "growthCharacteristics": {
@@ -81,7 +82,7 @@
     
     "growthTimeline": {
       "germinationTime": 7,
-      "daysToMaturity": 75,
+      "daysToMaturity": 108,
       "harvestWindow": 45,
       "seasonalPlanting": ["Mar", "Apr", "May", "Jun"],
       "germinationDays": 7,
@@ -89,7 +90,7 @@
       "vegetativeDays": 28,
       "floweringDays": 14,
       "fruitingDays": 45,
-      "totalDays": 75
+      "totalDays": 108
     },
     
     "yieldInfo": {
@@ -151,6 +152,7 @@
     "scientificName": "Lactuca sativa var. longifolia",
     "variety": "Parris Island Cos",
     "category": "vegetable",
+    "farmingType": "hydroponic",
     "family": "Asteraceae",
     
     "growthCharacteristics": {

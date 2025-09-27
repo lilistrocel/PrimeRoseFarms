@@ -1,0 +1,14 @@
+---
+alwaysApply: true
+priority: 7
+---
+# Development Workflow Rules
+
+## Development Workflow
+1. **Module-based development** - Develop features in logical modules (User Management, Farm Management, Plant Data, etc.)
+2. **Milestone tracking** - Update DevLog.md after completing each module or milestone
+3. **Demo user system** - Maintain demo users for all role types for testing and validation
+4. **Script automation** - Use PowerShell scripts for development startup, shutdown, and testing
+
+## Additional Rules
+*This section will be expanded as more rules are added during development*

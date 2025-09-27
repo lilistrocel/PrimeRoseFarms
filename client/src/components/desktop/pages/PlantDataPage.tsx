@@ -45,7 +45,7 @@ import {
   Thermostat as TempIcon
 } from '@mui/icons-material';
 // import { useAppSelector } from '../../../store';
-import { IPlantData } from '../../../services/plantDataApi';
+import { IPlantData, FarmingType } from '../../../services/plantDataApi';
 import plantDataApi from '../../../services/plantDataApi';
 
 const PlantDataPage: React.FC = () => {
@@ -61,6 +61,7 @@ const PlantDataPage: React.FC = () => {
       scientificName: partialForm.scientificName || '',
       variety: partialForm.variety || '',
       category: partialForm.category || 'vegetable',
+      farmingType: partialForm.farmingType || FarmingType.OPEN_FIELD_SOIL,
       family: partialForm.family || '',
       growthCharacteristics: {
         height: partialForm.growthCharacteristics?.height || 100,
@@ -185,6 +186,7 @@ const PlantDataPage: React.FC = () => {
     scientificName: '',
     variety: '',
     category: 'vegetable',
+    farmingType: FarmingType.OPEN_FIELD_SOIL,
     family: '',
     growthCharacteristics: {
       height: 100,
@@ -259,7 +261,8 @@ const PlantDataPage: React.FC = () => {
   const loadData = useCallback(async () => {
     setError(null);
     try {
-      const response = await plantDataApi.getPlantData();
+      // Explicitly request only active plants
+      const response = await plantDataApi.getPlantData({ isActive: true });
       console.log('API response:', response);
       console.log('Plants from API:', response.data.plants);
       console.log('Number of plants:', response.data.plants.length);
@@ -806,7 +809,21 @@ const PlantDataPage: React.FC = () => {
         mb: 3
       }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={activeTab} onChange={handleTabChange} aria-label="plant data management tabs">
+          <Tabs 
+            value={activeTab} 
+            onChange={handleTabChange} 
+            aria-label="plant data management tabs"
+            variant="scrollable"
+            scrollButtons="auto"
+            allowScrollButtonsMobile
+            sx={{
+              '& .MuiTabs-scrollButtons': {
+                '&.Mui-disabled': {
+                  opacity: 0.3,
+                },
+              },
+            }}
+          >
             <Tab 
               icon={<PlantIcon />} 
               label="Plant Overview" 
@@ -913,6 +930,7 @@ const PlantDataPage: React.FC = () => {
                   <TableCell>Scientific Name</TableCell>
                   <TableCell>Category</TableCell>
                   <TableCell>Variety</TableCell>
+                  <TableCell>Farming Type</TableCell>
                   <TableCell>Total Days</TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
@@ -932,6 +950,13 @@ const PlantDataPage: React.FC = () => {
                       />
                     </TableCell>
                     <TableCell>{plant.variety}</TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={plant.farmingType?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Not specified'} 
+                        color="secondary" 
+                        size="small" 
+                      />
+                    </TableCell>
                     <TableCell>{plant.growthTimeline?.totalDays || 'Not specified'} days</TableCell>
                     <TableCell>
                       <IconButton size="small" onClick={() => { setSelectedPlant(plant); setPlantForm(plant); setDialogTab(0); setPlantDialogOpen(true); }}>
@@ -1388,6 +1413,24 @@ const PlantDataPage: React.FC = () => {
                 onChange={(e) => setPlantForm({ ...plantForm, variety: e.target.value })}
               />
               </Box>
+            <Box sx={{ flex: '1 1 300px', minWidth: '300px' }}>
+              <FormControl fullWidth>
+                <InputLabel>Farming Type</InputLabel>
+                <Select
+                  value={plantForm.farmingType || 'open_field_soil'}
+                  onChange={(e) => setPlantForm({ ...plantForm, farmingType: e.target.value as FarmingType })}
+                >
+                  <MenuItem value="open_field_soil">Open Field Soil</MenuItem>
+                  <MenuItem value="open_field_desert">Open Field Desert</MenuItem>
+                  <MenuItem value="greenhouse">Greenhouse</MenuItem>
+                  <MenuItem value="nethouse">Nethouse</MenuItem>
+                  <MenuItem value="hydroponic">Hydroponic</MenuItem>
+                  <MenuItem value="aquaponic">Aquaponic</MenuItem>
+                  <MenuItem value="aeroponic">Aeroponic</MenuItem>
+                  <MenuItem value="special">Special</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
               <Box sx={{ flex: '1 1 300px', minWidth: '300px' }}>
                 <TextField
                   fullWidth

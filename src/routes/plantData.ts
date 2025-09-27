@@ -21,7 +21,8 @@ router.get('/', authorize(UserRole.ADMIN, UserRole.MANAGER, UserRole.AGRONOMIST)
       limit = '10', 
       category, 
       search, 
-      isActive = 'true' 
+      isActive = 'true',
+      farmingType
     } = req.query;
 
     const pageNum = parseInt(page as string);
@@ -31,6 +32,7 @@ router.get('/', authorize(UserRole.ADMIN, UserRole.MANAGER, UserRole.AGRONOMIST)
     // Build filter
     const filter: any = {};
     if (category) filter.category = category;
+    if (farmingType) filter.farmingType = farmingType;
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: 'i' } },
@@ -54,7 +56,7 @@ router.get('/', authorize(UserRole.ADMIN, UserRole.MANAGER, UserRole.AGRONOMIST)
       userId: req.user?.userId,
       total,
       returned: plants.length,
-      filters: { category, search, isActive }
+      filters: { category, search, isActive, farmingType }
     });
 
     return res.json({

@@ -1,0 +1,29 @@
+---
+alwaysApply: true
+priority: 4
+---
+# Architecture and Design Rules
+
+## Architecture and Design
+1. **Business process-driven design** - All APIs and interfaces must be designed around actual business workflows rather than generic CRUD operations
+2. **Role-based access control** - Implement granular permissions with farm-specific, block-level, and time-based restrictions
+3. **Multi-tenant architecture** - Design all components to support multiple farms with proper data isolation
+4. **Real-time integration** - Implement WebSocket connections for live sensor data, task updates, and alerts
+
+## Database and Models
+5. **TypeScript safety** - All database models must have zero TypeScript errors with proper type safety
+6. **Business logic integration** - Each model must include comprehensive business logic methods and validation rules
+7. **Encryption compliance** - Implement field-level encryption for sensitive data using AES-256-GCM
+8. **Audit trail requirements** - All data modifications must include created/modified tracking with user attribution
+
+## API Development
+9. **Process-specific endpoints** - Create Manager, Worker, Sales, and Sensor APIs that serve actual business workflows
+10. **Authentication middleware** - All protected endpoints must use proper authentication and authorization middleware
+11. **Error handling** - Implement comprehensive error handling with consistent response formats
+12. **Performance optimization** - Design APIs for specific data access patterns with proper indexing
+
+## Frontend Development
+13. **Role-based interfaces** - Implement desktop interfaces for management roles and mobile interfaces for field workers
+14. **Material-UI consistency** - Use Material-UI components with consistent design patterns
+15. **TypeScript integration** - All frontend components must be fully type-safe
+16. **Responsive design** - Ensure all interfaces work on desktop, tablet, and mobile devices

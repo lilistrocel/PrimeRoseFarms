@@ -6,7 +6,9 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 export interface IFarm {
   _id: string;
   name: string;
+  farmId: string;
   ownerId: string;
+  farmOwner: string;
   location: {
     address: string;
     city: string;
@@ -22,20 +24,24 @@ export interface IFarm {
   specifications: {
     totalArea: number;
     usableArea: number;
+    maxBlocks: number;
     establishedDate: string;
     farmType: 'organic' | 'conventional' | 'hydroponic' | 'mixed' | 'research' | 'commercial';
     certification: string[];
     climate: 'tropical' | 'subtropical' | 'temperate' | 'continental' | 'arctic';
     soilType: 'clay' | 'sandy' | 'loamy' | 'silty' | 'peaty' | 'chalky' | 'mixed';
   };
-  status: 'active' | 'inactive' | 'maintenance' | 'expansion' | 'sale';
-  blocks: {
-    total: number;
-    active: number;
-    available: number;
-    inUse: number;
-    maintenance: number;
+  mapLocation: {
+    mapUrl?: string;
+    mapDescription?: string;
+    boundaries?: {
+      north: number;
+      south: number;
+      east: number;
+      west: number;
+    };
   };
+  status: 'active' | 'inactive' | 'maintenance' | 'expansion' | 'sale';
   currentOperations: {
     activeBlocks: string[];
     plannedBlocks: string[];
@@ -244,7 +250,9 @@ const mockFarms: IFarm[] = [
   {
     _id: 'mock-farm-1',
     name: 'PrimeRose Main Farm',
+    farmId: 'FARM-001',
     ownerId: 'mock-owner-1',
+    farmOwner: 'John Smith',
     location: {
       address: '123 Farm Road',
       city: 'Agricultural City',
@@ -257,20 +265,24 @@ const mockFarms: IFarm[] = [
     specifications: {
       totalArea: 100,
       usableArea: 85,
+      maxBlocks: 20,
       establishedDate: '2020-01-15',
       farmType: 'organic',
       certification: ['USDA Organic', 'GAP'],
       climate: 'temperate',
       soilType: 'loamy'
     },
-    status: 'active',
-    blocks: {
-      total: 12,
-      active: 8,
-      available: 3,
-      inUse: 8,
-      maintenance: 1
+    mapLocation: {
+      mapUrl: 'https://maps.google.com/example-farm',
+      mapDescription: 'Main farm with 12 blocks arranged in 3 rows',
+      boundaries: {
+        north: 40.7200,
+        south: 40.7000,
+        east: -73.9900,
+        west: -74.0200
+      }
     },
+    status: 'active',
     currentOperations: {
       activeBlocks: ['block-1', 'block-2', 'block-3'],
       plannedBlocks: ['block-4'],
@@ -603,7 +615,7 @@ class FarmManagementApi {
   }
 
   // Plant Management APIs
-  async getPlants(): Promise<IPlant[]> {
+  async getPlants(blockType?: string): Promise<IPlant[]> {
     if (testModeService.isTestMode() && !testModeService.useRealData('farm-management')) {
       console.log('🔧 Using mock plant data');
       return Promise.resolve(mockPlants);
@@ -611,7 +623,26 @@ class FarmManagementApi {
     
     console.log('🔧 Using real plant data from API');
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/v1/manager/plants`, {
+      // Map block types to farming types
+      const blockTypeToFarmingType: { [key: string]: string } = {
+        'open_field': 'open_field_soil',
+        'greenhouse': 'greenhouse',
+        'nethouse': 'nethouse',
+        'hydroponic': 'hydroponic',
+        'aquaponic': 'aquaponic',
+        'container': 'special',
+        'vertical': 'special',
+        'other': 'special'
+      };
+      
+      const farmingType = blockType ? blockTypeToFarmingType[blockType] : undefined;
+      const params = new URLSearchParams();
+      params.append('isActive', 'true');
+      if (farmingType) {
+        params.append('farmingType', farmingType);
+      }
+      
+      const response = await axios.get(`${API_BASE_URL}/api/v1/plant-data?${params.toString()}`, {
         headers: this.getAuthHeader()
       });
       return response.data.data.plants || [];

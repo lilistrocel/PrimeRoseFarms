@@ -189,6 +189,18 @@ export interface IDeliveryRecord {
   estimatedDelivery: string;
 }
 
+// Farming Types
+export enum FarmingType {
+  OPEN_FIELD_SOIL = 'open_field_soil',
+  OPEN_FIELD_DESERT = 'open_field_desert',
+  GREENHOUSE = 'greenhouse',
+  NETHOUSE = 'nethouse',
+  HYDROPONIC = 'hydroponic',
+  AQUAPONIC = 'aquaponic',
+  AEROPONIC = 'aeroponic',
+  SPECIAL = 'special'
+}
+
 // Plant Data Management Interface
 export interface IPlantData {
   _id: string;
@@ -196,6 +208,7 @@ export interface IPlantData {
   scientificName: string;
   family: string;
   variety: string;
+  farmingType: FarmingType;
   growthCharacteristics: {
     height: number;
     spread: number;

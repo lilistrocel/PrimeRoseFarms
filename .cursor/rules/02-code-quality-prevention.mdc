@@ -1,0 +1,30 @@
+---
+alwaysApply: false
+priority: 2
+---
+# Code Quality and Error Prevention Rules
+
+## TypeScript and React Development
+1. **Import verification** - Always verify that all imported components, icons, and modules actually exist in their respective packages before using them
+2. **Duplicate import prevention** - Never import the same item from multiple sources; use single, correct import statements
+3. **Icon name accuracy** - Use exact Material-UI icon names; verify icon existence before importing (e.g., `Nature` not `Eco`)
+4. **Component replacement completeness** - When replacing components, update BOTH opening AND closing tags to prevent orphaned tags
+5. **Tag matching verification** - Ensure all opening tags have corresponding closing tags with matching component names
+6. **TypeScript error resolution** - Fix TypeScript compilation errors immediately rather than allowing them to accumulate
+7. **Component API validation** - Verify that replacement components support the same props and functionality as original components
+8. **Pre-compilation verification** - Scan for red underlines in IDE and verify import statements before moving to next component
+9. **Copy-paste verification** - Always check and verify imports after copying code from other sources
+10. **Icon assumption prevention** - Never assume icon names; always check Material-UI documentation for correct icon names
+
+## Code Quality Standards
+11. **Zero error tolerance** - All code must compile without TypeScript errors before marking tasks complete
+12. **Immediate error fixing** - Address compilation errors as they occur rather than batching fixes
+13. **Import validation** - Verify all import statements are correct and necessary before committing code
+14. **Component consistency** - Maintain consistent component usage patterns across the application
+15. **Error prevention mindset** - Proactively check for common mistakes rather than reactive error fixing
+
+## Quality Assurance Rules
+16. **Code review requirements** - All code must be reviewed for adherence to these rules
+17. **Documentation validation** - Verify all documentation is updated before marking tasks complete
+18. **Integration testing** - Test all modules together to ensure proper integration
+19. **User experience validation** - Test all interfaces with actual demo users before deployment

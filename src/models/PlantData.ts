@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import { encryptionService } from '../utils/encryption';
-import { DataProtectionLevel } from '../types';
+import { DataProtectionLevel, FarmingType } from '../types';
 
 /**
  * Plant Data Interface
@@ -12,6 +12,7 @@ export interface IPlantData {
   scientificName: string;
   variety: string;
   category: 'vegetable' | 'fruit' | 'herb' | 'flower' | 'grain' | 'legume' | 'other';
+  farmingType: FarmingType;
   
   // Basic Plant Information
   family: string;
@@ -190,6 +191,11 @@ const plantDataSchema = new Schema<IPlantDataDocument>({
     type: String,
     required: true,
     enum: ['vegetable', 'fruit', 'herb', 'flower', 'grain', 'legume', 'other']
+  },
+  farmingType: {
+    type: String,
+    required: true,
+    enum: Object.values(FarmingType)
   },
   family: {
     type: String,
@@ -400,7 +406,7 @@ const plantDataSchema = new Schema<IPlantDataDocument>({
 });
 
 // Indexes for performance
-plantDataSchema.index({ name: 1, variety: 1 }, { unique: true });
+plantDataSchema.index({ name: 1, variety: 1, farmingType: 1 }, { unique: true });
 plantDataSchema.index({ category: 1 });
 plantDataSchema.index({ isActive: 1 });
 plantDataSchema.index({ 'marketInfo.demandLevel': 1 });

@@ -9,7 +9,9 @@ import { DataProtectionLevel } from '../types';
 export interface IFarmData {
   _id?: string;
   name: string;
+  farmId: string; // Unique farm identifier
   ownerId: string; // Reference to UserData
+  farmOwner: string; // Farm owner name
   
   // Location Information
   location: {
@@ -29,11 +31,24 @@ export interface IFarmData {
   specifications: {
     totalArea: number; // hectares
     usableArea: number; // hectares
+    maxBlocks: number; // Maximum number of blocks that can be assigned to this farm
     establishedDate: Date;
     farmType: 'organic' | 'conventional' | 'hydroponic' | 'mixed' | 'research' | 'commercial';
     certification: string[]; // e.g., ['USDA Organic', 'GAP', 'HACCP']
     climate: 'tropical' | 'subtropical' | 'temperate' | 'continental' | 'arctic';
     soilType: 'clay' | 'sandy' | 'loamy' | 'silty' | 'peaty' | 'chalky' | 'mixed';
+  };
+  
+  // Map and Location Details
+  mapLocation: {
+    mapUrl?: string; // URL to farm map image or interactive map
+    mapDescription?: string; // Description of the farm layout
+    boundaries?: {
+      north: number;
+      south: number;
+      east: number;
+      west: number;
+    };
   };
   
   // Current Status
@@ -203,10 +218,23 @@ const farmDataSchema = new Schema<IFarmDataDocument>({
     trim: true,
     maxlength: 100
   },
+  farmId: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    maxlength: 50
+  },
   ownerId: {
     type: String,
     required: true,
     ref: 'UserData'
+  },
+  farmOwner: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: 100
   },
   
   location: {
@@ -225,6 +253,7 @@ const farmDataSchema = new Schema<IFarmDataDocument>({
   specifications: {
     totalArea: { type: Number, required: true, min: 0 },
     usableArea: { type: Number, required: true, min: 0 },
+    maxBlocks: { type: Number, required: true, min: 1 },
     establishedDate: { type: Date, required: true },
     farmType: {
       type: String,
@@ -241,6 +270,17 @@ const farmDataSchema = new Schema<IFarmDataDocument>({
       type: String,
       required: true,
       enum: ['clay', 'sandy', 'loamy', 'silty', 'peaty', 'chalky', 'mixed']
+    }
+  },
+  
+  mapLocation: {
+    mapUrl: { type: String, trim: true },
+    mapDescription: { type: String, trim: true },
+    boundaries: {
+      north: { type: Number },
+      south: { type: Number },
+      east: { type: Number },
+      west: { type: Number }
     }
   },
   

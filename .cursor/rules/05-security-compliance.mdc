@@ -1,0 +1,17 @@
+---
+alwaysApply: true
+priority: 5
+---
+# Security and Compliance Rules
+
+## Security and Compliance
+1. **Multi-layer encryption** - Implement four-level data protection (Public, Internal, Confidential, Restricted)
+2. **Permission granularity** - Support farm-specific access, block-level restrictions, and customer assignments
+3. **Activity tracking** - Log all user activities with IP addresses and audit trails
+4. **Compliance integration** - Track certifications, training completion, and safety requirements
+
+## Testing and Quality
+5. **Comprehensive testing** - Implement test suites for all major components with Jest framework
+6. **Test mode system** - Maintain universal test mode switch for development flexibility
+7. **Performance monitoring** - Implement logging and monitoring for slow operations and system health
+8. **Security validation** - Test all authentication, authorization, and encryption features

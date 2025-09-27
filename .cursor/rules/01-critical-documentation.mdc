@@ -1,0 +1,41 @@
+---
+alwaysApply: true
+priority: 1
+---
+# CRITICAL: Documentation-First Approach
+
+## MANDATORY: Check Core Documentation FIRST
+Before starting any task, the AI agent MUST:
+
+1. **ALWAYS READ FIRST:**
+   - `ProcessFlow.md` - Understand business processes and data flows
+   - `DevLog.md` - Review current development status and recent changes
+   - `SystemArchitecture.md` - Understand system structure and communication patterns
+   - `API_DOCUMENTATION.md` - Review existing APIs and business process endpoints
+
+2. **ALIGN WITH EXISTING SYSTEM:**
+   - Follow established business process workflows
+   - Maintain consistency with current architecture
+   - Build upon existing implementations
+   - Respect current development patterns and decisions
+
+## MANDATORY: Update Documentation LAST
+After completing any task, the AI agent MUST:
+
+1. **UPDATE DevLog.md** - Record what was accomplished, decisions made, and next steps
+2. **UPDATE SystemArchitecture.md** - Document any structural changes or new components
+3. **UPDATE API_DOCUMENTATION.md** - Document new endpoints or modified business processes
+4. **UPDATE ProcessFlow.md** - Update business process documentation if workflows changed
+
+## CRITICAL REMINDER: Documentation-First Workflow
+
+### Before ANY Task:
+1. **READ** ProcessFlow.md, DevLog.md, SystemArchitecture.md, API_DOCUMENTATION.md
+2. **UNDERSTAND** current system state and business processes
+3. **ALIGN** with existing architecture and patterns
+
+### After ANY Task:
+1. **UPDATE** DevLog.md with accomplishments and decisions
+2. **UPDATE** SystemArchitecture.md with structural changes
+3. **UPDATE** API_DOCUMENTATION.md with new/modified endpoints
+4. **UPDATE** ProcessFlow.md with workflow changes

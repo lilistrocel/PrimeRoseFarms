@@ -2,6 +2,18 @@ import axios from 'axios';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
+// Farming Types
+export enum FarmingType {
+  OPEN_FIELD_SOIL = 'open_field_soil',
+  OPEN_FIELD_DESERT = 'open_field_desert',
+  GREENHOUSE = 'greenhouse',
+  NETHOUSE = 'nethouse',
+  HYDROPONIC = 'hydroponic',
+  AQUAPONIC = 'aquaponic',
+  AEROPONIC = 'aeroponic',
+  SPECIAL = 'special'
+}
+
 // Plant Data Interface
 export interface IPlantData {
   _id?: string;
@@ -9,6 +21,7 @@ export interface IPlantData {
   scientificName: string;
   variety: string;
   category: 'vegetable' | 'fruit' | 'herb' | 'flower' | 'grain' | 'legume' | 'other';
+  farmingType: FarmingType;
   
   // Basic Plant Information
   family: string;
@@ -315,6 +328,7 @@ class PlantDataApi {
         scientificName: 'Solanum lycopersicum',
         variety: 'Cherry',
         category: 'vegetable',
+        farmingType: FarmingType.OPEN_FIELD_SOIL,
         family: 'Solanaceae',
         growthCharacteristics: {
           height: 150,
@@ -427,6 +441,7 @@ class PlantDataApi {
         scientificName: 'Lactuca sativa',
         variety: 'Romaine',
         category: 'vegetable',
+        farmingType: FarmingType.HYDROPONIC,
         family: 'Asteraceae',
         growthCharacteristics: {
           height: 30,
