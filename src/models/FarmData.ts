@@ -51,6 +51,7 @@ export interface IFarmData {
     };
   };
   
+  
   // Current Status
   status: 'active' | 'inactive' | 'maintenance' | 'expansion' | 'sale';
   
@@ -98,6 +99,18 @@ export interface IFarmData {
   
   // Financial Overview
   financials: {
+    // Basic Financial Data
+    landRentPerMonth: number; // Monthly land rent
+    electricityCostPerKw: number; // Cost per kilowatt of electricity
+    waterCostPerCm3: number; // Cost per cubic centimeter of water
+    initialCapitalInvestment: number; // Total initial investment
+    depreciation: number; // Annual depreciation
+    incentives: number; // Government incentives received
+    otherCosts: number; // Additional miscellaneous costs
+    currency: string; // Currency code (USD, EUR, etc.)
+    lastUpdated: Date; // Last time financial data was updated
+    
+    // Calculated Financial Metrics
     totalInvestment: number; // USD
     monthlyOperatingCost: number; // USD
     monthlyRevenue: number; // USD
@@ -284,6 +297,32 @@ const farmDataSchema = new Schema<IFarmDataDocument>({
     }
   },
   
+  financials: {
+    // Basic Financial Data
+    landRentPerMonth: { type: Number, required: true, min: 0 },
+    electricityCostPerKw: { type: Number, required: true, min: 0 },
+    waterCostPerCm3: { type: Number, required: true, min: 0 },
+    initialCapitalInvestment: { type: Number, required: true, min: 0 },
+    depreciation: { type: Number, required: true, min: 0 },
+    incentives: { type: Number, required: true, min: 0 },
+    otherCosts: { type: Number, required: true, min: 0 },
+    currency: { 
+      type: String, 
+      required: true, 
+      enum: ['USD', 'EUR', 'GBP', 'AED', 'SAR', 'CAD', 'AUD', 'JPY', 'CHF', 'CNY'],
+      default: 'USD'
+    },
+    lastUpdated: { type: Date, required: true, default: Date.now },
+    
+    // Calculated Financial Metrics
+    totalInvestment: { type: Number, default: 0, min: 0 },
+    monthlyOperatingCost: { type: Number, default: 0, min: 0 },
+    monthlyRevenue: { type: Number, default: 0, min: 0 },
+    monthlyProfit: { type: Number, default: 0 },
+    roi: { type: Number, default: 0 },
+    breakEvenPoint: { type: Date }
+  },
+  
   status: {
     type: String,
     required: true,
@@ -328,15 +367,6 @@ const farmDataSchema = new Schema<IFarmDataDocument>({
       actualYield: { type: Number, default: 0, min: 0 },
       actualRevenue: { type: Number, default: 0, min: 0 }
     }
-  },
-  
-  financials: {
-    totalInvestment: { type: Number, default: 0, min: 0 },
-    monthlyOperatingCost: { type: Number, default: 0, min: 0 },
-    monthlyRevenue: { type: Number, default: 0, min: 0 },
-    monthlyProfit: { type: Number, default: 0 },
-    roi: { type: Number, default: 0 },
-    breakEvenPoint: { type: Date }
   },
   
   resources: {

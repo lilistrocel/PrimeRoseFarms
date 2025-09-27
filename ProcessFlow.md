@@ -4,7 +4,85 @@ This document tracks how data is input into the system and how it's used through
 
 ## Data Input Processes
 
-### 1. Agronomist Plant Data Input Process
+### 0. Data Synchronization System ✅ COMPLETE
+
+**Process Owner:** System  
+**Purpose:** Ensure real-time data synchronization between frontend and backend systems
+
+**Critical Issues Resolved (2024-09-27):**
+- **Frontend-Backend Mismatch:** Fixed issue where farms/blocks appeared in UI but not in database
+- **Test Mode Configuration:** Resolved mock data usage preventing real API integration
+- **Environment Configuration:** Created proper `.env` file with test mode settings
+- **API Endpoint Integration:** Added missing farm and block creation endpoints
+
+**Technical Implementation:**
+- **Backend API Routes:** Added `POST /api/v1/manager/farms` and `POST /api/v1/manager/blocks` endpoints
+- **Frontend Configuration:** Fixed test mode configuration in `client/src/config/testMode.ts`
+- **Environment Variables:** Created `client/.env` with `REACT_APP_TEST_MODE=false` and real data modules
+- **API Integration:** All farm and block operations now properly sync with database
+
+**System Benefits:**
+- **Data Integrity:** Frontend and backend data now properly synchronized
+- **Real-time Updates:** All changes immediately reflect in both UI and database
+- **User Experience:** Smooth, error-free farm management operations
+- **Development Workflow:** Proper test mode system for development and production
+
+## Data Input Processes
+
+### 1. Plant Assignment System ✅ COMPLETE
+
+**Process Owner:** Manager  
+**Purpose:** Assign multiple plant types to blocks with capacity management and state tracking
+
+**Recent Improvements (2024-09-27):**
+- **Data Synchronization:** Fixed frontend-backend data synchronization issues
+- **UI/UX Enhancements:** Improved text readability, area calculation, and dropdown functionality
+- **State Management:** Fixed plant assignment button state and form data preservation
+- **API Integration:** Added missing `plantingDate` field and proper error handling
+- **ID Mapping:** Resolved API `id` vs frontend `_id` field mismatches
+
+#### Block States and Transitions
+The system now supports 5 distinct block states:
+
+**Empty State:**
+- No plants assigned
+- Freshly cleaned after harvest
+- Available for new assignments
+
+**Assigned State:**
+- Plants assigned but not yet planted
+- Capacity management active
+- Ready for planting transition
+
+**Planted State:**
+- All assigned plants have been planted
+- Growing phase active
+- Harvest prediction calculations begin
+
+**Harvesting State:**
+- Plants ready for harvest
+- Harvest timing analysis active
+- Early/late harvest tracking
+
+**Alert State:**
+- Temporary override state for issues
+- Disease, pest, weather, equipment alerts
+- Returns to previous state when resolved
+
+#### Multi-Plant Assignment Process
+1. **Capacity Management:** Each block has a maximum plant capacity (user-editable quota)
+2. **Plant Selection:** Multiple plant types can be assigned to the same block
+3. **Quantity Assignment:** Each plant type has its own assigned count
+4. **Capacity Validation:** Real-time validation prevents over-assignment
+5. **State Transitions:** Automatic state changes based on planting/harvest activities
+
+#### Harvest Prediction and Tracking
+- **Expected Dates:** Automatic calculation of harvest start/end dates based on plant data
+- **Timing Analysis:** Tracks early/late harvest starts with detailed notes
+- **State History:** Complete audit trail of all state transitions with timestamps
+- **Performance Metrics:** ROI calculations and yield predictions
+
+### 2. Agronomist Plant Data Input Process
 
 **Process Owner:** Agronomist  
 **Purpose:** Define plant specifications and care requirements for optimal farm operations

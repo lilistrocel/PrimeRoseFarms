@@ -41,13 +41,15 @@ router.get('/daily-tasks', async (req: Request, res: Response) => {
     const currentDate = new Date(date as string);
 
     for (const block of assignedBlocks) {
-      if (!block.currentPlanting?.plantDataId) continue;
+      if (!block.plantAssignment.assignedPlants.length) continue;
 
-      // Get plant data to determine tasks
-      const plant = await PlantData.findById(block.currentPlanting.plantDataId);
-      if (!plant) continue;
+      // Process each assigned plant
+      for (const assignedPlant of block.plantAssignment.assignedPlants) {
+        // Get plant data to determine tasks
+        const plant = await PlantData.findById(assignedPlant.plantDataId);
+        if (!plant) continue;
 
-      const plantingDate = new Date(block.currentPlanting.plantingDate!);
+        const plantingDate = new Date(assignedPlant.plantingDate!);
       const daysSincePlanting = Math.floor((currentDate.getTime() - plantingDate.getTime()) / (1000 * 60 * 60 * 24));
       const plantData = plant as any;
 
@@ -82,7 +84,7 @@ router.get('/daily-tasks', async (req: Request, res: Response) => {
           description: `Water plants in ${block.name}`,
           estimatedTime: 30, // minutes
           requirements: {
-            waterAmount: plantData.growingRequirements.waterRequirements.daily * (block.currentPlanting.plantCount || 0),
+            waterAmount: plantData.growingRequirements.waterRequirements.daily * (assignedPlant.assignedCount || 0),
             equipment: ['irrigation_system', 'water_meter'],
             safety: []
           },
@@ -96,7 +98,7 @@ router.get('/daily-tasks', async (req: Request, res: Response) => {
       }
 
       // Fertilizer tasks (example: weekly during vegetative stage)
-      if (daysSincePlanting > 7 && daysSincePlanting % 7 === 0 && block.currentPlanting.growthStage === 'vegetative') {
+      if (daysSincePlanting > 7 && daysSincePlanting % 7 === 0) {
         blockTasks.push({
           id: `fertilizing_${block._id}_${date}`,
           type: 'fertilizing',
@@ -106,7 +108,7 @@ router.get('/daily-tasks', async (req: Request, res: Response) => {
           estimatedTime: 45, // minutes
           requirements: {
             fertilizerType: plantData.resourceRequirements.fertilizerType,
-            amount: plantData.resourceRequirements.fertilizerAmount * (block.currentPlanting.plantCount || 0),
+            amount: plantData.resourceRequirements.fertilizerAmount * (assignedPlant.assignedCount || 0),
             equipment: ['sprayer', 'measuring_tools', 'mixing_container'],
             safety: ['gloves', 'mask', 'protective_clothing']
           },
@@ -143,8 +145,8 @@ router.get('/daily-tasks', async (req: Request, res: Response) => {
 
       // Harvest tasks (if ready for harvest)
       if (block.status === 'harvesting' || 
-          (block.currentPlanting.expectedHarvestDate && 
-           new Date(block.currentPlanting.expectedHarvestDate) <= currentDate)) {
+          (assignedPlant.expectedHarvestStart &&
+           new Date(assignedPlant.expectedHarvestStart) <= currentDate)) {
         blockTasks.push({
           id: `harvest_${block._id}_${date}`,
           type: 'harvest',
@@ -173,13 +175,14 @@ router.get('/daily-tasks', async (req: Request, res: Response) => {
           name: block.name,
           type: block.blockType,
           plantName: plant.name,
-          plantCount: block.currentPlanting?.plantCount,
-          growthStage: block.currentPlanting?.growthStage,
+          plantCount: assignedPlant.assignedCount,
+          growthStage: 'planted', // All assigned plants are in planted stage
           daysSincePlanting
         };
       });
 
-      tasks.push(...blockTasks);
+        tasks.push(...blockTasks);
+      }
     }
 
     // Sort tasks by priority
@@ -516,10 +519,13 @@ router.post('/record-harvest', async (req: Request, res: Response) => {
 
     // Get plant data for yield comparison
     let expectedYield = 0;
-    if (block.currentPlanting?.plantDataId) {
-      const plant = await PlantData.findById(block.currentPlanting.plantDataId);
-      if (plant) {
-        expectedYield = (plant as any).yieldInfo.expectedYieldPerPlant * (block.currentPlanting.plantCount || 0);
+    if (block.plantAssignment.assignedPlants.length > 0) {
+      // Calculate yield for all assigned plants
+      for (const assignedPlant of block.plantAssignment.assignedPlants) {
+        const plant = await PlantData.findById(assignedPlant.plantDataId);
+        if (plant) {
+          expectedYield += (plant as any).yieldInfo.expectedYieldPerPlant * (assignedPlant.assignedCount || 0);
+        }
       }
     }
 
@@ -556,8 +562,8 @@ router.post('/record-harvest', async (req: Request, res: Response) => {
       blockId,
       harvesterId,
       harvestDate,
-      plantDataId: block.currentPlanting?.plantDataId,
-      plantCount: block.currentPlanting?.plantCount,
+      plantDataId: block.plantAssignment.assignedPlants[0]?.plantDataId,
+      plantCount: block.plantAssignment.totalAssigned,
       harvest: {
         totalQuantity,
         qualityGrades,

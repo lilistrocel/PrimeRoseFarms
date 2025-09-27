@@ -52,15 +52,17 @@ router.get('/predicted-stock', async (req: Request, res: Response) => {
     // Get blocks with expected harvests within timeframe
     const harvestingBlocks = await BlockData.find({
       isActive: true,
-      'currentPlanting.expectedHarvestDate': { 
+      'plantAssignment.assignedPlants.expectedHarvestStart': { 
         $gte: new Date(), 
         $lte: endDate 
       },
-      'currentPlanting.plantDataId': { $exists: true }
+      'plantAssignment.assignedPlants': { $exists: true, $not: { $size: 0 } }
     });
 
     // Get plant data for harvest calculations
-    const plantIds = harvestingBlocks.map(b => b.currentPlanting?.plantDataId).filter(Boolean);
+    const plantIds = harvestingBlocks.flatMap(b => 
+      b.plantAssignment.assignedPlants.map(p => p.plantDataId)
+    ).filter(Boolean);
     const plants = await PlantData.find({ _id: { $in: plantIds } });
     const plantsMap = new Map(plants.map(p => [p._id?.toString(), p]));
 
@@ -68,14 +70,16 @@ router.get('/predicted-stock', async (req: Request, res: Response) => {
     const predictedHarvests: { [key: string]: any } = {};
 
     for (const block of harvestingBlocks) {
-      const plantId = block.currentPlanting?.plantDataId;
-      const plant = plantsMap.get(plantId || '');
-      
-      if (!plant) continue;
+      // Process each assigned plant in the block
+      for (const assignedPlant of block.plantAssignment.assignedPlants) {
+        const plantId = assignedPlant.plantDataId;
+        const plant = plantsMap.get(plantId || '');
+        
+        if (!plant) continue;
 
-      const plantName = plant.name;
-      const expectedYield = (plant as any).yieldInfo.expectedYieldPerPlant * (block.currentPlanting?.plantCount || 0);
-      const harvestDate = block.currentPlanting?.expectedHarvestDate;
+        const plantName = plant.name;
+        const expectedYield = (plant as any).yieldInfo.expectedYieldPerPlant * (assignedPlant.assignedCount || 0);
+        const harvestDate = assignedPlant.expectedHarvestStart;
 
       if (!predictedHarvests[plantName]) {
         predictedHarvests[plantName] = {
@@ -98,7 +102,8 @@ router.get('/predicted-stock', async (req: Request, res: Response) => {
         qualityEstimate: 'standard' // In reality, this would be predicted based on conditions
       });
 
-      predictedHarvests[plantName].totalPredictedYield += expectedYield;
+        predictedHarvests[plantName].totalPredictedYield += expectedYield;
+      }
     }
 
     // Add current inventory data

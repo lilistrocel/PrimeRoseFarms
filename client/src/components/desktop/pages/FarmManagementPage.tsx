@@ -38,15 +38,14 @@ import {
   Lightbulb as OptimizationIcon,
   Assignment as AssignmentIcon
 } from '@mui/icons-material';
-import { useAppSelector } from '../../../store';
 import { 
   farmManagementApi, 
   IFarm, 
   IBlock, 
-  IPlant, 
   IPerformanceDashboard, 
   IBlockOptimization 
 } from '../../../services/farmManagementApi';
+import { IPlantData } from '../../../services/plantDataApi';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -75,11 +74,10 @@ function TabPanel(props: TabPanelProps) {
 }
 
 const FarmManagementPage: React.FC = () => {
-  const user = useAppSelector(state => state.auth.user);
   const [activeTab, setActiveTab] = useState(0);
   const [farms, setFarms] = useState<IFarm[]>([]);
   const [blocks, setBlocks] = useState<IBlock[]>([]);
-  const [plants, setPlants] = useState<IPlant[]>([]);
+  const [plants, setPlants] = useState<IPlantData[]>([]);
   const [performanceData, setPerformanceData] = useState<IPerformanceDashboard | null>(null);
   const [optimizationData, setOptimizationData] = useState<IBlockOptimization[]>([]);
   const [loading, setLoading] = useState(false);
@@ -91,6 +89,42 @@ const FarmManagementPage: React.FC = () => {
   const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
   const [selectedFarm, setSelectedFarm] = useState<IFarm | null>(null);
   const [selectedBlock, setSelectedBlock] = useState<IBlock | null>(null);
+  const [farmDialogTab, setFarmDialogTab] = useState(0);
+  const [plantAssignmentForm, setPlantAssignmentForm] = useState<{
+    blockId?: string;
+    selectedPlants: Array<{
+      plantDataId: string;
+      plantName: string;
+      count: number;
+    }>;
+  }>({
+    selectedPlants: []
+  });
+  
+  // Helper function to update financial data
+  const updateFinancialField = (field: string, value: number | string) => {
+    setFarmForm({
+      ...farmForm,
+      financials: {
+        landRentPerMonth: farmForm.financials?.landRentPerMonth || 0,
+        electricityCostPerKw: farmForm.financials?.electricityCostPerKw || 0,
+        waterCostPerCm3: farmForm.financials?.waterCostPerCm3 || 0,
+        initialCapitalInvestment: farmForm.financials?.initialCapitalInvestment || 0,
+        depreciation: farmForm.financials?.depreciation || 0,
+        incentives: farmForm.financials?.incentives || 0,
+        otherCosts: farmForm.financials?.otherCosts || 0,
+        currency: farmForm.financials?.currency || 'USD',
+        lastUpdated: new Date().toISOString(),
+        totalInvestment: farmForm.financials?.totalInvestment || 0,
+        monthlyOperatingCost: farmForm.financials?.monthlyOperatingCost || 0,
+        monthlyRevenue: farmForm.financials?.monthlyRevenue || 0,
+        monthlyProfit: farmForm.financials?.monthlyProfit || 0,
+        roi: farmForm.financials?.roi || 0,
+        breakEvenPoint: farmForm.financials?.breakEvenPoint || '',
+        [field]: value
+      }
+    });
+  };
   
   // Form states
   const [farmForm, setFarmForm] = useState<Partial<IFarm>>({
@@ -135,6 +169,11 @@ const FarmManagementPage: React.FC = () => {
       area: 0
     }
   });
+  
+  // Debug block form state
+  useEffect(() => {
+    console.log('Block form state:', blockForm);
+  }, [blockForm]);
   const [assignmentForm, setAssignmentForm] = useState({
     blockId: '',
     plantDataId: '',
@@ -162,11 +201,49 @@ const FarmManagementPage: React.FC = () => {
         farmManagementApi.getBlockOptimization()
       ]);
       
-      setFarms(farmsData);
-      setBlocks(blocksData);
-      setPlants(plantsData);
+      const farmsArray = Array.isArray(farmsData) ? farmsData : [];
+      const blocksArray = Array.isArray(blocksData) ? blocksData : [];
+      const plantsArray = Array.isArray(plantsData) ? plantsData : [];
+      const optimizationArray = Array.isArray(optimizationData) ? optimizationData : [];
+      
+      console.log('Loaded farms:', farmsArray);
+      console.log('Loaded blocks:', blocksArray);
+      
+      // Debug block structure
+      if (blocksArray.length > 0) {
+        console.log('First block structure:', blocksArray[0]);
+        console.log('Block ID field:', blocksArray[0]._id);
+        console.log('All block object keys:', Object.keys(blocksArray[0]));
+      }
+      
+      // Debug farm structure
+      if (farmsArray.length > 0) {
+        console.log('First farm structure:', farmsArray[0]);
+        console.log('Farm _id field:', farmsArray[0]._id);
+        console.log('Farm name field:', farmsArray[0].name);
+        console.log('All farm object keys:', Object.keys(farmsArray[0]));
+        console.log('Farm object entries:', Object.entries(farmsArray[0]));
+      }
+      
+      // Map the data to include _id field for compatibility
+      const farmsWithId = farmsArray.map((farm: any) => ({
+        ...farm,
+        _id: farm._id || farm.id || `farm-${Math.random().toString(36).substr(2, 9)}`
+      }));
+      
+      const blocksWithId = blocksArray.map((block: any) => ({
+        ...block,
+        _id: block._id || block.id || `block-${Math.random().toString(36).substr(2, 9)}`
+      }));
+      
+      console.log('Mapped farms with _id:', farmsWithId.map(f => ({ name: f.name, _id: f._id, id: f.id })));
+      console.log('Mapped blocks with _id:', blocksWithId.map(b => ({ name: b.name, _id: b._id, id: b.id })));
+      
+      setFarms(farmsWithId);
+      setBlocks(blocksWithId);
+      setPlants(plantsArray);
       setPerformanceData(performanceData);
-      setOptimizationData(optimizationData);
+      setOptimizationData(optimizationArray);
     } catch (err) {
       setError('Failed to load farm management data');
       console.error('Error loading data:', err);
@@ -187,7 +264,87 @@ const FarmManagementPage: React.FC = () => {
   // Farm management handlers
   const handleCreateFarm = async () => {
     try {
-      await farmManagementApi.createFarm(farmForm as Omit<IFarm, '_id' | 'createdAt' | 'updatedAt'>);
+      const farmData = {
+        ...farmForm,
+        ownerId: '68d2698e7ce115d82039ac85', // Use current user ID
+        // Add required location fields
+        location: {
+          address: farmForm.location?.address || 'Not specified',
+          city: farmForm.location?.city || 'Not specified',
+          state: farmForm.location?.state || 'Not specified',
+          country: farmForm.location?.country || 'Not specified',
+          zipCode: farmForm.location?.zipCode || '00000',
+          coordinates: farmForm.location?.coordinates || { latitude: 0, longitude: 0 },
+          timezone: farmForm.location?.timezone || 'UTC'
+        },
+        // Add required specifications
+        specifications: {
+          ...farmForm.specifications,
+          establishedDate: farmForm.specifications?.establishedDate || new Date().toISOString(),
+          totalArea: farmForm.specifications?.totalArea || 0,
+          usableArea: farmForm.specifications?.usableArea || 0,
+          maxBlocks: farmForm.specifications?.maxBlocks || 0,
+          farmType: farmForm.specifications?.farmType || 'organic',
+          certification: farmForm.specifications?.certification || [],
+          climate: farmForm.specifications?.climate || 'temperate',
+          soilType: farmForm.specifications?.soilType || 'loamy'
+        },
+        // Add required resources
+        resources: {
+          water: {
+            source: 'municipal',
+            dailyUsage: 1000,
+            monthlyCost: 100,
+            quality: 'good'
+          },
+          electricity: {
+            source: 'grid',
+            dailyUsage: 50,
+            monthlyCost: 200,
+            efficiency: 85
+          },
+          labor: {
+            totalWorkers: 5,
+            fullTime: 3,
+            partTime: 2,
+            seasonal: 0,
+            monthlyCost: 5000
+          }
+        },
+        // Add required risks
+        risks: {
+          weather: {
+            riskLevel: 'medium',
+            mitigation: ['Greenhouse protection', 'Weather monitoring'],
+            insurance: true,
+            coverage: 100000
+          },
+          market: {
+            riskLevel: 'medium',
+            diversification: ['Multiple crops', 'Direct sales'],
+            contracts: 50
+          },
+          operational: {
+            riskLevel: 'low',
+            backupSystems: ['Backup irrigation', 'Generator'],
+            contingencyPlans: ['Emergency protocols', 'Staff training']
+          }
+        },
+        // Add required production
+        production: {
+          currentCrops: [],
+          monthlyProduction: [],
+          annualTarget: {
+            year: new Date().getFullYear(),
+            targetYield: 1000,
+            targetRevenue: 50000,
+            actualYield: 0,
+            actualRevenue: 0
+          }
+        }
+      } as Omit<IFarm, '_id' | 'createdAt' | 'updatedAt'>;
+      
+      await farmManagementApi.createFarm(farmData);
       setFarmDialogOpen(false);
       setFarmForm({
         name: '',
@@ -222,6 +379,26 @@ const FarmManagementPage: React.FC = () => {
             west: 0
           }
         },
+        financials: {
+          // Basic Financial Data
+          landRentPerMonth: 0,
+          electricityCostPerKw: 0,
+          waterCostPerCm3: 0,
+          initialCapitalInvestment: 0,
+          depreciation: 0,
+          incentives: 0,
+          otherCosts: 0,
+          currency: 'USD',
+          lastUpdated: new Date().toISOString(),
+          
+          // Calculated Financial Metrics
+          totalInvestment: 0,
+          monthlyOperatingCost: 0,
+          monthlyRevenue: 0,
+          monthlyProfit: 0,
+          roi: 0,
+          breakEvenPoint: ''
+        },
         status: 'active'
       });
       loadData();
@@ -235,7 +412,87 @@ const FarmManagementPage: React.FC = () => {
     if (!selectedFarm) return;
     
     try {
-      await farmManagementApi.updateFarm(selectedFarm._id, farmForm);
+      const farmData = {
+        ...farmForm,
+        ownerId: '68d2698e7ce115d82039ac85', // Use current user ID
+        // Add required location fields
+        location: {
+          address: farmForm.location?.address || 'Not specified',
+          city: farmForm.location?.city || 'Not specified',
+          state: farmForm.location?.state || 'Not specified',
+          country: farmForm.location?.country || 'Not specified',
+          zipCode: farmForm.location?.zipCode || '00000',
+          coordinates: farmForm.location?.coordinates || { latitude: 0, longitude: 0 },
+          timezone: farmForm.location?.timezone || 'UTC'
+        },
+        // Add required specifications
+        specifications: {
+          ...farmForm.specifications,
+          establishedDate: farmForm.specifications?.establishedDate || new Date().toISOString(),
+          totalArea: farmForm.specifications?.totalArea || 0,
+          usableArea: farmForm.specifications?.usableArea || 0,
+          maxBlocks: farmForm.specifications?.maxBlocks || 0,
+          farmType: farmForm.specifications?.farmType || 'organic',
+          certification: farmForm.specifications?.certification || [],
+          climate: farmForm.specifications?.climate || 'temperate',
+          soilType: farmForm.specifications?.soilType || 'loamy'
+        },
+        // Add required resources
+        resources: {
+          water: {
+            source: 'municipal',
+            dailyUsage: 1000,
+            monthlyCost: 100,
+            quality: 'good'
+          },
+          electricity: {
+            source: 'grid',
+            dailyUsage: 50,
+            monthlyCost: 200,
+            efficiency: 85
+          },
+          labor: {
+            totalWorkers: 5,
+            fullTime: 3,
+            partTime: 2,
+            seasonal: 0,
+            monthlyCost: 5000
+          }
+        },
+        // Add required risks
+        risks: {
+          weather: {
+            riskLevel: 'medium',
+            mitigation: ['Greenhouse protection', 'Weather monitoring'],
+            insurance: true,
+            coverage: 100000
+          },
+          market: {
+            riskLevel: 'medium',
+            diversification: ['Multiple crops', 'Direct sales'],
+            contracts: 50
+          },
+          operational: {
+            riskLevel: 'low',
+            backupSystems: ['Backup irrigation', 'Generator'],
+            contingencyPlans: ['Emergency protocols', 'Staff training']
+          }
+        },
+        // Add required production
+        production: {
+          currentCrops: [],
+          monthlyProduction: [],
+          annualTarget: {
+            year: new Date().getFullYear(),
+            targetYield: 1000,
+            targetRevenue: 50000,
+            actualYield: 0,
+            actualRevenue: 0
+          }
+        }
+      };
+      
+      await farmManagementApi.updateFarm(selectedFarm._id, farmData);
       setFarmDialogOpen(false);
       setSelectedFarm(null);
       setFarmForm({
@@ -271,6 +528,26 @@ const FarmManagementPage: React.FC = () => {
             west: 0
           }
         },
+        financials: {
+          // Basic Financial Data
+          landRentPerMonth: 0,
+          electricityCostPerKw: 0,
+          waterCostPerCm3: 0,
+          initialCapitalInvestment: 0,
+          depreciation: 0,
+          incentives: 0,
+          otherCosts: 0,
+          currency: 'USD',
+          lastUpdated: new Date().toISOString(),
+          
+          // Calculated Financial Metrics
+          totalInvestment: 0,
+          monthlyOperatingCost: 0,
+          monthlyRevenue: 0,
+          monthlyProfit: 0,
+          roi: 0,
+          breakEvenPoint: ''
+        },
         status: 'active'
       });
       loadData();
@@ -283,7 +560,82 @@ const FarmManagementPage: React.FC = () => {
   // Block management handlers
   const handleCreateBlock = async () => {
     try {
-      await farmManagementApi.createBlock(blockForm as Omit<IBlock, '_id' | 'createdAt' | 'updatedAt'>);
+      if (!blockForm.farmId) {
+        setError('Please select a farm for the block');
+        return;
+      }
+      
+      if (!blockForm.name) {
+        setError('Please enter a block name');
+        return;
+      }
+      
+      if (!blockForm.blockType) {
+        setError('Please select a block type');
+        return;
+      }
+      
+      // Create block data with all required fields
+      const blockData = {
+        ...blockForm,
+        // Add required location fields
+        location: {
+          coordinates: {
+            x: blockForm.location?.coordinates?.x || 0,
+            y: blockForm.location?.coordinates?.y || 0,
+            z: blockForm.location?.coordinates?.z || 0
+          },
+          orientation: blockForm.location?.orientation || 0
+        },
+        // Add required infrastructure fields
+        infrastructure: {
+          irrigation: {
+            type: 'drip',
+            capacity: 100,
+            coverage: 100,
+            automation: false
+          },
+          lighting: {
+            type: 'natural',
+            intensity: 1000,
+            duration: 12,
+            automation: false
+          },
+          climateControl: {
+            heating: false,
+            cooling: false,
+            ventilation: false,
+            humidityControl: false,
+            automation: false
+          },
+          power: {
+            connected: true,
+            capacity: 1000,
+            backup: false
+          },
+          water: {
+            source: 'municipal',
+            quality: 'good',
+            ph: 7.0,
+            tds: 200
+          }
+        },
+        // Add required plant assignment fields
+        plantAssignment: {
+          maxPlantCapacity: 100,
+          assignedPlants: [],
+          totalAssigned: 0,
+          remainingCapacity: 100
+        },
+        // Add required status
+        status: 'empty',
+        // Add required metadata
+        isActive: true,
+        createdBy: '68d2698e7ce115d82039ac85', // Use current user ID
+        lastModifiedBy: '68d2698e7ce115d82039ac85'
+      } as Omit<IBlock, '_id' | 'createdAt' | 'updatedAt'>;
+      
+      await farmManagementApi.createBlock(blockData);
       setBlockDialogOpen(false);
       setBlockForm({});
       loadData();
@@ -296,8 +648,47 @@ const FarmManagementPage: React.FC = () => {
   const handleUpdateBlock = async () => {
     if (!selectedBlock) return;
     
+    console.log('Updating block:', selectedBlock);
+    console.log('Block ID:', selectedBlock._id);
+    console.log('Block ID type:', typeof selectedBlock._id);
+    
+    if (!selectedBlock._id) {
+      setError('Block ID is missing. Cannot update block.');
+      return;
+    }
+    
+    // Check if the ID looks like a MongoDB ObjectId (24 hex characters)
+    const objectIdRegex = /^[0-9a-fA-F]{24}$/;
+    if (!objectIdRegex.test(selectedBlock._id)) {
+      setError(`Invalid block ID format: ${selectedBlock._id}. Expected MongoDB ObjectId.`);
+      return;
+    }
+    
     try {
-      await farmManagementApi.updateBlock(selectedBlock._id, blockForm);
+      // Create block data with only the changed fields
+      const blockData = {
+        name: blockForm.name,
+        farmId: blockForm.farmId,
+        blockType: blockForm.blockType,
+        dimensions: blockForm.dimensions,
+        // Only include plantAssignment if it was changed
+        ...(blockForm.plantAssignment && {
+          plantAssignment: {
+            maxPlantCapacity: blockForm.plantAssignment.maxPlantCapacity,
+            assignedPlants: blockForm.plantAssignment.assignedPlants || [],
+            totalAssigned: blockForm.plantAssignment.totalAssigned || 0,
+            remainingCapacity: blockForm.plantAssignment.maxPlantCapacity || 100
+          }
+        }),
+        lastModifiedBy: '68d2698e7ce115d82039ac85'
+      };
+      
+      console.log('Sending block update with data:', blockData);
+      console.log('Block ID being used:', selectedBlock._id);
+      
+      const result = await farmManagementApi.updateBlock(selectedBlock._id, blockData);
+      console.log('Block update result:', result);
+      
       setBlockDialogOpen(false);
       setSelectedBlock(null);
       setBlockForm({});
@@ -311,19 +702,89 @@ const FarmManagementPage: React.FC = () => {
   // Plant assignment handler
   const handleAssignPlant = async () => {
     try {
-      await farmManagementApi.assignPlantToBlock(
-        assignmentForm.blockId,
-        assignmentForm.plantDataId,
-        assignmentForm.plantCount,
-        assignmentForm.plantingDate
-      );
+      setLoading(true);
+      if (!selectedBlock || plantAssignmentForm.selectedPlants.length === 0) {
+        setError('Please select a block and at least one plant');
+        return;
+      }
+      
+      // Check if total plants exceed block capacity
+      const totalPlants = plantAssignmentForm.selectedPlants.reduce((sum, plant) => sum + plant.count, 0);
+      if (totalPlants > selectedBlock.plantAssignment.remainingCapacity) {
+        setError(`Cannot assign ${totalPlants} plants. Block only has ${selectedBlock.plantAssignment.remainingCapacity} capacity remaining.`);
+        return;
+      }
+      
+      // Assign plants to block
+      for (const plant of plantAssignmentForm.selectedPlants) {
+        await farmManagementApi.assignPlantToBlock(selectedBlock._id, plant.plantDataId, plant.plantName, plant.count);
+      }
+      
       setAssignmentDialogOpen(false);
-      setAssignmentForm({ blockId: '', plantDataId: '', plantCount: 0, plantingDate: '' });
+      setPlantAssignmentForm({ selectedPlants: [] });
       loadData();
     } catch (err) {
-      setError('Failed to assign plant to block');
-      console.error('Error assigning plant:', err);
+      setError('Failed to assign plants');
+    } finally {
+      setLoading(false);
     }
+  };
+  
+  const addPlantToAssignment = (plant: IPlantData, count: number) => {
+    console.log('🔍 addPlantToAssignment called:', { plant, count, currentForm: plantAssignmentForm });
+    
+    if (!plant._id) {
+      console.error('Plant ID is undefined');
+      return;
+    }
+    
+    const existingIndex = plantAssignmentForm.selectedPlants.findIndex(p => p.plantDataId === plant._id);
+    console.log('🔍 Existing plant index:', existingIndex);
+    
+    if (existingIndex >= 0) {
+      const updatedPlants = [...plantAssignmentForm.selectedPlants];
+      updatedPlants[existingIndex].count += count;
+      console.log('🔍 Updating existing plant:', updatedPlants);
+      setPlantAssignmentForm({ 
+        ...plantAssignmentForm, // Preserve all existing form data including blockId
+        selectedPlants: updatedPlants 
+      });
+    } else {
+      const newPlant = {
+        plantDataId: plant._id,
+        plantName: plant.name,
+        count: count
+      };
+      const newSelectedPlants = [...plantAssignmentForm.selectedPlants, newPlant];
+      console.log('🔍 Adding new plant:', newPlant);
+      console.log('🔍 New selected plants:', newSelectedPlants);
+      setPlantAssignmentForm({
+        ...plantAssignmentForm, // Preserve all existing form data including blockId
+        selectedPlants: newSelectedPlants
+      });
+    }
+  };
+  
+  const removePlantFromAssignment = (plantDataId: string) => {
+    setPlantAssignmentForm({
+      ...plantAssignmentForm, // Preserve all existing form data including blockId
+      selectedPlants: plantAssignmentForm.selectedPlants.filter(p => p.plantDataId !== plantDataId)
+    });
+  };
+  
+  const updatePlantCount = (plantDataId: string, count: number) => {
+    if (count <= 0) {
+      removePlantFromAssignment(plantDataId);
+      return;
+    }
+    
+    const updatedPlants = plantAssignmentForm.selectedPlants.map(p => 
+      p.plantDataId === plantDataId ? { ...p, count } : p
+    );
+    setPlantAssignmentForm({ 
+      ...plantAssignmentForm, // Preserve all existing form data including blockId
+      selectedPlants: updatedPlants 
+    });
   };
 
   // For now, show all farms and blocks (filtering can be implemented later)
@@ -333,12 +794,11 @@ const FarmManagementPage: React.FC = () => {
   // Get status color
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'success';
-      case 'growing': return 'success';
-      case 'available': return 'info';
-      case 'harvesting': return 'warning';
-      case 'maintenance': return 'error';
-      case 'inactive': return 'default';
+      case 'empty': return 'default';
+      case 'assigned': return 'info';
+      case 'planted': return 'primary';
+      case 'harvesting': return 'secondary';
+      case 'alert': return 'error';
       default: return 'default';
     }
   };
@@ -603,6 +1063,26 @@ const FarmManagementPage: React.FC = () => {
             west: 0
           }
         },
+        financials: {
+          // Basic Financial Data
+          landRentPerMonth: 0,
+          electricityCostPerKw: 0,
+          waterCostPerCm3: 0,
+          initialCapitalInvestment: 0,
+          depreciation: 0,
+          incentives: 0,
+          otherCosts: 0,
+          currency: 'USD',
+          lastUpdated: new Date().toISOString(),
+          
+          // Calculated Financial Metrics
+          totalInvestment: 0,
+          monthlyOperatingCost: 0,
+          monthlyRevenue: 0,
+          monthlyProfit: 0,
+          roi: 0,
+          breakEvenPoint: ''
+        },
         status: 'active'
       });
               setFarmDialogOpen(true);
@@ -640,9 +1120,21 @@ const FarmManagementPage: React.FC = () => {
                     <strong>Coordinates:</strong> {farm.location?.coordinates?.latitude?.toFixed(4) || 'N/A'}, {farm.location?.coordinates?.longitude?.toFixed(4) || 'N/A'}
                   </Typography>
                   
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     {farm.specifications?.totalArea || 0} hectares • {farm.specifications?.farmType || 'N/A'} • Max Blocks: {farm.specifications?.maxBlocks || 0}
                   </Typography>
+                  
+                  {farm.financials && (
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        <strong>Financial Summary:</strong> Monthly Rent: {farm.financials.currency} {farm.financials.landRentPerMonth?.toLocaleString() || '0'} • 
+                        Investment: {farm.financials.currency} {farm.financials.initialCapitalInvestment?.toLocaleString() || '0'}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        ROI: {farm.financials.roi?.toFixed(1) || '0'}% • Monthly Profit: {farm.financials.currency} {farm.financials.monthlyProfit?.toLocaleString() || '0'}
+                      </Typography>
+                    </Box>
+                  )}
 
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                     <Box>
@@ -666,7 +1158,7 @@ const FarmManagementPage: React.FC = () => {
                         Available
                       </Typography>
                       <Typography variant="h6">
-                        {blocks.filter(block => block.farmId === farm._id && block.status === 'available').length}
+                        {Math.max(0, (farm.specifications?.maxBlocks || 0) - blocks.filter(block => block.farmId === farm._id).length)}
                       </Typography>
                     </Box>
                   </Box>
@@ -761,16 +1253,24 @@ const FarmManagementPage: React.FC = () => {
                   </TableCell>
                   <TableCell>{block.dimensions.area}</TableCell>
                   <TableCell>
-                    {block.currentPlant ? (
+                    {block.plantAssignment.assignedPlants.length > 0 ? (
                       <Box>
-                        <Typography variant="body2">{block.currentPlant.plantName}</Typography>
+                        {block.plantAssignment.assignedPlants.map((plant, index) => (
+                          <Box key={index} sx={{ mb: 0.5 }}>
+                            <Typography variant="body2">{plant.plantName}</Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {plant.assignedCount} plants
+                              {plant.plantingDate && ` • Planted: ${new Date(plant.plantingDate).toLocaleDateString()}`}
+                            </Typography>
+                          </Box>
+                        ))}
                         <Typography variant="caption" color="text.secondary">
-                          {block.currentPlant.plantCount} plants
+                          Total: {block.plantAssignment.totalAssigned}/{block.plantAssignment.maxPlantCapacity}
                         </Typography>
                       </Box>
                     ) : (
                       <Typography variant="body2" color="text.secondary">
-                        No plant assigned
+                        No plants assigned
                       </Typography>
                     )}
                   </TableCell>
@@ -778,8 +1278,27 @@ const FarmManagementPage: React.FC = () => {
                     <IconButton
                       size="small"
                       onClick={() => {
-                        setSelectedBlock(block);
-                        setBlockForm(block);
+                        console.log('Block data for editing:', block);
+                        console.log('Block _id:', block._id);
+                        console.log('Block id:', (block as any).id);
+                        console.log('All block keys:', Object.keys(block));
+                        
+                        // Use the actual ID field that exists in the data
+                        const blockId = block._id || (block as any).id;
+                        
+                        if (!blockId) {
+                          setError('Cannot edit block: No valid ID found');
+                          return;
+                        }
+                        
+                        // Use the actual ID from the block data
+                        const blockWithId = {
+                          ...block,
+                          _id: blockId
+                        };
+                        console.log('Editing block with ID:', blockWithId._id);
+                        setSelectedBlock(blockWithId);
+                        setBlockForm(blockWithId);
                         setBlockDialogOpen(true);
                       }}
                     >
@@ -806,7 +1325,7 @@ const FarmManagementPage: React.FC = () => {
               <Card>
                 <CardContent>
                   <Typography variant="h4" color="primary">
-                    {performanceData.totalBlocks}
+                    {performanceData.totalBlocks || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Total Blocks
@@ -818,7 +1337,7 @@ const FarmManagementPage: React.FC = () => {
               <Card>
                 <CardContent>
                   <Typography variant="h4" color="success.main">
-                    {performanceData.activeBlocks}
+                    {performanceData.activeBlocks || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Active Blocks
@@ -830,7 +1349,7 @@ const FarmManagementPage: React.FC = () => {
               <Card>
                 <CardContent>
                   <Typography variant="h4" color="info.main">
-                    {performanceData.totalYield.toLocaleString()}
+                    {performanceData.totalYield?.toLocaleString() || '0'}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Total Yield (kg)
@@ -842,7 +1361,7 @@ const FarmManagementPage: React.FC = () => {
               <Card>
                 <CardContent>
                   <Typography variant="h4" color="warning.main">
-                    ${performanceData.totalRevenue.toLocaleString()}
+                    ${performanceData.totalRevenue?.toLocaleString() || '0'}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Total Revenue
@@ -859,39 +1378,47 @@ const FarmManagementPage: React.FC = () => {
         <Typography variant="h6" sx={{ mb: 3 }}>Block Optimization</Typography>
         
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
-          {optimizationData.map((optimization) => (
-            <Box key={optimization.blockId} sx={{ flex: '1 1 400px', minWidth: '400px' }}>
-              <Card>
-                <CardContent>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6">{optimization.blockName}</Typography>
-                    <Chip 
-                      label={`${Math.round(optimization.optimizationScore * 100)}%`}
-                      color={optimization.optimizationScore > 0.7 ? 'success' : 'warning'}
-                    />
-                  </Box>
-                  
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    Current Status: {optimization.currentStatus}
-                  </Typography>
-
-                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                    Recommendations:
-                  </Typography>
-                  {optimization.recommendations.map((rec, index) => (
-                    <Box key={index} sx={{ mb: 1 }}>
-                      <Typography variant="body2">
-                        • {rec.description}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        Impact: {rec.impact} • Cost: ${rec.cost} • Benefit: ${rec.expectedBenefit}
-                      </Typography>
+          {Array.isArray(optimizationData) && optimizationData.length > 0 ? (
+            optimizationData.map((optimization) => (
+              <Box key={optimization.blockId} sx={{ flex: '1 1 400px', minWidth: '400px' }}>
+                <Card>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                      <Typography variant="h6">{optimization.blockName}</Typography>
+                      <Chip 
+                        label={`${Math.round(optimization.optimizationScore * 100)}%`}
+                        color={optimization.optimizationScore > 0.7 ? 'success' : 'warning'}
+                      />
                     </Box>
-                  ))}
-                </CardContent>
-              </Card>
+                    
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      Current Status: {optimization.currentStatus}
+                    </Typography>
+
+                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                      Recommendations:
+                    </Typography>
+                    {optimization.recommendations.map((rec, index) => (
+                      <Box key={index} sx={{ mb: 1 }}>
+                        <Typography variant="body2">
+                          • {rec.description}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          Impact: {rec.impact} • Cost: ${rec.cost} • Benefit: ${rec.expectedBenefit}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </CardContent>
+                </Card>
+              </Box>
+            ))
+          ) : (
+            <Box sx={{ flex: '1 1 100%', textAlign: 'center', py: 4 }}>
+              <Typography variant="body1" color="text.secondary">
+                No optimization data available. Create some blocks to see optimization recommendations.
+              </Typography>
             </Box>
-          ))}
+          )}
         </Box>
       </TabPanel>
 
@@ -905,7 +1432,7 @@ const FarmManagementPage: React.FC = () => {
               <Card>
                 <CardContent>
                   <Typography variant="h4" color="primary">
-                    {performanceData.totalBlocks}
+                    {performanceData.totalBlocks || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Total Blocks
@@ -917,7 +1444,7 @@ const FarmManagementPage: React.FC = () => {
               <Card>
                 <CardContent>
                   <Typography variant="h4" color="success.main">
-                    {performanceData.activeBlocks}
+                    {performanceData.activeBlocks || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Active Blocks
@@ -929,7 +1456,7 @@ const FarmManagementPage: React.FC = () => {
               <Card>
                 <CardContent>
                   <Typography variant="h4" color="info.main">
-                    {performanceData.totalYield.toLocaleString()} kg
+                    {performanceData.totalYield?.toLocaleString() || '0'} kg
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Total Yield (kg)
@@ -941,7 +1468,7 @@ const FarmManagementPage: React.FC = () => {
               <Card>
                 <CardContent>
                   <Typography variant="h4" color="warning.main">
-                    ${performanceData.totalRevenue.toLocaleString()}
+                    ${performanceData.totalRevenue?.toLocaleString() || '0'}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Total Revenue
@@ -995,11 +1522,17 @@ const FarmManagementPage: React.FC = () => {
       </TabPanel>
 
       {/* Farm Dialog */}
-      <Dialog open={farmDialogOpen} onClose={() => setFarmDialogOpen(false)} maxWidth="md" fullWidth>
+      <Dialog open={farmDialogOpen} onClose={() => setFarmDialogOpen(false)} maxWidth="lg" fullWidth>
         <DialogTitle>
           {selectedFarm ? 'Edit Farm' : 'Create New Farm'}
         </DialogTitle>
         <DialogContent>
+          <Tabs value={farmDialogTab} onChange={(e, newValue) => setFarmDialogTab(newValue)} sx={{ mb: 2 }}>
+            <Tab label="Basic Information" />
+            <Tab label="Financial Data" />
+          </Tabs>
+          
+          {farmDialogTab === 0 && (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 1 }}>
             {/* Farm Name */}
             <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
@@ -1283,6 +1816,99 @@ const FarmManagementPage: React.FC = () => {
               />
             </Box>
           </Box>
+          )}
+          
+          {farmDialogTab === 1 && (
+            <Box sx={{ mt: 2 }}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
+                  <TextField
+                    fullWidth
+                    label="Land Rent per Month"
+                    type="number"
+                    value={farmForm.financials?.landRentPerMonth || ''}
+                    onChange={(e) => updateFinancialField('landRentPerMonth', parseFloat(e.target.value) || 0)}
+                    helperText="Monthly rent for the farm land"
+                  />
+                </Box>
+                <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
+                  <TextField
+                    fullWidth
+                    label="Electricity Cost per kW"
+                    type="number"
+                    value={farmForm.financials?.electricityCostPerKw || ''}
+                    onChange={(e) => updateFinancialField('electricityCostPerKw', parseFloat(e.target.value) || 0)}
+                    helperText="Cost per kilowatt of electricity"
+                  />
+                </Box>
+                <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
+                  <TextField
+                    fullWidth
+                    label="Water Cost per cm³"
+                    type="number"
+                    value={farmForm.financials?.waterCostPerCm3 || ''}
+                    onChange={(e) => updateFinancialField('waterCostPerCm3', parseFloat(e.target.value) || 0)}
+                    helperText="Cost per cubic centimeter of water"
+                  />
+                </Box>
+                <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
+                  <TextField
+                    fullWidth
+                    label="Initial Capital Investment"
+                    type="number"
+                    value={farmForm.financials?.initialCapitalInvestment || ''}
+                    onChange={(e) => updateFinancialField('initialCapitalInvestment', parseFloat(e.target.value) || 0)}
+                    helperText="Total initial investment in the farm"
+                  />
+                </Box>
+                <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
+                  <TextField
+                    fullWidth
+                    label="Depreciation"
+                    type="number"
+                    value={farmForm.financials?.depreciation || ''}
+                    onChange={(e) => updateFinancialField('depreciation', parseFloat(e.target.value) || 0)}
+                    helperText="Annual depreciation amount"
+                  />
+                </Box>
+                <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
+                  <TextField
+                    fullWidth
+                    label="Incentives"
+                    type="number"
+                    value={farmForm.financials?.incentives || ''}
+                    onChange={(e) => updateFinancialField('incentives', parseFloat(e.target.value) || 0)}
+                    helperText="Government incentives received"
+                  />
+                </Box>
+                <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
+                  <TextField
+                    fullWidth
+                    label="Other Costs"
+                    type="number"
+                    value={farmForm.financials?.otherCosts || ''}
+                    onChange={(e) => updateFinancialField('otherCosts', parseFloat(e.target.value) || 0)}
+                    helperText="Additional miscellaneous costs"
+                  />
+                </Box>
+                <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
+                  <FormControl fullWidth>
+                    <InputLabel>Currency</InputLabel>
+                    <Select
+                      value={farmForm.financials?.currency || 'USD'}
+                      onChange={(e) => updateFinancialField('currency', e.target.value)}
+                    >
+                      <MenuItem value="USD">USD - US Dollar</MenuItem>
+                      <MenuItem value="EUR">EUR - Euro</MenuItem>
+                      <MenuItem value="GBP">GBP - British Pound</MenuItem>
+                      <MenuItem value="AED">AED - UAE Dirham</MenuItem>
+                      <MenuItem value="SAR">SAR - Saudi Riyal</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
+              </Box>
+            </Box>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setFarmDialogOpen(false)}>Cancel</Button>
@@ -1308,18 +1934,43 @@ const FarmManagementPage: React.FC = () => {
               />
             </Box>
             <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
-              <FormControl fullWidth>
+              <FormControl fullWidth required>
                 <InputLabel>Farm</InputLabel>
                 <Select
                   value={blockForm.farmId || ''}
-                  onChange={(e) => setBlockForm({ ...blockForm, farmId: e.target.value })}
+                  onChange={(e) => {
+                    console.log('Farm selected:', e.target.value);
+                    console.log('Current blockForm.farmId:', blockForm.farmId);
+                    console.log('Event target value:', e.target.value);
+                    setBlockForm({ ...blockForm, farmId: e.target.value });
+                  }}
+                  label="Farm"
+                  displayEmpty
                 >
-                  {farms.map((farm) => (
-                    <MenuItem key={farm._id} value={farm._id}>
-                      {farm.name}
+                  <MenuItem value="" disabled>
+                    <em>Select a farm</em>
+                  </MenuItem>
+                  {farms.length > 0 ? (
+                    farms.map((farm, index) => {
+                      const farmId = farm._id || `farm-${index}`;
+                      console.log('Rendering farm option:', farmId, farm.name, farm.farmId);
+                      return (
+                        <MenuItem key={farmId} value={farmId}>
+                          {farm.name} ({farm.farmId})
+                        </MenuItem>
+                      );
+                    })
+                  ) : (
+                    <MenuItem disabled>
+                      No farms available. Create a farm first.
                     </MenuItem>
-                  ))}
+                  )}
                 </Select>
+                {farms.length === 0 && (
+                  <Typography variant="caption" color="error" sx={{ mt: 1, display: 'block' }}>
+                    Please create a farm before creating blocks.
+                  </Typography>
+                )}
               </FormControl>
             </Box>
             <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
@@ -1345,15 +1996,20 @@ const FarmManagementPage: React.FC = () => {
                 label="Length (meters)"
                 type="number"
                 value={blockForm.dimensions?.length || ''}
-                onChange={(e) => setBlockForm({
-                  ...blockForm,
-                  dimensions: { 
-                    ...blockForm.dimensions,
-                    length: parseFloat(e.target.value) || 0,
-                    width: blockForm.dimensions?.width || 0,
-                    area: blockForm.dimensions?.area || 0
-                  }
-                })}
+                onChange={(e) => {
+                  const length = parseFloat(e.target.value) || 0;
+                  const width = blockForm.dimensions?.width || 0;
+                  const area = length * width;
+                  setBlockForm({
+                    ...blockForm,
+                    dimensions: { 
+                      ...blockForm.dimensions,
+                      length,
+                      width,
+                      area
+                    }
+                  });
+                }}
               />
             </Box>
             <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
@@ -1362,15 +2018,20 @@ const FarmManagementPage: React.FC = () => {
                 label="Width (meters)"
                 type="number"
                 value={blockForm.dimensions?.width || ''}
-                onChange={(e) => setBlockForm({
-                  ...blockForm,
-                  dimensions: { 
-                    ...blockForm.dimensions,
-                    length: blockForm.dimensions?.length || 0,
-                    width: parseFloat(e.target.value) || 0,
-                    area: blockForm.dimensions?.area || 0
-                  }
-                })}
+                onChange={(e) => {
+                  const width = parseFloat(e.target.value) || 0;
+                  const length = blockForm.dimensions?.length || 0;
+                  const area = length * width;
+                  setBlockForm({
+                    ...blockForm,
+                    dimensions: { 
+                      ...blockForm.dimensions,
+                      length,
+                      width,
+                      area
+                    }
+                  });
+                }}
               />
             </Box>
             <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
@@ -1379,15 +2040,43 @@ const FarmManagementPage: React.FC = () => {
                 label="Area (m²)"
                 type="number"
                 value={blockForm.dimensions?.area || ''}
+                disabled
+                helperText="Automatically calculated from length × width"
+                sx={{
+                  '& .MuiInputBase-input': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    color: 'rgba(255, 255, 255, 0.7)'
+                  },
+                  '& .MuiFormHelperText-root': {
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    fontSize: '0.875rem'
+                  }
+                }}
+              />
+            </Box>
+            <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
+              <TextField
+                fullWidth
+                label="Maximum Plant Capacity"
+                type="number"
+                value={blockForm.plantAssignment?.maxPlantCapacity || ''}
                 onChange={(e) => setBlockForm({
                   ...blockForm,
-                  dimensions: { 
-                    ...blockForm.dimensions,
-                    length: blockForm.dimensions?.length || 0,
-                    width: blockForm.dimensions?.width || 0,
-                    area: parseFloat(e.target.value) || 0
+                  plantAssignment: {
+                    ...blockForm.plantAssignment,
+                    maxPlantCapacity: parseInt(e.target.value) || 0,
+                    assignedPlants: blockForm.plantAssignment?.assignedPlants || [],
+                    totalAssigned: blockForm.plantAssignment?.totalAssigned || 0,
+                    remainingCapacity: parseInt(e.target.value) || 0
                   }
                 })}
+                helperText="Maximum number of plants this block can hold"
+                sx={{
+                  '& .MuiFormHelperText-root': {
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    fontSize: '0.875rem'
+                  }
+                }}
               />
             </Box>
           </Box>
@@ -1401,65 +2090,224 @@ const FarmManagementPage: React.FC = () => {
       </Dialog>
 
       {/* Plant Assignment Dialog */}
-      <Dialog open={assignmentDialogOpen} onClose={() => setAssignmentDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Assign Plant to Block</DialogTitle>
+      <Dialog open={assignmentDialogOpen} onClose={() => setAssignmentDialogOpen(false)} maxWidth="lg" fullWidth>
+        <DialogTitle>
+          Assign Plants to Block
+        </DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 1 }}>
-            <Box sx={{ flex: '1 1 100%', minWidth: '100%' }}>
-              <FormControl fullWidth>
-                <InputLabel>Block</InputLabel>
-                <Select
-                  value={assignmentForm.blockId}
-                  onChange={(e) => setAssignmentForm({ ...assignmentForm, blockId: e.target.value })}
-                >
-                  {blocks.filter(b => b.status === 'available').map((block) => (
-                    <MenuItem key={block._id} value={block._id}>
-                      {block.name} ({farms.find(f => f._id === block.farmId)?.name})
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
-            <Box sx={{ flex: '1 1 100%', minWidth: '100%' }}>
-              <FormControl fullWidth>
-                <InputLabel>Plant</InputLabel>
-                <Select
-                  value={assignmentForm.plantDataId}
-                  onChange={(e) => setAssignmentForm({ ...assignmentForm, plantDataId: e.target.value })}
-                >
-                  {plants.map((plant) => (
-                    <MenuItem key={plant._id} value={plant._id}>
-                      {plant.name} ({plant.variety})
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
-            <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
-              <TextField
-                fullWidth
-                label="Plant Count"
-                type="number"
-                value={assignmentForm.plantCount}
-                onChange={(e) => setAssignmentForm({ ...assignmentForm, plantCount: parseInt(e.target.value) })}
-              />
-            </Box>
-            <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
-              <TextField
-                fullWidth
-                label="Planting Date"
-                type="date"
-                value={assignmentForm.plantingDate}
-                onChange={(e) => setAssignmentForm({ ...assignmentForm, plantingDate: e.target.value })}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Box>
+          {/* Block Selection */}
+          <Box sx={{ mb: 3 }}>
+            <FormControl fullWidth required sx={{ mb: 2 }}>
+              <InputLabel>Select Block</InputLabel>
+              <Select
+                value={plantAssignmentForm.blockId || ''}
+                onChange={(e) => {
+                  const blockId = e.target.value;
+                  const block = blocks.find(b => (b._id || (b as any).id) === blockId);
+                  console.log('Block selected:', blockId, block);
+                  setPlantAssignmentForm({ 
+                    ...plantAssignmentForm, 
+                    blockId,
+                    selectedPlants: [] // Reset plants when block changes
+                  });
+                  setSelectedBlock(block || null);
+                }}
+                label="Select Block"
+              >
+                {blocks.length > 0 ? (
+                  blocks.map((block, index) => {
+                    const blockId = block._id || (block as any).id || `block-${index}`;
+                    console.log('Rendering block option:', blockId, block.name, block.blockType);
+                    return (
+                      <MenuItem key={blockId} value={blockId}>
+                        {block.name} ({block.blockType}) - Capacity: {block.plantAssignment?.remainingCapacity || 0}
+                      </MenuItem>
+                    );
+                  })
+                ) : (
+                  <MenuItem disabled>No blocks available</MenuItem>
+                )}
+              </Select>
+            </FormControl>
+            
+            {selectedBlock && (
+              <Box sx={{ p: 2, bgcolor: 'grey.800', borderRadius: 1, border: '1px solid', borderColor: 'grey.600' }}>
+                <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 'bold' }}>Selected Block Details</Typography>
+                <Typography variant="body2" sx={{ color: 'grey.300', mt: 1 }}>
+                  Block: {selectedBlock.name} | Type: {selectedBlock.blockType} | 
+                  Capacity: {selectedBlock.plantAssignment?.remainingCapacity || 0} plants remaining
+                </Typography>
+              </Box>
+            )}
           </Box>
+
+          {selectedBlock && (
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              {/* Available Plants - Filtered by Block Type */}
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  Available Plants (Filtered for {selectedBlock.blockType})
+                </Typography>
+                <FormControl fullWidth sx={{ mb: 2 }}>
+                  <InputLabel>Select Plant</InputLabel>
+                  <Select
+                    value={assignmentForm.plantDataId || ''}
+                    onChange={(e) => setAssignmentForm({ ...assignmentForm, plantDataId: e.target.value })}
+                    label="Select Plant"
+                  >
+                    {plants
+                      .filter(plant => {
+                        // Filter plants based on block type
+                        const blockType = selectedBlock.blockType;
+                        if (blockType === 'open_field') {
+                          return plant.farmingType === 'open_field_soil' || plant.farmingType === 'open_field_desert';
+                        } else if (blockType === 'greenhouse') {
+                          return plant.farmingType === 'greenhouse';
+                        } else if (blockType === 'hydroponic') {
+                          return plant.farmingType === 'hydroponic';
+                        } else if (blockType === 'vertical') {
+                          return plant.farmingType === 'special';
+                        } else if (blockType === 'aquaponic') {
+                          return plant.farmingType === 'aquaponic';
+                        }
+                        return true; // Show all if no specific filter
+                      })
+                      .map((plant, index) => {
+                        const plantId = plant._id || (plant as any).id || `plant-${index}`;
+                        console.log('Rendering plant option:', plantId, plant.name, plant.farmingType);
+                        return (
+                          <MenuItem key={plantId} value={plantId}>
+                            {plant.name} ({plant.farmingType})
+                          </MenuItem>
+                        );
+                      })}
+                  </Select>
+                </FormControl>
+                
+                {assignmentForm.plantDataId && (
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                    <TextField
+                      label="Plant Count"
+                      type="number"
+                      value={assignmentForm.plantCount || ''}
+                      onChange={(e) => setAssignmentForm({ ...assignmentForm, plantCount: parseInt(e.target.value) || 0 })}
+                      sx={{ width: 120 }}
+                    />
+                    <Button
+                      variant="outlined"
+                      onClick={() => {
+                        const plant = plants.find(p => (p._id || (p as any).id) === assignmentForm.plantDataId);
+                        console.log('Adding plant:', assignmentForm.plantDataId, plant);
+                        if (plant && assignmentForm.plantCount > 0) {
+                          addPlantToAssignment(plant, assignmentForm.plantCount);
+                          setAssignmentForm({ ...assignmentForm, plantDataId: '', plantCount: 0 });
+                        }
+                      }}
+                      disabled={!assignmentForm.plantDataId || !assignmentForm.plantCount}
+                    >
+                      Add Plant
+                    </Button>
+                  </Box>
+                )}
+              </Box>
+              
+              {/* Selected Plants */}
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="h6" sx={{ mb: 2 }}>Selected Plants</Typography>
+                <Box sx={{ maxHeight: 300, overflowY: 'auto' }}>
+                  {plantAssignmentForm.selectedPlants.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+                      No plants selected
+                    </Typography>
+                  ) : (
+                    plantAssignmentForm.selectedPlants.map((plant) => (
+                      <Card key={plant.plantDataId} sx={{ mb: 1, p: 2 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Box>
+                            <Typography variant="subtitle1">{plant.plantName}</Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {plant.count} plants
+                            </Typography>
+                          </Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <TextField
+                              size="small"
+                              type="number"
+                              value={plant.count}
+                              onChange={(e) => updatePlantCount(plant.plantDataId, parseInt(e.target.value) || 0)}
+                              sx={{ width: 80 }}
+                            />
+                            <Button
+                              size="small"
+                              color="error"
+                              onClick={() => removePlantFromAssignment(plant.plantDataId)}
+                            >
+                              Remove
+                            </Button>
+                          </Box>
+                        </Box>
+                      </Card>
+                    ))
+                  )}
+                </Box>
+                
+                {/* Summary */}
+                {plantAssignmentForm.selectedPlants.length > 0 && (
+                  <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.800', borderRadius: 1, border: '1px solid', borderColor: 'grey.600' }}>
+                    <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 'bold' }}>Assignment Summary</Typography>
+                    <Typography variant="body2" sx={{ color: 'grey.300', mt: 1 }}>
+                      Total Plants: {plantAssignmentForm.selectedPlants.reduce((sum, p) => sum + p.count, 0)}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'grey.300' }}>
+                      Remaining Capacity: {selectedBlock.plantAssignment?.remainingCapacity - plantAssignmentForm.selectedPlants.reduce((sum, p) => sum + p.count, 0)}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            </Box>
+          )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setAssignmentDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleAssignPlant} variant="contained">
-            Assign Plant
+          <Button onClick={() => {
+            setAssignmentDialogOpen(false);
+            setPlantAssignmentForm({ selectedPlants: [] });
+            setSelectedBlock(null);
+          }}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={() => {
+              console.log('Assign Plants clicked');
+              console.log('Selected plants:', plantAssignmentForm.selectedPlants);
+              console.log('Block ID:', plantAssignmentForm.blockId);
+              console.log('Button disabled:', plantAssignmentForm.selectedPlants.length === 0 || !plantAssignmentForm.blockId);
+              handleAssignPlant();
+            }} 
+            variant="contained"
+            disabled={(() => {
+              const isDisabled = plantAssignmentForm.selectedPlants.length === 0 || !plantAssignmentForm.blockId;
+              console.log('🔍 Assign Plants Button Debug:', {
+                selectedPlantsLength: plantAssignmentForm.selectedPlants.length,
+                blockId: plantAssignmentForm.blockId,
+                selectedPlants: plantAssignmentForm.selectedPlants,
+                isDisabled: isDisabled,
+                plantAssignmentForm: plantAssignmentForm
+              });
+              return isDisabled;
+            })()}
+            sx={{
+              backgroundColor: plantAssignmentForm.selectedPlants.length === 0 || !plantAssignmentForm.blockId 
+                ? 'grey.600' 
+                : 'primary.main',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: plantAssignmentForm.selectedPlants.length === 0 || !plantAssignmentForm.blockId 
+                  ? 'grey.600' 
+                  : 'primary.dark'
+              }
+            }}
+          >
+            Assign Plants
           </Button>
         </DialogActions>
       </Dialog>

@@ -42,6 +42,26 @@ export interface IFarm {
     };
   };
   status: 'active' | 'inactive' | 'maintenance' | 'expansion' | 'sale';
+  financials: {
+    // Basic Financial Data
+    landRentPerMonth: number;
+    electricityCostPerKw: number;
+    waterCostPerCm3: number;
+    initialCapitalInvestment: number;
+    depreciation: number;
+    incentives: number;
+    otherCosts: number;
+    currency: string;
+    lastUpdated: string;
+    
+    // Calculated Financial Metrics
+    totalInvestment: number;
+    monthlyOperatingCost: number;
+    monthlyRevenue: number;
+    monthlyProfit: number;
+    roi: number;
+    breakEvenPoint: string;
+  };
   currentOperations: {
     activeBlocks: string[];
     plannedBlocks: string[];
@@ -70,14 +90,6 @@ export interface IFarm {
       actualYield: number;
       actualRevenue: number;
     };
-  };
-  financials: {
-    totalInvestment: number;
-    monthlyOperatingCost: number;
-    monthlyRevenue: number;
-    monthlyProfit: number;
-    roi: number;
-    breakEvenPoint?: string;
   };
   isActive: boolean;
   createdAt: string;
@@ -137,14 +149,38 @@ export interface IBlock {
       tds: number;
     };
   };
-  status: 'available' | 'preparing' | 'planting' | 'growing' | 'harvesting' | 'maintenance' | 'inactive';
-  currentPlant?: {
-    plantDataId: string;
-    plantName: string;
-    plantCount: number;
-    plantingDate: string;
-    expectedHarvestDate: string;
-    growthStage: 'germination' | 'vegetative' | 'flowering' | 'fruiting' | 'maturity';
+  status: 'empty' | 'assigned' | 'planted' | 'harvesting' | 'alert';
+  plantAssignment: {
+    maxPlantCapacity: number;
+    assignedPlants: Array<{
+      plantDataId: string;
+      plantName: string;
+      assignedCount: number;
+      plantingDate?: string;
+      expectedHarvestStart?: string;
+      expectedHarvestEnd?: string;
+      actualHarvestStart?: string;
+      actualHarvestEnd?: string;
+      harvestNotes?: string;
+    }>;
+    totalAssigned: number;
+    remainingCapacity: number;
+  };
+  stateHistory: Array<{
+    fromState: string;
+    toState: string;
+    timestamp: string;
+    notes?: string;
+    triggeredBy?: string;
+  }>;
+  alertInfo?: {
+    alertType: 'disease' | 'pest' | 'weather' | 'equipment' | 'other';
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    description: string;
+    startDate: string;
+    endDate?: string;
+    resolvedBy?: string;
+    resolutionNotes?: string;
   };
   performance?: {
     lastHarvestYield: number;
@@ -282,6 +318,26 @@ const mockFarms: IFarm[] = [
         west: -74.0200
       }
     },
+    financials: {
+      // Basic Financial Data
+      landRentPerMonth: 5000,
+      electricityCostPerKw: 0.12,
+      waterCostPerCm3: 0.05,
+      initialCapitalInvestment: 500000,
+      depreciation: 50000,
+      incentives: 10000,
+      otherCosts: 2000,
+      currency: 'USD',
+      lastUpdated: '2024-01-15T10:30:00Z',
+      
+      // Calculated Financial Metrics
+      totalInvestment: 500000,
+      monthlyOperatingCost: 15000,
+      monthlyRevenue: 25000,
+      monthlyProfit: 10000,
+      roi: 24.0,
+      breakEvenPoint: '2024-06-15T00:00:00Z'
+    },
     status: 'active',
     currentOperations: {
       activeBlocks: ['block-1', 'block-2', 'block-3'],
@@ -315,14 +371,6 @@ const mockFarms: IFarm[] = [
         actualYield: 15000,
         actualRevenue: 60000
       }
-    },
-    financials: {
-      totalInvestment: 500000,
-      monthlyOperatingCost: 25000,
-      monthlyRevenue: 35000,
-      monthlyProfit: 10000,
-      roi: 0.12,
-      breakEvenPoint: '2023-06-15'
     },
     isActive: true,
     createdAt: '2024-01-01T00:00:00Z',
@@ -380,15 +428,33 @@ const mockBlocks: IBlock[] = [
         tds: 200
       }
     },
-    status: 'growing',
-    currentPlant: {
-      plantDataId: 'plant-1',
-      plantName: 'Tomatoes',
-      plantCount: 500,
-      plantingDate: '2024-01-01',
-      expectedHarvestDate: '2024-03-15',
-      growthStage: 'vegetative'
+    status: 'planted',
+    plantAssignment: {
+      maxPlantCapacity: 1000,
+      assignedPlants: [{
+        plantDataId: 'plant-1',
+        plantName: 'Tomatoes',
+        assignedCount: 500,
+        plantingDate: '2024-01-01',
+        expectedHarvestStart: '2024-03-15',
+        expectedHarvestEnd: '2024-03-29'
+      }],
+      totalAssigned: 500,
+      remainingCapacity: 500
     },
+    stateHistory: [{
+      fromState: 'empty',
+      toState: 'assigned',
+      timestamp: '2024-01-01T00:00:00Z',
+      notes: 'Assigned 500 Tomato plants',
+      triggeredBy: 'user-1'
+    }, {
+      fromState: 'assigned',
+      toState: 'planted',
+      timestamp: '2024-01-01T10:00:00Z',
+      notes: 'Plants planted in block',
+      triggeredBy: 'user-1'
+    }],
     performance: {
       lastHarvestYield: 1200,
       lastHarvestDate: '2023-12-15',
@@ -615,7 +681,7 @@ class FarmManagementApi {
   }
 
   // Plant Management APIs
-  async getPlants(blockType?: string): Promise<IPlant[]> {
+  async getPlants(blockType?: string): Promise<any[]> {
     if (testModeService.isTestMode() && !testModeService.useRealData('farm-management')) {
       console.log('🔧 Using mock plant data');
       return Promise.resolve(mockPlants);
@@ -660,8 +726,8 @@ class FarmManagementApi {
         farms: mockFarms,
         blocks: mockBlocks,
         totalBlocks: mockBlocks.length,
-        activeBlocks: mockBlocks.filter(b => b.status === 'growing').length,
-        availableBlocks: mockBlocks.filter(b => b.status === 'available').length,
+        activeBlocks: mockBlocks.filter(b => b.status === 'planted').length,
+        availableBlocks: mockBlocks.filter(b => b.status === 'empty').length,
         harvestingBlocks: mockBlocks.filter(b => b.status === 'harvesting').length,
         totalYield: 5000,
         avgYieldPerBlock: 1250,
@@ -738,7 +804,7 @@ class FarmManagementApi {
   }
 
   // Plant Assignment API
-  async assignPlantToBlock(blockId: string, plantDataId: string, plantCount: number, plantingDate: string, preview: boolean = false): Promise<any> {
+  async assignPlantToBlock(blockId: string, plantDataId: string, plantName: string, plantCount: number, preview: boolean = false): Promise<any> {
     if (testModeService.isTestMode() && !testModeService.useRealData('farm-management')) {
       console.log('🔧 Using mock plant assignment');
       return Promise.resolve({
@@ -747,9 +813,9 @@ class FarmManagementApi {
         data: {
           blockId,
           plantDataId,
+          plantName,
           plantCount,
-          plantingDate,
-          expectedHarvestDate: new Date(new Date(plantingDate).getTime() + 75 * 24 * 60 * 60 * 1000).toISOString(),
+          expectedHarvestDate: new Date(Date.now() + 75 * 24 * 60 * 60 * 1000).toISOString(),
           resourceRequirements: {
             fertilizer: 50,
             water: 200,
@@ -763,8 +829,9 @@ class FarmManagementApi {
       const response = await axios.post(`${API_BASE_URL}/api/v1/manager/assign-plant-to-block`, {
         blockId,
         plantDataId,
+        plantName,
         plantCount,
-        plantingDate,
+        plantingDate: new Date().toISOString(), // Add current date as planting date
         preview
       }, {
         headers: this.getAuthHeader()

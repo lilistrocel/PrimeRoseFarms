@@ -111,10 +111,13 @@ router.post('/data-reading', async (req: Request, res: Response) => {
     // If there's a block associated, check against plant requirements
     if (blockId) {
       const block = await BlockData.findById(blockId);
-      if (block && block.currentPlanting?.plantDataId) {
-        const plant = await PlantData.findById(block.currentPlanting.plantDataId);
-        if (plant) {
-          await checkPlantRequirements(readings, plant, alerts, sensorId, blockId);
+      if (block && block.plantAssignment.assignedPlants.length > 0) {
+        // Check requirements for all assigned plants
+        for (const assignedPlant of block.plantAssignment.assignedPlants) {
+          const plant = await PlantData.findById(assignedPlant.plantDataId);
+          if (plant) {
+            await checkPlantRequirements(readings, plant, alerts, sensorId, blockId);
+          }
         }
       }
     }

@@ -14,10 +14,12 @@ export interface TestModeConfig {
 
 // Default test mode configuration
 const defaultTestConfig: TestModeConfig = {
-  enabled: process.env.REACT_APP_TEST_MODE !== 'false', // Default to true unless explicitly disabled
+  enabled: process.env.REACT_APP_TEST_MODE === 'true', // Default to false unless explicitly enabled
   mockLevel: (process.env.REACT_APP_TEST_LEVEL as 'basic' | 'advanced' | 'full') || 'advanced',
   realDataModules: process.env.REACT_APP_REAL_DATA_MODULES?.split(',') || [
-    // No modules use real data by default in test mode
+    'farm-management',
+    'user-management', 
+    'plant-data'
   ],
   mockDataSets: {}
 };
@@ -102,7 +104,11 @@ class TestModeService {
       enabled: this.config.enabled,
       mockLevel: this.config.mockLevel,
       realDataModules: this.config.realDataModules,
-      mockDataSetsCount: Object.keys(this.config.mockDataSets).length
+      mockDataSetsCount: Object.keys(this.config.mockDataSets).length,
+      envVars: {
+        REACT_APP_TEST_MODE: process.env.REACT_APP_TEST_MODE,
+        REACT_APP_REAL_DATA_MODULES: process.env.REACT_APP_REAL_DATA_MODULES
+      }
     });
   }
 }

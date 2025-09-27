@@ -67,17 +67,44 @@ export interface IBlockData {
   };
   
   // Current Status
-  status: 'available' | 'preparing' | 'planting' | 'growing' | 'harvesting' | 'maintenance' | 'inactive';
+  status: 'empty' | 'assigned' | 'planted' | 'harvesting' | 'alert';
   
-  // Current Planting
-  currentPlanting?: {
-    plantDataId: string; // Reference to PlantData
-    plantingDate: Date;
-    expectedHarvestDate: Date;
-    plantCount: number;
-    plantingDensity: number; // plants per square meter
-    growthStage: 'germination' | 'seedling' | 'vegetative' | 'flowering' | 'fruiting' | 'harvesting';
-    notes: string;
+  // Plant Assignment and Management
+  plantAssignment: {
+    maxPlantCapacity: number; // Maximum number of plants this block can hold
+    assignedPlants: Array<{
+      plantDataId: string; // Reference to PlantData
+      plantName: string;
+      assignedCount: number; // Number of plants assigned
+      plantingDate?: Date; // When plants were actually planted
+      expectedHarvestStart?: Date; // Predicted harvest start date
+      expectedHarvestEnd?: Date; // Predicted harvest end date
+      actualHarvestStart?: Date; // Actual harvest start date
+      actualHarvestEnd?: Date; // Actual harvest end date
+      harvestNotes?: string; // Notes about early/late harvest timing
+    }>;
+    totalAssigned: number; // Total plants assigned (sum of assignedCount)
+    remainingCapacity: number; // Available capacity for more plants
+  };
+  
+  // State History and Tracking
+  stateHistory: Array<{
+    fromState: string;
+    toState: string;
+    timestamp: Date;
+    notes?: string;
+    triggeredBy?: string; // User ID or system
+  }>;
+  
+  // Alert Management
+  alertInfo?: {
+    alertType: 'disease' | 'pest' | 'weather' | 'equipment' | 'other';
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    description: string;
+    startDate: Date;
+    endDate?: Date;
+    resolvedBy?: string; // User ID
+    resolutionNotes?: string;
   };
   
   // Environmental Conditions (current)
@@ -222,21 +249,49 @@ const blockDataSchema = new Schema<IBlockDataDocument>({
   status: {
     type: String,
     required: true,
-    enum: ['available', 'preparing', 'planting', 'growing', 'harvesting', 'maintenance', 'inactive'],
-    default: 'available'
+    enum: ['empty', 'assigned', 'planted', 'harvesting', 'alert'],
+    default: 'empty'
   },
   
-  currentPlanting: {
-    plantDataId: { type: String, ref: 'PlantData' },
-    plantingDate: { type: Date },
-    expectedHarvestDate: { type: Date },
-    plantCount: { type: Number, min: 0 },
-    plantingDensity: { type: Number, min: 0 },
-    growthStage: {
+  plantAssignment: {
+    maxPlantCapacity: { type: Number, required: true, min: 1 },
+    assignedPlants: [{
+      plantDataId: { type: String, required: true, ref: 'PlantData' },
+      plantName: { type: String, required: true, trim: true },
+      assignedCount: { type: Number, required: true, min: 1 },
+      plantingDate: { type: Date },
+      expectedHarvestStart: { type: Date },
+      expectedHarvestEnd: { type: Date },
+      actualHarvestStart: { type: Date },
+      actualHarvestEnd: { type: Date },
+      harvestNotes: { type: String, trim: true }
+    }],
+    totalAssigned: { type: Number, default: 0, min: 0 },
+    remainingCapacity: { type: Number, default: 0, min: 0 }
+  },
+  
+  stateHistory: [{
+    fromState: { type: String, required: true },
+    toState: { type: String, required: true },
+    timestamp: { type: Date, required: true, default: Date.now },
+    notes: { type: String, trim: true },
+    triggeredBy: { type: String, trim: true }
+  }],
+  
+  alertInfo: {
+    alertType: {
       type: String,
-      enum: ['germination', 'seedling', 'vegetative', 'flowering', 'fruiting', 'harvesting']
+      enum: ['disease', 'pest', 'weather', 'equipment', 'other']
     },
-    notes: { type: String, maxlength: 500 }
+    severity: {
+      type: String,
+      enum: ['low', 'medium', 'high', 'critical']
+    },
+    description: { type: String, trim: true },
+    startDate: { type: Date },
+    endDate: { type: Date },
+    resolvedBy: { type: String, trim: true },
+    resolutionNotes: { type: String, trim: true }
   },
   
   currentConditions: {
@@ -318,17 +373,19 @@ blockDataSchema.pre('save', function(next) {
                         this.costs.maintenanceCost + 
                         this.costs.utilityCost;
   
-  // Validate planting density
-  if (this.currentPlanting && this.currentPlanting.plantCount && this.dimensions.area > 0) {
-    this.currentPlanting.plantingDensity = this.currentPlanting.plantCount / this.dimensions.area;
+  // Validate plant assignment capacity
+  if (this.plantAssignment.totalAssigned > this.plantAssignment.maxPlantCapacity) {
+    return next(new Error('Total assigned plants cannot exceed maximum capacity'));
   }
   
-  // Validate harvest date
-  if (this.currentPlanting && this.currentPlanting.plantingDate && this.currentPlanting.expectedHarvestDate) {
-    if (this.currentPlanting.expectedHarvestDate <= this.currentPlanting.plantingDate) {
-      return next(new Error('Expected harvest date must be after planting date'));
+  // Validate harvest dates for assigned plants
+  this.plantAssignment.assignedPlants.forEach((plant: any) => {
+    if (plant.plantingDate && plant.expectedHarvestStart) {
+      if (new Date(plant.expectedHarvestStart) <= new Date(plant.plantingDate)) {
+        return next(new Error('Expected harvest date must be after planting date'));
+      }
     }
-  }
+  });
   
   next();
 });
@@ -347,8 +404,111 @@ blockDataSchema.methods.getDaysToHarvest = function(): number {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };
 
+// State transition methods
+blockDataSchema.methods.transitionToState = function(newState: string, triggeredBy?: string, notes?: string): void {
+  const oldState = this.status;
+  this.status = newState;
+  
+  // Add to state history
+  this.stateHistory.push({
+    fromState: oldState,
+    toState: newState,
+    timestamp: new Date(),
+    notes: notes || '',
+    triggeredBy: triggeredBy || 'system'
+  });
+  
+  // Update plant assignment dates based on state
+  if (newState === 'planted' && oldState === 'assigned') {
+    this.plantAssignment.assignedPlants.forEach((plant: any) => {
+      if (!plant.plantingDate) {
+        plant.plantingDate = new Date();
+        // Calculate expected harvest dates based on plant data
+        // This would need to be implemented with actual plant data lookup
+        const daysToHarvest = 90; // Placeholder - should come from plant data
+        plant.expectedHarvestStart = new Date(Date.now() + daysToHarvest * 24 * 60 * 60 * 1000);
+        plant.expectedHarvestEnd = new Date(Date.now() + (daysToHarvest + 14) * 24 * 60 * 60 * 1000);
+      }
+    });
+  }
+  
+  if (newState === 'harvesting' && oldState === 'planted') {
+    this.plantAssignment.assignedPlants.forEach((plant: any) => {
+      if (!plant.actualHarvestStart) {
+        plant.actualHarvestStart = new Date();
+        // Calculate timing notes
+        if (plant.expectedHarvestStart) {
+          const daysDiff = Math.floor((new Date().getTime() - plant.expectedHarvestStart.getTime()) / (1000 * 60 * 60 * 24));
+          if (daysDiff > 0) {
+            plant.harvestNotes = `Harvest started ${daysDiff} days late`;
+          } else if (daysDiff < 0) {
+            plant.harvestNotes = `Harvest started ${Math.abs(daysDiff)} days early`;
+          } else {
+            plant.harvestNotes = 'Harvest started on time';
+          }
+        }
+      }
+    });
+  }
+};
+
+blockDataSchema.methods.assignPlant = function(plantDataId: string, plantName: string, count: number): boolean {
+  if (this.plantAssignment.remainingCapacity < count) {
+    return false; // Not enough capacity
+  }
+  
+  // Check if plant is already assigned
+  const existingPlant = this.plantAssignment.assignedPlants.find((p: any) => p.plantDataId === plantDataId);
+  if (existingPlant) {
+    existingPlant.assignedCount += count;
+  } else {
+    this.plantAssignment.assignedPlants.push({
+      plantDataId,
+      plantName,
+      assignedCount: count
+    });
+  }
+  
+  // Update totals
+  this.plantAssignment.totalAssigned += count;
+  this.plantAssignment.remainingCapacity -= count;
+  
+  // Transition to assigned state if not already
+  if (this.status === 'empty') {
+    this.transitionToState('assigned', 'system', `Assigned ${count} ${plantName} plants`);
+  }
+  
+  return true;
+};
+
+blockDataSchema.methods.removePlantAssignment = function(plantDataId: string, count: number): boolean {
+  const plantIndex = this.plantAssignment.assignedPlants.findIndex((p: any) => p.plantDataId === plantDataId);
+  if (plantIndex === -1) return false;
+  
+  const plant = this.plantAssignment.assignedPlants[plantIndex];
+  if (plant.assignedCount < count) return false;
+  
+  plant.assignedCount -= count;
+  this.plantAssignment.totalAssigned -= count;
+  this.plantAssignment.remainingCapacity += count;
+  
+  // Remove plant if count reaches 0
+  if (plant.assignedCount === 0) {
+    this.plantAssignment.assignedPlants.splice(plantIndex, 1);
+  }
+  
+  // Transition to empty if no plants assigned
+  if (this.plantAssignment.totalAssigned === 0) {
+    this.transitionToState('empty', 'system', 'All plant assignments removed');
+  }
+  
+  return true;
+};
+
 blockDataSchema.methods.isReadyForHarvest = function(): boolean {
-  return this.getDaysToHarvest() <= 0 && this.status === 'growing';
+  return this.status === 'planted' && this.plantAssignment.assignedPlants.some((plant: any) => {
+    return plant.expectedHarvestStart && new Date() >= plant.expectedHarvestStart;
+  });
 };
 
 blockDataSchema.methods.calculateROI = function(): number {

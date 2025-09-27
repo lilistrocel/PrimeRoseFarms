@@ -48,6 +48,305 @@ Get profitability analysis for plant/block combinations.
 ```
 
 ### POST /manager/assign-plant-to-block
+Assign plants to blocks with capacity management and state tracking.
+
+**Request Body:**
+```json
+{
+  "blockId": "68d83f2c2df95818db372c57",
+  "plantDataId": "68d6dcfd8d7ff81f58f9d4ba",
+  "plantName": "Tomato (Cherry)",
+  "plantCount": 50,
+  "plantingDate": "2024-09-27T20:17:29.720Z",
+  "preview": false
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Plant assigned to block successfully",
+  "data": {
+    "blockId": "68d83f2c2df95818db372c57",
+    "plantDataId": "68d6dcfd8d7ff81f58f9d4ba",
+    "plantName": "Tomato (Cherry)",
+    "plantCount": 50,
+    "expectedHarvestDate": "2024-12-11T20:17:29.720Z",
+    "resourceRequirements": {
+      "fertilizer": 50,
+      "water": 200,
+      "labor": 8
+    }
+  }
+}
+```
+
+**Error Response:**
+```json
+{
+  "success": false,
+  "message": "Missing required fields: blockId, plantDataId, plantCount, plantingDate"
+}
+```
+
+### POST /manager/farms
+Create new farms with comprehensive farm data.
+
+**Request Body:**
+```json
+{
+  "name": "Al Ain Farm",
+  "ownerId": "68d2698e7ce115d82039ac85",
+  "location": {
+    "address": "Al Ain, UAE",
+    "city": "Al Ain",
+    "state": "Abu Dhabi",
+    "country": "UAE",
+    "zipCode": "12345",
+    "coordinates": {
+      "latitude": 24.2075,
+      "longitude": 55.7447
+    },
+    "timezone": "Asia/Dubai"
+  },
+  "specifications": {
+    "totalArea": 1000,
+    "cultivableArea": 800,
+    "establishedDate": "2020-01-01",
+    "certifications": ["Organic", "GAP"],
+    "farmingTypes": ["open_field", "greenhouse"]
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Farm created successfully",
+  "data": {
+    "_id": "68d83cc1f3dc0b97b7071729",
+    "name": "Al Ain Farm",
+    "ownerId": "68d2698e7ce115d82039ac85",
+    "location": { ... },
+    "specifications": { ... },
+    "createdAt": "2024-09-27T20:17:29.720Z",
+    "updatedAt": "2024-09-27T20:17:29.720Z"
+  }
+```
+
+### POST /manager/blocks
+Create new blocks with infrastructure and capacity management.
+
+**Request Body:**
+```json
+{
+  "name": "AA001",
+  "farmId": "68d83cc1f3dc0b97b7071729",
+  "blockType": "open_field",
+  "dimensions": {
+    "length": 100,
+    "width": 50,
+    "area": 5000
+  },
+  "location": {
+    "coordinates": {
+      "latitude": 24.2075,
+      "longitude": 55.7447
+    },
+    "elevation": 200,
+    "soilType": "loamy"
+  },
+  "infrastructure": {
+    "irrigation": "drip",
+    "drainage": "surface",
+    "shade": "none",
+    "equipment": ["tractor", "irrigation_system"]
+  },
+  "plantAssignment": {
+    "maxPlantCapacity": 200,
+    "assignedPlants": [],
+    "totalAssigned": 0,
+    "remainingCapacity": 200
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Block created successfully",
+  "data": {
+    "_id": "68d83f2c2df95818db372c57",
+    "name": "AA001",
+    "farmId": "68d83cc1f3dc0b97b7071729",
+    "blockType": "open_field",
+    "dimensions": { ... },
+    "plantAssignment": { ... },
+    "createdAt": "2024-09-27T20:17:29.720Z",
+    "updatedAt": "2024-09-27T20:17:29.720Z"
+  }
+}
+```
+Assign a single plant to a block (legacy endpoint).
+
+**Request Body:**
+```json
+{
+  "blockId": "block123",
+  "plantDataId": "plant456",
+  "plantName": "Tomatoes",
+  "plantCount": 100,
+  "preview": false
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Plant assigned to block successfully",
+  "data": {
+    "blockId": "block123",
+    "plantDataId": "plant456",
+    "plantName": "Tomatoes",
+    "plantCount": 100,
+    "expectedHarvestDate": "2024-03-15T00:00:00Z"
+  }
+}
+```
+
+## Plant Assignment System APIs
+
+### Multi-Plant Assignment
+The system now supports assigning multiple plant types to a single block with capacity management.
+
+### Block State Management
+**Available States:**
+- `empty` - No plants assigned
+- `assigned` - Plants assigned but not planted
+- `planted` - All plants planted, growing phase
+- `harvesting` - Plants ready for harvest
+- `alert` - Temporary override for issues
+
+### GET /manager/blocks
+Get all blocks with their current plant assignments and capacity information.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "blocks": [{
+      "_id": "block123",
+      "name": "Greenhouse A",
+      "status": "assigned",
+      "plantAssignment": {
+        "maxPlantCapacity": 1000,
+        "assignedPlants": [{
+          "plantDataId": "plant456",
+          "plantName": "Tomatoes",
+          "assignedCount": 500,
+          "plantingDate": "2024-01-15T00:00:00Z",
+          "expectedHarvestStart": "2024-03-15T00:00:00Z",
+          "expectedHarvestEnd": "2024-03-29T00:00:00Z"
+        }],
+        "totalAssigned": 500,
+        "remainingCapacity": 500
+      },
+      "stateHistory": [{
+        "fromState": "empty",
+        "toState": "assigned",
+        "timestamp": "2024-01-15T10:00:00Z",
+        "notes": "Assigned 500 Tomato plants",
+        "triggeredBy": "user123"
+      }]
+    }]
+  }
+}
+```
+
+### POST /manager/assign-plants-to-block
+Assign multiple plants to a block with capacity validation.
+
+**Request Body:**
+```json
+{
+  "blockId": "block123",
+  "plants": [{
+    "plantDataId": "plant456",
+    "plantName": "Tomatoes",
+    "assignedCount": 300
+  }, {
+    "plantDataId": "plant789",
+    "plantName": "Lettuce",
+    "assignedCount": 200
+  }]
+}
+```
+
+### PUT /manager/blocks/:blockId/state
+Transition a block to a new state.
+
+**Request Body:**
+```json
+{
+  "newState": "planted",
+  "notes": "All plants have been planted",
+  "triggeredBy": "user123"
+}
+```
+
+### GET /manager/blocks/:blockId/state-history
+Get the complete state transition history for a block.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "stateHistory": [{
+      "fromState": "empty",
+      "toState": "assigned",
+      "timestamp": "2024-01-15T10:00:00Z",
+      "notes": "Assigned 500 Tomato plants",
+      "triggeredBy": "user123"
+    }, {
+      "fromState": "assigned",
+      "toState": "planted",
+      "timestamp": "2024-01-15T14:00:00Z",
+      "notes": "All plants planted",
+      "triggeredBy": "user123"
+    }]
+  }
+}
+```
+
+### POST /manager/blocks/:blockId/alert
+Create an alert for a block (temporary state override).
+
+**Request Body:**
+```json
+{
+  "alertType": "disease",
+  "severity": "high",
+  "description": "Fungal infection detected",
+  "startDate": "2024-01-20T00:00:00Z"
+}
+```
+
+### PUT /manager/blocks/:blockId/alert/resolve
+Resolve an alert and return block to previous state.
+
+**Request Body:**
+```json
+{
+  "resolutionNotes": "Fungal treatment applied successfully",
+  "resolvedBy": "user123"
+}
+```
 Assign plants to blocks with preview and commitment options.
 
 ### GET /manager/performance-dashboard

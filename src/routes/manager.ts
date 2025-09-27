@@ -270,15 +270,17 @@ router.post('/assign-plant-to-block', async (req: Request, res: Response) => {
 
     // Commit the assignment
     const updatedBlock = await BlockData.findByIdAndUpdate(blockId, {
-      status: 'planting',
-      currentPlanting: {
-        plantDataId,
-        plantingDate,
-        expectedHarvestDate: harvestDate,
-        plantCount,
-        plantingDensity: plantCount / blockArea,
-        growthStage: 'germination',
-        notes: `Assigned by Manager ${req.user?.userId}`
+      status: 'assigned',
+      $push: {
+        'plantAssignment.assignedPlants': {
+          plantDataId,
+          plantName: plant.name,
+          assignedCount: plantCount
+        }
+      },
+      $inc: {
+        'plantAssignment.totalAssigned': plantCount,
+        'plantAssignment.remainingCapacity': -plantCount
       },
       lastModifiedBy: req.user?.userId
     }, { new: true });
@@ -356,8 +358,8 @@ router.get('/performance-dashboard', async (req: Request, res: Response) => {
 
     // Calculate performance metrics
     const totalBlocks = blocks.length;
-    const activeBlocks = blocks.filter(b => b.status === 'growing' || b.status === 'planting').length;
-    const availableBlocks = blocks.filter(b => b.status === 'available').length;
+    const activeBlocks = blocks.filter(b => b.status === 'planted').length;
+    const availableBlocks = blocks.filter(b => b.status === 'empty').length;
     const harvestingBlocks = blocks.filter(b => b.status === 'harvesting').length;
 
     // Calculate yield performance
@@ -376,16 +378,22 @@ router.get('/performance-dashboard', async (req: Request, res: Response) => {
     upcomingHarvestDate.setDate(upcomingHarvestDate.getDate() + 30);
     
     const upcomingHarvests = blocks.filter(b => 
-      b.currentPlanting?.expectedHarvestDate &&
-      new Date(b.currentPlanting.expectedHarvestDate) <= upcomingHarvestDate
-    ).map(b => ({
-      blockId: b._id,
-      blockName: b.name,
-      plantDataId: b.currentPlanting?.plantDataId,
-      expectedHarvestDate: b.currentPlanting?.expectedHarvestDate,
-      plantCount: b.currentPlanting?.plantCount,
-      growthStage: b.currentPlanting?.growthStage
-    }));
+      b.plantAssignment.assignedPlants.some(plant => 
+        plant.expectedHarvestStart && new Date(plant.expectedHarvestStart) <= upcomingHarvestDate
+      )
+    ).map(b => {
+      const harvestPlant = b.plantAssignment.assignedPlants.find(plant => 
+        plant.expectedHarvestStart && new Date(plant.expectedHarvestStart) <= upcomingHarvestDate
+      );
+      return {
+        blockId: b._id,
+        blockName: b.name,
+        plantDataId: harvestPlant?.plantDataId,
+        expectedHarvestDate: harvestPlant?.expectedHarvestStart,
+        plantCount: harvestPlant?.assignedCount,
+        growthStage: 'planted' // All assigned plants are in planted stage
+      };
+    });
 
     // Performance alerts
     const alerts = [];
@@ -511,7 +519,7 @@ router.get('/block-optimization', async (req: Request, res: Response) => {
       };
 
       // Check utilization
-      if (block.status === 'available') {
+      if (block.status === 'empty') {
         blockAnalysis.recommendations.push({
           type: 'opportunity',
           priority: 'high',
@@ -568,7 +576,7 @@ router.get('/block-optimization', async (req: Request, res: Response) => {
         return true;
       }).slice(0, 3); // Top 3 suitable plants
 
-      if (suitablePlants.length > 0 && block.status === 'available') {
+      if (suitablePlants.length > 0 && block.status === 'empty') {
         blockAnalysis.recommendations.push({
           type: 'suggestion',
           priority: 'low',
@@ -613,6 +621,508 @@ router.get('/block-optimization', async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       message: 'Failed to generate block optimization recommendations',
+      error: (error as Error).message
+    });
+  }
+});
+
+/**
+ * @route GET /api/manager/farms
+ * @desc Get all farms with optional filtering
+ * @access Manager, Admin
+ */
+router.get('/farms', async (req: Request, res: Response) => {
+  try {
+    const { ownerId, status, farmType } = req.query;
+
+    logger.info(LogCategory.FARM, 'Farms list requested', {
+      userId: req.user?.userId,
+      filters: { ownerId, status, farmType }
+    });
+
+    // Build filter
+    const filter: any = { isActive: true };
+    if (ownerId) filter.ownerId = ownerId;
+    if (status) filter.status = status;
+    if (farmType) filter['specifications.farmType'] = farmType;
+
+    const farms = await FarmData.find(filter)
+      .sort({ createdAt: -1 })
+      .select('-__v');
+
+    return res.json({
+      success: true,
+      message: 'Farms retrieved successfully',
+      data: { farms }
+    });
+
+  } catch (error) {
+    logger.error(LogCategory.FARM, 'Failed to get farms', {
+      userId: req.user?.userId,
+      error: (error as Error).message
+    });
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve farms',
+      error: (error as Error).message
+    });
+  }
+});
+
+/**
+ * @route GET /api/manager/farms/:id
+ * @desc Get specific farm by ID
+ * @access Manager, Admin
+ */
+router.get('/farms/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    logger.info(LogCategory.FARM, 'Farm details requested', {
+      userId: req.user?.userId,
+      farmId: id
+    });
+
+    const farm = await FarmData.findById(id).select('-__v');
+    if (!farm) {
+      return res.status(404).json({
+        success: false,
+        message: 'Farm not found'
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: 'Farm retrieved successfully',
+      data: farm
+    });
+
+  } catch (error) {
+    logger.error(LogCategory.FARM, 'Failed to get farm', {
+      userId: req.user?.userId,
+      farmId: req.params.id,
+      error: (error as Error).message
+    });
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve farm',
+      error: (error as Error).message
+    });
+  }
+});
+
+/**
+ * @route POST /api/manager/farms
+ * @desc Create new farm
+ * @access Manager, Admin
+ */
+router.post('/farms', async (req: Request, res: Response) => {
+  try {
+    const farmData = {
+      ...req.body,
+      createdBy: req.user?.userId,
+      lastModifiedBy: req.user?.userId,
+      isActive: true
+    };
+
+    logger.info(LogCategory.FARM, 'Farm creation requested', {
+      userId: req.user?.userId,
+      farmName: farmData.name
+    });
+
+    const farm = new FarmData(farmData);
+    await farm.save();
+
+    logger.info(LogCategory.FARM, 'Farm created successfully', {
+      userId: req.user?.userId,
+      farmId: farm._id,
+      farmName: farm.name
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: 'Farm created successfully',
+      data: farm
+    });
+
+  } catch (error) {
+    logger.error(LogCategory.FARM, 'Failed to create farm', {
+      userId: req.user?.userId,
+      error: (error as Error).message
+    });
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to create farm',
+      error: (error as Error).message
+    });
+  }
+});
+
+/**
+ * @route PUT /api/manager/farms/:id
+ * @desc Update farm
+ * @access Manager, Admin
+ */
+router.put('/farms/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const updateData = {
+      ...req.body,
+      lastModifiedBy: req.user?.userId
+    };
+
+    logger.info(LogCategory.FARM, 'Farm update requested', {
+      userId: req.user?.userId,
+      farmId: id
+    });
+
+    const farm = await FarmData.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select('-__v');
+
+    if (!farm) {
+      return res.status(404).json({
+        success: false,
+        message: 'Farm not found'
+      });
+    }
+
+    logger.info(LogCategory.FARM, 'Farm updated successfully', {
+      userId: req.user?.userId,
+      farmId: farm._id,
+      farmName: farm.name
+    });
+
+    return res.json({
+      success: true,
+      message: 'Farm updated successfully',
+      data: farm
+    });
+
+  } catch (error) {
+    logger.error(LogCategory.FARM, 'Failed to update farm', {
+      userId: req.user?.userId,
+      farmId: req.params.id,
+      error: (error as Error).message
+    });
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to update farm',
+      error: (error as Error).message
+    });
+  }
+});
+
+/**
+ * @route DELETE /api/manager/farms/:id
+ * @desc Soft delete farm
+ * @access Manager, Admin
+ */
+router.delete('/farms/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    logger.info(LogCategory.FARM, 'Farm deletion requested', {
+      userId: req.user?.userId,
+      farmId: id
+    });
+
+    const farm = await FarmData.findByIdAndUpdate(
+      id,
+      { 
+        isActive: false,
+        lastModifiedBy: req.user?.userId
+      },
+      { new: true }
+    ).select('-__v');
+
+    if (!farm) {
+      return res.status(404).json({
+        success: false,
+        message: 'Farm not found'
+      });
+    }
+
+    logger.info(LogCategory.FARM, 'Farm deleted successfully', {
+      userId: req.user?.userId,
+      farmId: farm._id,
+      farmName: farm.name
+    });
+
+    return res.json({
+      success: true,
+      message: 'Farm deleted successfully',
+      data: farm
+    });
+
+  } catch (error) {
+    logger.error(LogCategory.FARM, 'Failed to delete farm', {
+      userId: req.user?.userId,
+      farmId: req.params.id,
+      error: (error as Error).message
+    });
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to delete farm',
+      error: (error as Error).message
+    });
+  }
+});
+
+/**
+ * @route GET /api/manager/blocks
+ * @desc Get all blocks with optional filtering
+ * @access Manager, Admin
+ */
+router.get('/blocks', async (req: Request, res: Response) => {
+  try {
+    const { farmId, blockType, status } = req.query;
+
+    logger.info(LogCategory.FARM, 'Blocks list requested', {
+      userId: req.user?.userId,
+      filters: { farmId, blockType, status }
+    });
+
+    // Build filter
+    const filter: any = { isActive: true };
+    if (farmId) filter.farmId = farmId;
+    if (blockType) filter.blockType = blockType;
+    if (status) filter.status = status;
+
+    const blocks = await BlockData.find(filter)
+      .sort({ createdAt: -1 })
+      .select('-__v');
+
+    return res.json({
+      success: true,
+      message: 'Blocks retrieved successfully',
+      data: { blocks }
+    });
+
+  } catch (error) {
+    logger.error(LogCategory.FARM, 'Failed to get blocks', {
+      userId: req.user?.userId,
+      error: (error as Error).message
+    });
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve blocks',
+      error: (error as Error).message
+    });
+  }
+});
+
+/**
+ * @route GET /api/manager/blocks/:id
+ * @desc Get specific block by ID
+ * @access Manager, Admin
+ */
+router.get('/blocks/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    logger.info(LogCategory.FARM, 'Block details requested', {
+      userId: req.user?.userId,
+      blockId: id
+    });
+
+    const block = await BlockData.findById(id).select('-__v');
+    if (!block) {
+      return res.status(404).json({
+        success: false,
+        message: 'Block not found'
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: 'Block retrieved successfully',
+      data: block
+    });
+
+  } catch (error) {
+    logger.error(LogCategory.FARM, 'Failed to get block', {
+      userId: req.user?.userId,
+      blockId: req.params.id,
+      error: (error as Error).message
+    });
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve block',
+      error: (error as Error).message
+    });
+  }
+});
+
+/**
+ * @route POST /api/manager/blocks
+ * @desc Create new block
+ * @access Manager, Admin
+ */
+router.post('/blocks', async (req: Request, res: Response) => {
+  try {
+    const blockData = {
+      ...req.body,
+      createdBy: req.user?.userId,
+      lastModifiedBy: req.user?.userId,
+      isActive: true
+    };
+
+    logger.info(LogCategory.FARM, 'Block creation requested', {
+      userId: req.user?.userId,
+      blockName: blockData.name,
+      farmId: blockData.farmId
+    });
+
+    const block = new BlockData(blockData);
+    await block.save();
+
+    logger.info(LogCategory.FARM, 'Block created successfully', {
+      userId: req.user?.userId,
+      blockId: block._id,
+      blockName: block.name,
+      farmId: block.farmId
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: 'Block created successfully',
+      data: block
+    });
+
+  } catch (error) {
+    logger.error(LogCategory.FARM, 'Failed to create block', {
+      userId: req.user?.userId,
+      error: (error as Error).message
+    });
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to create block',
+      error: (error as Error).message
+    });
+  }
+});
+
+/**
+ * @route PUT /api/manager/blocks/:id
+ * @desc Update block
+ * @access Manager, Admin
+ */
+router.put('/blocks/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const updateData = {
+      ...req.body,
+      lastModifiedBy: req.user?.userId
+    };
+
+    logger.info(LogCategory.FARM, 'Block update requested', {
+      userId: req.user?.userId,
+      blockId: id
+    });
+
+    const block = await BlockData.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select('-__v');
+
+    if (!block) {
+      return res.status(404).json({
+        success: false,
+        message: 'Block not found'
+      });
+    }
+
+    logger.info(LogCategory.FARM, 'Block updated successfully', {
+      userId: req.user?.userId,
+      blockId: block._id,
+      blockName: block.name
+    });
+
+    return res.json({
+      success: true,
+      message: 'Block updated successfully',
+      data: block
+    });
+
+  } catch (error) {
+    logger.error(LogCategory.FARM, 'Failed to update block', {
+      userId: req.user?.userId,
+      blockId: req.params.id,
+      error: (error as Error).message
+    });
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to update block',
+      error: (error as Error).message
+    });
+  }
+});
+
+/**
+ * @route DELETE /api/manager/blocks/:id
+ * @desc Soft delete block
+ * @access Manager, Admin
+ */
+router.delete('/blocks/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    logger.info(LogCategory.FARM, 'Block deletion requested', {
+      userId: req.user?.userId,
+      blockId: id
+    });
+
+    const block = await BlockData.findByIdAndUpdate(
+      id,
+      { 
+        isActive: false,
+        lastModifiedBy: req.user?.userId
+      },
+      { new: true }
+    ).select('-__v');
+
+    if (!block) {
+      return res.status(404).json({
+        success: false,
+        message: 'Block not found'
+      });
+    }
+
+    logger.info(LogCategory.FARM, 'Block deleted successfully', {
+      userId: req.user?.userId,
+      blockId: block._id,
+      blockName: block.name
+    });
+
+    return res.json({
+      success: true,
+      message: 'Block deleted successfully',
+      data: block
+    });
+
+  } catch (error) {
+    logger.error(LogCategory.FARM, 'Failed to delete block', {
+      userId: req.user?.userId,
+      blockId: req.params.id,
+      error: (error as Error).message
+    });
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to delete block',
       error: (error as Error).message
     });
   }
