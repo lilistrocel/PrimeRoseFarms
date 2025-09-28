@@ -10,6 +10,7 @@ import workerRoutes from './worker';
 import salesRoutes from './sales';
 import sensorRoutes from './sensor';
 import plantDataRoutes from './plantData';
+import costsRoutes from './costs';
 
 const router = Router();
 
@@ -49,7 +50,8 @@ router.get('/api', (req, res) => {
       worker: '/api/v1/worker',
       sales: '/api/v1/sales',
       sensor: '/api/v1/sensor',
-      plantData: '/api/v1/plant-data'
+      plantData: '/api/v1/plant-data',
+      costs: '/api/v1/costs'
     },
     description: 'Business process-driven APIs for agricultural farm management'
   });
@@ -67,5 +69,6 @@ router.use(`${API_VERSION}/worker`, workerRoutes);
 router.use(`${API_VERSION}/sales`, salesRoutes);
 router.use(`${API_VERSION}/sensor`, sensorRoutes);
 router.use(`${API_VERSION}/plant-data`, plantDataRoutes);
+router.use(`${API_VERSION}/costs`, costsRoutes);
 
 export default router;

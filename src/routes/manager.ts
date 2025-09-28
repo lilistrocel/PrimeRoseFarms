@@ -1128,4 +1128,85 @@ router.delete('/blocks/:id', async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * @route PUT /api/manager/blocks/:blockId/state
+ * @desc Change the state of a block
+ * @access Manager, Admin
+ */
+router.put('/blocks/:blockId/state', async (req: Request, res: Response) => {
+  try {
+    const { blockId } = req.params;
+    const { newState, notes, triggeredBy } = req.body;
+
+    logger.info(LogCategory.API, 'Block state change requested', {
+      userId: req.user?.userId,
+      blockId,
+      newState,
+      notes,
+      triggeredBy
+    });
+
+    // Validate new state
+    const validStates = ['empty', 'assigned', 'planted', 'harvesting', 'alert'];
+    if (!validStates.includes(newState)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid state. Must be one of: ${validStates.join(', ')}`
+      });
+    }
+
+    // Find the block
+    const block = await BlockData.findById(blockId);
+    if (!block) {
+      return res.status(404).json({
+        success: false,
+        message: 'Block not found'
+      });
+    }
+
+    // Get current state
+    const currentState = block.status;
+
+    // Update block state using the transitionToState method
+    block.transitionToState(newState, triggeredBy || req.user?.userId || 'system', notes || '');
+    
+    // Save the block to persist the changes
+    await block.save();
+
+    logger.info(LogCategory.API, 'Block state changed successfully', {
+      userId: req.user?.userId,
+      blockId,
+      fromState: currentState,
+      toState: newState,
+      notes
+    });
+
+    return res.json({
+      success: true,
+      message: 'Block state changed successfully',
+      data: {
+        blockId,
+        fromState: currentState,
+        toState: newState,
+        notes,
+        triggeredBy: triggeredBy || req.user?.userId || 'system',
+        timestamp: new Date().toISOString()
+      }
+    });
+
+  } catch (error) {
+    logger.error(LogCategory.API, 'Error changing block state', {
+      userId: req.user?.userId,
+      blockId: req.params.blockId,
+      error: (error as Error).message
+    });
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to change block state',
+      error: (error as Error).message
+    });
+  }
+});
+
 export default router;

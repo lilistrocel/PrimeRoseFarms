@@ -1,0 +1,34 @@
+---
+alwaysApply: true
+---
+# Frontend Code Quality Rules
+
+## CRITICAL: SX Prop Replacement Rules
+
+### NEVER Create Duplicate SX Props
+1. **Check for existing sx props** - Before replacing any color, style, or theme properties, ALWAYS check if the element already has an `sx` prop
+2. **Merge, don't replace** - If an `sx` prop exists, merge the new styles into the existing object instead of creating duplicate props
+3. **Use object spread syntax** - Always use `sx={{ ...existingSx, newProperty: value }}` pattern
+
+### SX Prop Replacement Pattern
+**WRONG:**
+```tsx
+// Before: sx={{ textTransform: 'uppercase' }}
+// After replacement: sx={{ color: themeUtils.colors.text.secondary }} sx={{ textTransform: 'uppercase' }} ❌
+```
+
+**CORRECT:**
+```tsx
+// Before: sx={{ textTransform: 'uppercase' }}
+// After replacement: sx={{ textTransform: 'uppercase', color: themeUtils.colors.text.secondary }} ✅
+```
+
+### Material-UI Theme Integration Rules
+4. **Theme-aware replacements** - When replacing hardcoded colors with theme utilities, always preserve existing sx properties
+5. **Object merging** - Use proper object merging to combine existing and new sx properties
+6. **Validation before replacement** - Always validate that the replacement doesn't create duplicate sx props
+
+### Code Quality Standards
+7. **No duplicate props** - Never create multiple sx props on the same element
+8. **Consistent formatting** - Maintain consistent sx prop formatting and indentation
+9. **Type safety** - Ensure all sx prop values are properly typed and theme-compliant

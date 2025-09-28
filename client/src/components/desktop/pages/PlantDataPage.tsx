@@ -47,8 +47,10 @@ import {
 // import { useAppSelector } from '../../../store';
 import { IPlantData, FarmingType } from '../../../services/plantDataApi';
 import plantDataApi from '../../../services/plantDataApi';
+import { useThemeUtils } from '../../../utils/themeUtils';
 
 const PlantDataPage: React.FC = () => {
+  const themeUtils = useThemeUtils();
   const [activeTab, setActiveTab] = useState(0);
   const [dialogTab, setDialogTab] = useState(0);
   const [plantData, setPlantData] = useState<IPlantData[]>([]);
@@ -546,7 +548,7 @@ const PlantDataPage: React.FC = () => {
           <Box>
             <Typography variant="h4" component="h1" sx={{ 
               fontWeight: 700, 
-              color: '#FFFFFF',
+              color: themeUtils.colors.text.primary,
               mb: 1
             }}>
               Plant Data Management
@@ -560,7 +562,7 @@ const PlantDataPage: React.FC = () => {
                 label={`${plantData.length} Plant Varieties`} 
                 color="primary" 
                 variant="outlined"
-                sx={{ borderColor: '#00D4AA', color: '#00D4AA' }}
+                sx={{ borderColor: themeUtils.colors.success, color: themeUtils.colors.success }}
               />
               <Chip 
                 icon={<ScheduleIcon />} 
@@ -571,7 +573,7 @@ const PlantDataPage: React.FC = () => {
             </Box>
           </Box>
           <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h2" sx={{ fontWeight: 700, color: '#00D4AA', mb: 0 }}>
+            <Typography variant="h2" sx={{ fontWeight: 700, color: themeUtils.colors.success, mb: 0 }}>
               {plantData.length}
             </Typography>
             <Typography variant="body2" color="text.secondary">
@@ -592,7 +594,7 @@ const PlantDataPage: React.FC = () => {
         <Card sx={{ 
           flex: '1 1 200px', 
           minWidth: '200px',
-          background: 'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%)',
+          background: `linear-gradient(135deg, ${themeUtils.colors.surface} 0%, ${themeUtils.colors.background} 100%)`,
           border: '1px solid rgba(0,212,170,0.2)',
           position: 'relative',
           overflow: 'hidden',
@@ -603,25 +605,25 @@ const PlantDataPage: React.FC = () => {
             left: 0,
             right: 0,
             height: '3px',
-            background: 'linear-gradient(90deg, #00D4AA, #4DD0E1)',
+            background: `linear-gradient(90deg, ${themeUtils.colors.success}, ${themeUtils.colors.info})`,
           }
         }}>
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-              <Typography variant="h4" sx={{ fontWeight: 700, color: '#00D4AA' }}>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: themeUtils.colors.success }}>
                 {plantData.length}
               </Typography>
-              <LocalFlorist sx={{ color: '#00D4AA', fontSize: '2rem' }} />
+              <LocalFlorist sx={{ color: themeUtils.colors.success, fontSize: '2rem' }} />
             </Box>
             <Typography variant="body2" color="text.secondary">Plant Varieties</Typography>
-            <Typography variant="caption" sx={{ color: '#4CAF50' }}>Active in system</Typography>
+            <Typography variant="caption" sx={{ color: themeUtils.colors.success }}>Active in system</Typography>
           </CardContent>
         </Card>
 
         <Card sx={{ 
           flex: '1 1 200px', 
           minWidth: '200px',
-          background: 'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%)',
+          background: `linear-gradient(135deg, ${themeUtils.colors.surface} 0%, ${themeUtils.colors.background} 100%)`,
           border: '1px solid rgba(255,107,107,0.2)',
           position: 'relative',
           overflow: 'hidden',
@@ -632,25 +634,25 @@ const PlantDataPage: React.FC = () => {
             left: 0,
             right: 0,
             height: '3px',
-            background: 'linear-gradient(90deg, #FF6B6B, #FF8A80)',
+            background: `linear-gradient(90deg, ${themeUtils.colors.error}, ${themeUtils.colors.warning})`,
           }
         }}>
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-              <Typography variant="h4" sx={{ fontWeight: 700, color: '#FF6B6B' }}>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: themeUtils.colors.error }}>
                 {plantData.reduce((acc, plant) => acc + (plant.resourceRequirements?.fertilizerType?.length || 0), 0)}
               </Typography>
-              <ScheduleIcon sx={{ color: '#FF6B6B', fontSize: '2rem' }} />
+              <ScheduleIcon sx={{ color: themeUtils.colors.error, fontSize: '2rem' }} />
             </Box>
             <Typography variant="body2" color="text.secondary">Fertilizer Schedules</Typography>
-            <Typography variant="caption" sx={{ color: '#4CAF50' }}>Across all plants</Typography>
+            <Typography variant="caption" sx={{ color: themeUtils.colors.success }}>Across all plants</Typography>
           </CardContent>
         </Card>
 
         <Card sx={{ 
           flex: '1 1 200px', 
           minWidth: '200px',
-          background: 'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%)',
+          background: `linear-gradient(135deg, ${themeUtils.colors.surface} 0%, ${themeUtils.colors.background} 100%)`,
           border: '1px solid rgba(33,150,243,0.2)',
           position: 'relative',
           overflow: 'hidden',
@@ -661,25 +663,25 @@ const PlantDataPage: React.FC = () => {
             left: 0,
             right: 0,
             height: '3px',
-            background: 'linear-gradient(90deg, #2196F3, #64B5F6)',
+            background: `linear-gradient(90deg, ${themeUtils.colors.info}, ${themeUtils.colors.primary})`,
           }
         }}>
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-              <Typography variant="h4" sx={{ fontWeight: 700, color: '#2196F3' }}>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: themeUtils.colors.info }}>
                 {plantData.reduce((acc, plant) => acc + (plant.resourceRequirements?.pesticideType?.length || 0), 0)}
               </Typography>
-              <ScienceIcon sx={{ color: '#2196F3', fontSize: '2rem' }} />
+              <ScienceIcon sx={{ color: themeUtils.colors.info, fontSize: '2rem' }} />
             </Box>
             <Typography variant="body2" color="text.secondary">Pesticide Schedules</Typography>
-            <Typography variant="caption" sx={{ color: '#4CAF50' }}>Safety protocols</Typography>
+            <Typography variant="caption" sx={{ color: themeUtils.colors.success }}>Safety protocols</Typography>
           </CardContent>
         </Card>
 
         <Card sx={{ 
           flex: '1 1 200px', 
           minWidth: '200px',
-          background: 'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%)',
+          background: `linear-gradient(135deg, ${themeUtils.colors.surface} 0%, ${themeUtils.colors.background} 100%)`,
           border: '1px solid rgba(76,175,80,0.2)',
           position: 'relative',
           overflow: 'hidden',
@@ -690,18 +692,18 @@ const PlantDataPage: React.FC = () => {
             left: 0,
             right: 0,
             height: '3px',
-            background: 'linear-gradient(90deg, #4CAF50, #81C784)',
+            background: `linear-gradient(90deg, ${themeUtils.colors.success}, ${themeUtils.colors.primary})`,
           }
         }}>
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-              <Typography variant="h4" sx={{ fontWeight: 700, color: '#4CAF50' }}>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: themeUtils.colors.success }}>
                 {Math.round(plantData.reduce((acc, plant) => acc + (plant.growthTimeline?.totalDays || 0), 0) / plantData.length) || 0}
               </Typography>
-              <TimelineIcon sx={{ color: '#4CAF50', fontSize: '2rem' }} />
+              <TimelineIcon sx={{ color: themeUtils.colors.success, fontSize: '2rem' }} />
             </Box>
             <Typography variant="body2" color="text.secondary">Avg. Maturity (Days)</Typography>
-            <Typography variant="caption" sx={{ color: '#4CAF50' }}>Growth timeline</Typography>
+            <Typography variant="caption" sx={{ color: themeUtils.colors.success }}>Growth timeline</Typography>
           </CardContent>
         </Card>
       </Box>
@@ -712,7 +714,7 @@ const PlantDataPage: React.FC = () => {
         <Card sx={{ 
           flex: '1 1 300px', 
           minWidth: '300px',
-          background: 'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%)',
+          background: `linear-gradient(135deg, ${themeUtils.colors.surface} 0%, ${themeUtils.colors.background} 100%)`,
           border: '1px solid rgba(255,255,255,0.1)',
         }}>
           <CardContent>
@@ -722,10 +724,10 @@ const PlantDataPage: React.FC = () => {
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {[
-                { name: 'Vegetables', count: plantData.filter(p => p.category === 'vegetable').length, color: '#00D4AA' },
-                { name: 'Fruits', count: plantData.filter(p => p.category === 'fruit').length, color: '#FF6B6B' },
-                { name: 'Herbs', count: plantData.filter(p => p.category === 'herb').length, color: '#2196F3' },
-                { name: 'Flowers', count: plantData.filter(p => p.category === 'flower').length, color: '#4CAF50' },
+                { name: 'Vegetables', count: plantData.filter(p => p.category === 'vegetable').length, color: themeUtils.colors.success },
+                { name: 'Fruits', count: plantData.filter(p => p.category === 'fruit').length, color: themeUtils.colors.error },
+                { name: 'Herbs', count: plantData.filter(p => p.category === 'herb').length, color: themeUtils.colors.info },
+                { name: 'Flowers', count: plantData.filter(p => p.category === 'flower').length, color: themeUtils.colors.success },
               ].map((category, index) => (
                 <Box key={index} sx={{ 
                   display: 'flex', 
@@ -758,7 +760,7 @@ const PlantDataPage: React.FC = () => {
         <Card sx={{ 
           flex: '1 1 300px', 
           minWidth: '300px',
-          background: 'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%)',
+          background: `linear-gradient(135deg, ${themeUtils.colors.surface} 0%, ${themeUtils.colors.background} 100%)`,
           border: '1px solid rgba(255,255,255,0.1)',
         }}>
           <CardContent>
@@ -768,12 +770,12 @@ const PlantDataPage: React.FC = () => {
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {[
-                { icon: <AddIcon />, text: "Add New Plant", color: "#00D4AA", action: () => { setSelectedPlant(null); setPlantForm({}); setPlantDialogOpen(true); } },
-                { icon: <ScienceIcon />, text: "View Requirements", color: "#FF6B6B", action: () => setActiveTab(1) },
-                { icon: <ScheduleIcon />, text: "Fertilizer Schedule", color: "#2196F3", action: () => setActiveTab(2) },
-                { icon: <ScienceIcon />, text: "Pesticide Schedule", color: "#FF6B6B", action: () => setActiveTab(3) },
-                { icon: <TimelineIcon />, text: "Growth Timeline", color: "#4CAF50", action: () => setActiveTab(6) },
-                { icon: <AssessmentIcon />, text: "Yield Analysis", color: "#FFB74D", action: () => setActiveTab(7) },
+                { icon: <AddIcon />, text: "Add New Plant", color: themeUtils.colors.success, action: () => { setSelectedPlant(null); setPlantForm({}); setPlantDialogOpen(true); } },
+                { icon: <ScienceIcon />, text: "View Requirements", color: themeUtils.colors.error, action: () => setActiveTab(1) },
+                { icon: <ScheduleIcon />, text: "Fertilizer Schedule", color: themeUtils.colors.info, action: () => setActiveTab(2) },
+                { icon: <ScienceIcon />, text: "Pesticide Schedule", color: themeUtils.colors.error, action: () => setActiveTab(3) },
+                { icon: <TimelineIcon />, text: "Growth Timeline", color: themeUtils.colors.success, action: () => setActiveTab(6) },
+                { icon: <AssessmentIcon />, text: "Yield Analysis", color: themeUtils.colors.warning, action: () => setActiveTab(7) },
               ].map((action, index) => (
                 <Button
                   key={index}
@@ -804,7 +806,7 @@ const PlantDataPage: React.FC = () => {
 
       {/* Enhanced Tabs Section */}
       <Card sx={{ 
-        background: 'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%)',
+        background: `linear-gradient(135deg, ${themeUtils.colors.surface} 0%, ${themeUtils.colors.background} 100%)`,
         border: '1px solid rgba(255,255,255,0.1)',
         mb: 3
       }}>
@@ -1835,7 +1837,7 @@ const PlantDataPage: React.FC = () => {
 
       {/* System Status Section */}
       <Card sx={{ 
-        background: 'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%)',
+        background: `linear-gradient(135deg, ${themeUtils.colors.surface} 0%, ${themeUtils.colors.background} 100%)`,
         border: '1px solid rgba(255,255,255,0.1)',
       }}>
         <CardContent>
@@ -1854,11 +1856,11 @@ const PlantDataPage: React.FC = () => {
                   borderRadius: 4,
                   backgroundColor: 'rgba(255,255,255,0.1)',
                   '& .MuiLinearProgress-bar': {
-                    backgroundColor: '#4CAF50',
+                    backgroundColor: themeUtils.colors.success,
                   }
                 }} 
               />
-              <Typography variant="caption" sx={{ color: '#4CAF50', mt: 0.5, display: 'block' }}>All Data Valid</Typography>
+              <Typography variant="caption" sx={{ color: themeUtils.colors.success, mt: 0.5, display: 'block' }}>All Data Valid</Typography>
             </Box>
             <Box sx={{ flex: '1 1 200px' }}>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>Schedule Coverage</Typography>
@@ -1870,11 +1872,11 @@ const PlantDataPage: React.FC = () => {
                   borderRadius: 4,
                   backgroundColor: 'rgba(255,255,255,0.1)',
                   '& .MuiLinearProgress-bar': {
-                    backgroundColor: '#00D4AA',
+                    backgroundColor: themeUtils.colors.success,
                   }
                 }} 
               />
-              <Typography variant="caption" sx={{ color: '#00D4AA', mt: 0.5, display: 'block' }}>85% Complete</Typography>
+              <Typography variant="caption" sx={{ color: themeUtils.colors.success, mt: 0.5, display: 'block' }}>85% Complete</Typography>
             </Box>
             <Box sx={{ flex: '1 1 200px' }}>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>Growth Tracking</Typography>
@@ -1886,11 +1888,11 @@ const PlantDataPage: React.FC = () => {
                   borderRadius: 4,
                   backgroundColor: 'rgba(255,255,255,0.1)',
                   '& .MuiLinearProgress-bar': {
-                    backgroundColor: '#4CAF50',
+                    backgroundColor: themeUtils.colors.success,
                   }
                 }} 
               />
-              <Typography variant="caption" sx={{ color: '#4CAF50', mt: 0.5, display: 'block' }}>Excellent</Typography>
+              <Typography variant="caption" sx={{ color: themeUtils.colors.success, mt: 0.5, display: 'block' }}>Excellent</Typography>
             </Box>
           </Box>
         </CardContent>

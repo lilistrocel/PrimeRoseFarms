@@ -16,11 +16,13 @@ import { Visibility, VisibilityOff, Email, Lock } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { loginUser, clearError } from '../../store/slices/authSlice';
 import { ILoginCredentials } from '../../types';
+import { useThemeUtils } from '../../utils/themeUtils';
 
 const LoginScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const theme = useTheme();
   const isMobileDevice = useMediaQuery(theme.breakpoints.down('sm'));
+  const themeUtils = useThemeUtils();
   
   const { loading, error } = useAppSelector((state) => state.auth);
   
@@ -65,7 +67,7 @@ const LoginScreen: React.FC = () => {
       justifyContent="center"
       minHeight="100vh"
       sx={{
-        background: '#0F0F23',
+        background: themeUtils.colors.background,
         padding: isMobileDevice ? 2 : 3,
       }}
     >
@@ -73,10 +75,10 @@ const LoginScreen: React.FC = () => {
         sx={{
           width: '100%',
           maxWidth: isMobileDevice ? 350 : 400,
-          background: '#1E1E2E',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
-          borderRadius: 2,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          background: themeUtils.colors.surface,
+          border: `1px solid ${themeUtils.colors.border}`,
+          borderRadius: themeUtils.borderRadius.lg,
+          boxShadow: themeUtils.shadows.md,
         }}
       >
         <CardContent sx={{ padding: isMobileDevice ? 3 : 4 }}>
@@ -86,19 +88,20 @@ const LoginScreen: React.FC = () => {
               sx={{
                 height: '60px',
                 width: '60px',
-                background: '#E91E63',
-                borderRadius: 2,
+                background: themeUtils.colors.primary,
+                borderRadius: themeUtils.borderRadius.lg,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '2rem',
                 fontWeight: 'bold',
-                color: '#FFFFFF',
+                color: themeUtils.colors.text.primary,
                 marginBottom: 2,
                 transition: 'all 0.2s ease',
                 '&:hover': {
                   transform: 'scale(1.05)',
-                  background: '#C2185B',
+                  background: themeUtils.colors.primary,
+                  opacity: 0.9,
                 }
               }}
             >
@@ -108,12 +111,12 @@ const LoginScreen: React.FC = () => {
               variant={isMobileDevice ? "h5" : "h4"}
               component="h1"
               fontWeight="bold"
-              color="#E91E63"
+              color={themeUtils.colors.primary}
               gutterBottom
             >
               PrimeRose Farms
             </Typography>
-            <Typography variant="body2" sx={{ color: '#B0B0B0' }}>
+            <Typography variant="body2" sx={{ color: themeUtils.colors.text.secondary }}>
               Agricultural Farm Management System
             </Typography>
           </Box>
@@ -143,31 +146,31 @@ const LoginScreen: React.FC = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Email sx={{ color: '#B0B0B0' }} />
+                    <Email sx={{ color: themeUtils.colors.text.secondary }} />
                   </InputAdornment>
                 ),
               }}
               sx={{ 
                 mb: 2,
                 '& .MuiOutlinedInput-root': {
-                  color: '#FFFFFF',
+                  color: themeUtils.colors.text.primary,
                   '& .MuiOutlinedInput-input': {
-                    color: '#FFFFFF',
+                    color: themeUtils.colors.text.primary,
                   },
                   '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderColor: themeUtils.colors.border,
                   },
                   '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#E91E63',
+                    borderColor: themeUtils.colors.primary,
                   },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#E91E63',
+                    borderColor: themeUtils.colors.primary,
                   },
                 },
                 '& .MuiInputLabel-root': {
-                  color: '#B0B0B0',
+                  color: themeUtils.colors.text.secondary,
                   '&.Mui-focused': {
-                    color: '#E91E63',
+                    color: themeUtils.colors.primary,
                   },
                 },
               }}
@@ -185,7 +188,7 @@ const LoginScreen: React.FC = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Lock sx={{ color: '#B0B0B0' }} />
+                    <Lock sx={{ color: themeUtils.colors.text.secondary }} />
                   </InputAdornment>
                 ),
                 endAdornment: (
@@ -195,7 +198,7 @@ const LoginScreen: React.FC = () => {
                       onClick={togglePasswordVisibility}
                       edge="end"
                       disabled={loading}
-                      sx={{ color: '#B0B0B0' }}
+                      sx={{ color: themeUtils.colors.text.secondary }}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -205,24 +208,24 @@ const LoginScreen: React.FC = () => {
               sx={{ 
                 mb: 3,
                 '& .MuiOutlinedInput-root': {
-                  color: '#FFFFFF',
+                  color: themeUtils.colors.text.primary,
                   '& .MuiOutlinedInput-input': {
-                    color: '#FFFFFF',
+                    color: themeUtils.colors.text.primary,
                   },
                   '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderColor: themeUtils.colors.border,
                   },
                   '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#E91E63',
+                    borderColor: themeUtils.colors.primary,
                   },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#E91E63',
+                    borderColor: themeUtils.colors.primary,
                   },
                 },
                 '& .MuiInputLabel-root': {
-                  color: '#B0B0B0',
+                  color: themeUtils.colors.text.secondary,
                   '&.Mui-focused': {
-                    color: '#E91E63',
+                    color: themeUtils.colors.primary,
                   },
                 },
               }}
@@ -239,14 +242,15 @@ const LoginScreen: React.FC = () => {
                 fontSize: '1.1rem',
                 fontWeight: 'bold',
                 textTransform: 'none',
-                backgroundColor: '#E91E63',
-                color: '#FFFFFF',
+                backgroundColor: themeUtils.colors.primary,
+                color: themeUtils.colors.text.primary,
                 '&:hover': {
-                  backgroundColor: '#C2185B',
+                  backgroundColor: themeUtils.colors.primary,
+                  opacity: 0.9,
                 },
                 '&:disabled': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  color: 'rgba(255, 255, 255, 0.3)',
+                  backgroundColor: themeUtils.colors.surface,
+                  color: themeUtils.colors.text.disabled,
                 },
               }}
             >
@@ -256,20 +260,20 @@ const LoginScreen: React.FC = () => {
 
           {/* Demo Account Info */}
           <Box mt={3} p={2} sx={{ 
-            background: 'rgba(255, 255, 255, 0.02)', 
-            borderRadius: 1,
-            border: '1px solid rgba(255, 255, 255, 0.05)'
+            background: themeUtils.colors.surface, 
+            borderRadius: themeUtils.borderRadius.md,
+            border: `1px solid ${themeUtils.colors.border}`
           }}>
-            <Typography variant="caption" sx={{ color: '#B0B0B0', fontWeight: 600, mb: 1, display: 'block' }}>
+            <Typography variant="caption" sx={{ color: themeUtils.colors.text.secondary, fontWeight: 600, mb: 1, display: 'block' }}>
               Demo Accounts Available:
             </Typography>
-            <Typography variant="caption" sx={{ color: '#B0B0B0', display: 'block' }}>
+            <Typography variant="caption" sx={{ color: themeUtils.colors.text.secondary, display: 'block' }}>
               • Manager: manager@primerose.com
             </Typography>
-            <Typography variant="caption" sx={{ color: '#B0B0B0', display: 'block' }}>
+            <Typography variant="caption" sx={{ color: themeUtils.colors.text.secondary, display: 'block' }}>
               • Worker: worker@primerose.com
             </Typography>
-            <Typography variant="caption" sx={{ color: '#B0B0B0', display: 'block' }}>
+            <Typography variant="caption" sx={{ color: themeUtils.colors.text.secondary, display: 'block' }}>
               Password: demo123
             </Typography>
           </Box>

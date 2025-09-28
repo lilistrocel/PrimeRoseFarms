@@ -27,6 +27,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { IUser } from '../../../types';
+import { useThemeUtils } from '../../../utils/themeUtils';
 
 interface DesktopSidebarProps {
   user: IUser;
@@ -125,6 +126,7 @@ const navigationItems: NavigationItem[] = [
 const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ user, drawerWidth, open }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const themeUtils = useThemeUtils();
 
   // Filter navigation items based on user role
   const availableItems = navigationItems.filter(item => 
@@ -153,22 +155,21 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ user, drawerWidth, open
         }}>
           <Box
             component="img"
-            src="/logo.png"
+            src={themeUtils.assets.logo.primary}
             alt="PrimeRose Farms Logo"
             sx={{
               height: { xs: '40px', sm: '50px' },
               width: 'auto',
-              filter: 'brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)',
               transition: 'all 0.2s ease',
               '&:hover': {
                 transform: 'scale(1.05)',
-                filter: 'brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(120%) contrast(110%)',
+                opacity: 0.9,
               }
             }}
           />
           <Typography variant="h6" component="div" sx={{ 
             fontWeight: 700, 
-            color: '#E91E63', 
+            color: themeUtils.colors.primary, 
             fontSize: { xs: '0.9rem', sm: '1.1rem' }, 
             letterSpacing: '-0.01em',
             lineHeight: 1.2
@@ -177,7 +178,7 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ user, drawerWidth, open
           </Typography>
         </Box>
         <Typography variant="caption" sx={{ 
-          color: '#808080', 
+          color: themeUtils.colors.text.secondary, 
           fontSize: { xs: '0.7rem', sm: '0.75rem' }, 
           fontWeight: 500,
           display: 'block',
@@ -194,16 +195,16 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ user, drawerWidth, open
       {/* User Info */}
       <Box sx={{ 
         p: { xs: 2, sm: 3 }, 
-        background: 'rgba(255, 255, 255, 0.02)', 
-        borderRadius: '8px', 
+        background: themeUtils.colors.surface, 
+        borderRadius: themeUtils.borderRadius.md, 
         mx: { xs: 1, sm: 2 }, 
         mb: { xs: 1, sm: 2 },
-        border: '1px solid rgba(255, 255, 255, 0.05)',
+        border: `1px solid ${themeUtils.colors.border}`,
         transition: 'all 0.2s ease'
       }}>
         <Typography variant="subtitle1" sx={{ 
           fontWeight: 600, 
-          color: '#FFFFFF', 
+          color: themeUtils.colors.text.primary, 
           fontSize: { xs: '0.9rem', sm: '1rem' },
           lineHeight: 1.3,
           overflow: 'hidden',
@@ -213,7 +214,7 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ user, drawerWidth, open
           {user.firstName} {user.lastName}
         </Typography>
         <Typography variant="body2" sx={{ 
-          color: '#808080', 
+          color: themeUtils.colors.text.secondary, 
           fontSize: { xs: '0.8rem', sm: '0.875rem' }, 
           mb: 1,
           overflow: 'hidden',
@@ -227,8 +228,8 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ user, drawerWidth, open
           size="small" 
           sx={{ 
             mt: 1, 
-            backgroundColor: '#E91E63', 
-            color: '#FFFFFF', 
+            backgroundColor: themeUtils.colors.primary, 
+            color: themeUtils.colors.text.primary, 
             fontWeight: 600,
             fontSize: { xs: '0.7rem', sm: '0.75rem' },
             height: { xs: '20px', sm: '24px' }
@@ -255,19 +256,19 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ user, drawerWidth, open
                   transition: 'all 0.2s ease',
                   minHeight: { xs: '40px', sm: '48px' },
                   '&.Mui-selected': {
-                    backgroundColor: 'rgba(233, 30, 99, 0.1)',
-                    color: '#E91E63',
-                    borderLeft: '2px solid #E91E63',
+                    backgroundColor: `${themeUtils.colors.primary}20`,
+                    color: themeUtils.colors.primary,
+                    borderLeft: `2px solid ${themeUtils.colors.primary}`,
                     '& .MuiListItemIcon-root': {
-                      color: '#E91E63',
+                      color: themeUtils.colors.primary,
                     },
                     '&:hover': {
-                      backgroundColor: 'rgba(233, 30, 99, 0.15)',
+                      backgroundColor: `${themeUtils.colors.primary}30`,
                     },
                   },
                   '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                    color: '#FFFFFF',
+                    backgroundColor: `${themeUtils.colors.text.primary}10`,
+                    color: themeUtils.colors.text.primary,
                   },
                 }}
               >
@@ -284,7 +285,7 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ user, drawerWidth, open
                   primaryTypographyProps={{
                     fontSize: { xs: '0.8rem', sm: '0.875rem' },
                     fontWeight: isActive ? 600 : 500,
-                    color: isActive ? '#E91E63' : '#B0B0B0',
+                    color: isActive ? themeUtils.colors.primary : themeUtils.colors.text.secondary,
                     lineHeight: 1.2,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -298,8 +299,8 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ user, drawerWidth, open
                     sx={{ 
                       height: { xs: 18, sm: 20 }, 
                       fontSize: { xs: '0.65rem', sm: '0.7rem' },
-                      backgroundColor: '#FF6B6B',
-                      color: '#FFFFFF',
+                      backgroundColor: themeUtils.colors.warning,
+                      color: themeUtils.colors.text.primary,
                       fontWeight: 600,
                       borderRadius: '10px',
                       minWidth: { xs: 'auto', sm: 'auto' }
@@ -344,8 +345,8 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ user, drawerWidth, open
         '& .MuiDrawer-paper': {
           width: { xs: drawerWidth, sm: drawerWidth },
           boxSizing: 'border-box',
-          backgroundColor: '#0F0F23',
-          borderRight: '1px solid rgba(255, 255, 255, 0.05)',
+          backgroundColor: themeUtils.colors.surface,
+          borderRight: `1px solid ${themeUtils.colors.border}`,
           transition: 'all 0.2s ease',
         },
       }}

@@ -36,7 +36,8 @@ import {
   GridView as BlockIcon,
   TrendingUp as PerformanceIcon,
   Lightbulb as OptimizationIcon,
-  Assignment as AssignmentIcon
+  Assignment as AssignmentIcon,
+  SwapHoriz as StateChangeIcon
 } from '@mui/icons-material';
 import { 
   farmManagementApi, 
@@ -46,6 +47,7 @@ import {
   IBlockOptimization 
 } from '../../../services/farmManagementApi';
 import { IPlantData } from '../../../services/plantDataApi';
+import { useThemeStyles } from '../../../hooks/useThemeStyles';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -83,13 +85,19 @@ const FarmManagementPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
+  // Theme styles
+  const { backgroundStyles, cardStyles, buttonStyles, chipStyles, textStyles } = useThemeStyles();
+  
   // Dialog states
   const [farmDialogOpen, setFarmDialogOpen] = useState(false);
   const [blockDialogOpen, setBlockDialogOpen] = useState(false);
   const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
+  const [stateChangeDialogOpen, setStateChangeDialogOpen] = useState(false);
   const [selectedFarm, setSelectedFarm] = useState<IFarm | null>(null);
   const [selectedBlock, setSelectedBlock] = useState<IBlock | null>(null);
   const [farmDialogTab, setFarmDialogTab] = useState(0);
+  const [newBlockState, setNewBlockState] = useState<string>('');
+  const [stateChangeNotes, setStateChangeNotes] = useState<string>('');
   const [plantAssignmentForm, setPlantAssignmentForm] = useState<{
     blockId?: string;
     selectedPlants: Array<{
@@ -729,6 +737,36 @@ const FarmManagementPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const handleStateChange = async () => {
+    if (!selectedBlock || !newBlockState) {
+      setError('Please select a block and new state');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Call the state change API
+      await farmManagementApi.changeBlockState(
+        selectedBlock._id || (selectedBlock as any).id,
+        newBlockState,
+        stateChangeNotes
+      );
+
+      // Refresh data
+      await loadData();
+      setStateChangeDialogOpen(false);
+      setNewBlockState('');
+      setStateChangeNotes('');
+      setSelectedBlock(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to change block state');
+    } finally {
+      setLoading(false);
+    }
+  };
   
   const addPlantToAssignment = (plant: IPlantData, count: number) => {
     console.log('🔍 addPlantToAssignment called:', { plant, count, currentForm: plantAssignmentForm });
@@ -819,7 +857,7 @@ const FarmManagementPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', pb: 4 }}>
+    <Box sx={{ ...backgroundStyles, pb: 4 }}>
       {/* Header Section */}
       <Box sx={{ 
         display: 'flex', 
@@ -832,12 +870,12 @@ const FarmManagementPage: React.FC = () => {
         <Box>
           <Typography variant="h4" component="h1" sx={{ 
             fontWeight: 700, 
-            color: '#FFFFFF',
+            ...textStyles.primary,
             mb: 1
           }}>
             Farm Management
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body1" sx={textStyles.secondary}>
             Manage your farms, blocks, and agricultural operations
           </Typography>
         </Box>
@@ -1093,10 +1131,10 @@ const FarmManagementPage: React.FC = () => {
         </Box>
 
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
-          {filteredFarms.map((farm) => (
-            <Box key={farm._id} sx={{ flex: '1 1 300px', minWidth: '300px' }}>
-              <Card>
-                <CardContent>
+            {filteredFarms.map((farm) => (
+              <Box key={farm._id} sx={{ flex: '1 1 300px', minWidth: '300px' }}>
+                <Card sx={cardStyles}>
+                  <CardContent>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                     <Typography variant="h6" component="div">
                       {farm.name}
@@ -1150,7 +1188,7 @@ const FarmManagementPage: React.FC = () => {
                         In Use
                       </Typography>
                       <Typography variant="h6">
-                        {blocks.filter(block => block.farmId === farm._id && ['preparing', 'planting', 'growing', 'harvesting'].includes(block.status)).length}
+                        {blocks.filter(block => block.farmId === farm._id && ['assigned', 'planted', 'harvesting'].includes(block.status)).length}
                       </Typography>
                     </Box>
                     <Box>
@@ -1258,7 +1296,7 @@ const FarmManagementPage: React.FC = () => {
                         {block.plantAssignment.assignedPlants.map((plant, index) => (
                           <Box key={index} sx={{ mb: 0.5 }}>
                             <Typography variant="body2">{plant.plantName}</Typography>
-                            <Typography variant="caption" color="text.secondary">
+                        <Typography variant="caption" color="text.secondary">
                               {plant.assignedCount} plants
                               {plant.plantingDate && ` • Planted: ${new Date(plant.plantingDate).toLocaleDateString()}`}
                             </Typography>
@@ -1303,6 +1341,27 @@ const FarmManagementPage: React.FC = () => {
                       }}
                     >
                       <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        const blockId = block._id || (block as any).id;
+                        if (!blockId) {
+                          setError('Cannot change state: No valid ID found');
+                          return;
+                        }
+                        const blockWithId = {
+                          ...block,
+                          _id: blockId
+                        };
+                        setSelectedBlock(blockWithId);
+                        setNewBlockState('');
+                        setStateChangeNotes('');
+                        setStateChangeDialogOpen(true);
+                      }}
+                      title="Change Block State"
+                    >
+                      <StateChangeIcon />
                     </IconButton>
                     <IconButton size="small">
                       <ViewIcon />
@@ -1380,37 +1439,37 @@ const FarmManagementPage: React.FC = () => {
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
           {Array.isArray(optimizationData) && optimizationData.length > 0 ? (
             optimizationData.map((optimization) => (
-              <Box key={optimization.blockId} sx={{ flex: '1 1 400px', minWidth: '400px' }}>
-                <Card>
-                  <CardContent>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                      <Typography variant="h6">{optimization.blockName}</Typography>
-                      <Chip 
-                        label={`${Math.round(optimization.optimizationScore * 100)}%`}
-                        color={optimization.optimizationScore > 0.7 ? 'success' : 'warning'}
-                      />
-                    </Box>
-                    
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      Current Status: {optimization.currentStatus}
-                    </Typography>
+            <Box key={optimization.blockId} sx={{ flex: '1 1 400px', minWidth: '400px' }}>
+              <Card>
+                <CardContent>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6">{optimization.blockName}</Typography>
+                    <Chip 
+                      label={`${Math.round(optimization.optimizationScore * 100)}%`}
+                      color={optimization.optimizationScore > 0.7 ? 'success' : 'warning'}
+                    />
+                  </Box>
+                  
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    Current Status: {optimization.currentStatus}
+                  </Typography>
 
-                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                      Recommendations:
-                    </Typography>
-                    {optimization.recommendations.map((rec, index) => (
-                      <Box key={index} sx={{ mb: 1 }}>
-                        <Typography variant="body2">
-                          • {rec.description}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          Impact: {rec.impact} • Cost: ${rec.cost} • Benefit: ${rec.expectedBenefit}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </CardContent>
-                </Card>
-              </Box>
+                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                    Recommendations:
+                  </Typography>
+                  {optimization.recommendations.map((rec, index) => (
+                    <Box key={index} sx={{ mb: 1 }}>
+                      <Typography variant="body2">
+                        • {rec.description}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Impact: {rec.impact} • Cost: ${rec.cost} • Benefit: ${rec.expectedBenefit}
+                      </Typography>
+                    </Box>
+                  ))}
+                </CardContent>
+              </Card>
+            </Box>
             ))
           ) : (
             <Box sx={{ flex: '1 1 100%', textAlign: 'center', py: 4 }}>
@@ -1710,7 +1769,7 @@ const FarmManagementPage: React.FC = () => {
                 helperText="Maximum blocks that can be assigned to this farm"
                 required
               />
-            </Box>
+          </Box>
             
             {/* Farm Coordinates */}
             <Box sx={{ flex: '1 1 200px', minWidth: '200px' }}>
@@ -1949,7 +2008,7 @@ const FarmManagementPage: React.FC = () => {
                 >
                   <MenuItem value="" disabled>
                     <em>Select a farm</em>
-                  </MenuItem>
+                    </MenuItem>
                   {farms.length > 0 ? (
                     farms.map((farm, index) => {
                       const farmId = farm._id || `farm-${index}`;
@@ -2001,9 +2060,9 @@ const FarmManagementPage: React.FC = () => {
                   const width = blockForm.dimensions?.width || 0;
                   const area = length * width;
                   setBlockForm({
-                    ...blockForm,
-                    dimensions: { 
-                      ...blockForm.dimensions,
+                  ...blockForm,
+                  dimensions: { 
+                    ...blockForm.dimensions,
                       length,
                       width,
                       area
@@ -2023,9 +2082,9 @@ const FarmManagementPage: React.FC = () => {
                   const length = blockForm.dimensions?.length || 0;
                   const area = length * width;
                   setBlockForm({
-                    ...blockForm,
-                    dimensions: { 
-                      ...blockForm.dimensions,
+                  ...blockForm,
+                  dimensions: { 
+                    ...blockForm.dimensions,
                       length,
                       width,
                       area
@@ -2099,7 +2158,7 @@ const FarmManagementPage: React.FC = () => {
           <Box sx={{ mb: 3 }}>
             <FormControl fullWidth required sx={{ mb: 2 }}>
               <InputLabel>Select Block</InputLabel>
-              <Select
+                <Select
                 value={plantAssignmentForm.blockId || ''}
                 onChange={(e) => {
                   const blockId = e.target.value;
@@ -2121,14 +2180,14 @@ const FarmManagementPage: React.FC = () => {
                     return (
                       <MenuItem key={blockId} value={blockId}>
                         {block.name} ({block.blockType}) - Capacity: {block.plantAssignment?.remainingCapacity || 0}
-                      </MenuItem>
+                    </MenuItem>
                     );
                   })
                 ) : (
                   <MenuItem disabled>No blocks available</MenuItem>
                 )}
-              </Select>
-            </FormControl>
+                </Select>
+              </FormControl>
             
             {selectedBlock && (
               <Box sx={{ p: 2, bgcolor: 'grey.800', borderRadius: 1, border: '1px solid', borderColor: 'grey.600' }}>
@@ -2137,7 +2196,7 @@ const FarmManagementPage: React.FC = () => {
                   Block: {selectedBlock.name} | Type: {selectedBlock.blockType} | 
                   Capacity: {selectedBlock.plantAssignment?.remainingCapacity || 0} plants remaining
                 </Typography>
-              </Box>
+            </Box>
             )}
           </Box>
 
@@ -2150,9 +2209,9 @@ const FarmManagementPage: React.FC = () => {
                 </Typography>
                 <FormControl fullWidth sx={{ mb: 2 }}>
                   <InputLabel>Select Plant</InputLabel>
-                  <Select
+                <Select
                     value={assignmentForm.plantDataId || ''}
-                    onChange={(e) => setAssignmentForm({ ...assignmentForm, plantDataId: e.target.value })}
+                  onChange={(e) => setAssignmentForm({ ...assignmentForm, plantDataId: e.target.value })}
                     label="Select Plant"
                   >
                     {plants
@@ -2178,17 +2237,17 @@ const FarmManagementPage: React.FC = () => {
                         return (
                           <MenuItem key={plantId} value={plantId}>
                             {plant.name} ({plant.farmingType})
-                          </MenuItem>
+                    </MenuItem>
                         );
                       })}
-                  </Select>
-                </FormControl>
+                </Select>
+              </FormControl>
                 
                 {assignmentForm.plantDataId && (
                   <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                    <TextField
-                      label="Plant Count"
-                      type="number"
+              <TextField
+                label="Plant Count"
+                type="number"
                       value={assignmentForm.plantCount || ''}
                       onChange={(e) => setAssignmentForm({ ...assignmentForm, plantCount: parseInt(e.target.value) || 0 })}
                       sx={{ width: 120 }}
@@ -2207,7 +2266,7 @@ const FarmManagementPage: React.FC = () => {
                     >
                       Add Plant
                     </Button>
-                  </Box>
+            </Box>
                 )}
               </Box>
               
@@ -2230,7 +2289,7 @@ const FarmManagementPage: React.FC = () => {
                             </Typography>
                           </Box>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <TextField
+              <TextField
                               size="small"
                               type="number"
                               value={plant.count}
@@ -2244,8 +2303,8 @@ const FarmManagementPage: React.FC = () => {
                             >
                               Remove
                             </Button>
-                          </Box>
-                        </Box>
+            </Box>
+          </Box>
                       </Card>
                     ))
                   )}
@@ -2308,6 +2367,75 @@ const FarmManagementPage: React.FC = () => {
             }}
           >
             Assign Plants
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* State Change Dialog */}
+      <Dialog open={stateChangeDialogOpen} onClose={() => setStateChangeDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          Change Block State
+        </DialogTitle>
+        <DialogContent>
+          {selectedBlock && (
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle1" sx={{ mb: 2 }}>
+                Block: {selectedBlock.name} ({selectedBlock.blockType})
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Current State: <Chip label={selectedBlock.status} color={getStatusColor(selectedBlock.status) as any} size="small" />
+              </Typography>
+            </Box>
+          )}
+          
+          <FormControl fullWidth required sx={{ mb: 2 }}>
+            <InputLabel>New State</InputLabel>
+            <Select
+              value={newBlockState}
+              onChange={(e) => setNewBlockState(e.target.value)}
+              label="New State"
+            >
+              <MenuItem value="empty">Empty</MenuItem>
+              <MenuItem value="assigned">Assigned</MenuItem>
+              <MenuItem value="planted">Planted</MenuItem>
+              <MenuItem value="harvesting">Harvesting</MenuItem>
+              <MenuItem value="alert">Alert</MenuItem>
+            </Select>
+          </FormControl>
+          
+          <TextField
+            fullWidth
+            multiline
+            rows={3}
+            label="Notes (Optional)"
+            value={stateChangeNotes}
+            onChange={(e) => setStateChangeNotes(e.target.value)}
+            placeholder="Add notes about this state change..."
+            sx={{ mt: 2 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {
+            setStateChangeDialogOpen(false);
+            setNewBlockState('');
+            setStateChangeNotes('');
+            setSelectedBlock(null);
+          }}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleStateChange}
+            variant="contained"
+            disabled={!newBlockState}
+            sx={{
+              backgroundColor: !newBlockState ? 'grey.600' : 'primary.main',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: !newBlockState ? 'grey.600' : 'primary.dark'
+              }
+            }}
+          >
+            Change State
           </Button>
         </DialogActions>
       </Dialog>

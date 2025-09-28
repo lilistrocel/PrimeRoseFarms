@@ -22,6 +22,8 @@ import { useAppDispatch, useAppSelector } from '../../../store';
 import { toggleSidebar } from '../../../store/slices/interfaceSlice';
 import { logoutUser } from '../../../store/slices/authSlice';
 import { IUser } from '../../../types';
+import ThemeController from '../../common/ThemeController';
+import { useThemeUtils } from '../../../utils/themeUtils';
 
 interface DesktopNavbarProps {
   user: IUser;
@@ -31,6 +33,7 @@ interface DesktopNavbarProps {
 const DesktopNavbar: React.FC<DesktopNavbarProps> = ({ user, drawerWidth }) => {
   const dispatch = useAppDispatch();
   const { sidebarOpen, notifications } = useAppSelector((state) => state.interface);
+  const themeUtils = useThemeUtils();
   
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -92,6 +95,9 @@ const DesktopNavbar: React.FC<DesktopNavbarProps> = ({ user, drawerWidth }) => {
               </Badge>
             </IconButton>
           </Tooltip>
+
+          {/* Theme Controller */}
+          <ThemeController />
 
           {/* Settings */}
           <Tooltip title="Settings">

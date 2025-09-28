@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
+import { CssBaseline } from '@mui/material';
 import { store, useAppDispatch, useAppSelector } from './store';
 import { verifyToken } from './store/slices/authSlice';
 import { setOnlineStatus } from './store/slices/interfaceSlice';
@@ -8,6 +9,10 @@ import { setOnlineStatus } from './store/slices/interfaceSlice';
 import LoginScreen from './components/auth/LoginScreen';
 import InterfaceRouter from './components/InterfaceRouter';
 import LoadingScreen from './components/common/LoadingScreen';
+
+// Theme system
+import { ThemeProvider } from './contexts/ThemeContext';
+import { MaterialThemeProvider } from './contexts/MaterialThemeProvider';
 
 // Fix for ResizeObserver error
 import './utils/resizeObserverFix';
@@ -63,7 +68,12 @@ const App: React.FC = () => {
   
   return (
     <Provider store={store}>
-      <AppContent />
+      <ThemeProvider>
+        <MaterialThemeProvider>
+          <CssBaseline />
+          <AppContent />
+        </MaterialThemeProvider>
+      </ThemeProvider>
     </Provider>
   );
 };

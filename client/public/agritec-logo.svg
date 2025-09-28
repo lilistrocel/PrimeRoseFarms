@@ -1,0 +1,87 @@
+<svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shield Background Gradient -->
+  <defs>
+    <linearGradient id="shieldGradient" x1="250" y1="100" x2="250" y2="350" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4A90E2"/>
+      <stop offset="1" stop-color="#28A745"/>
+    </linearGradient>
+    <linearGradient id="fieldGradient" x1="100" y1="280" x2="400" y2="320" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#28A745"/>
+      <stop offset="0.5" stop-color="#8B4513"/>
+      <stop offset="1" stop-color="#28A745"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Shield Shape -->
+  <path d="M100 100 H400 V300 C400 320 350 350 250 350 C150 350 100 320 100 300 V100 Z" fill="url(#shieldGradient)"/>
+  
+  <!-- Shield Border -->
+  <path d="M100 100 H400 V300 C400 320 350 350 250 350 C150 350 100 320 100 300 V100 Z" stroke="#1E293B" stroke-width="8" fill="none"/>
+
+  <!-- Gear Top Edge -->
+  <path d="M100 100 L105 90 L115 100 L120 90 L130 100 L135 90 L145 100 L150 90 L160 100 L165 90 L175 100 L180 90 L190 100 L195 90 L205 100 L210 90 L220 100 L225 90 L235 100 L240 90 L250 100 L260 90 L265 100 L275 90 L280 100 L290 90 L295 100 L305 90 L310 100 L320 90 L325 100 L335 90 L340 100 L350 90 L355 100 L365 90 L370 100 L380 90 L385 100 L395 90 L400 100" fill="#1E293B"/>
+
+  <!-- Field/Path with gradient -->
+  <path d="M100 280 C150 290 200 290 250 280 C300 270 350 270 400 280 L400 300 C350 310 300 310 250 300 C200 290 150 290 100 300 Z" fill="url(#fieldGradient)"/>
+
+  <!-- Tractor Body -->
+  <path d="M180 220 L200 190 H280 L300 220 L290 250 L190 250 Z" fill="#28A745"/>
+  
+  <!-- Tractor Cabin -->
+  <rect x="200" y="190" width="80" height="30" fill="#1E293B"/>
+  
+  <!-- Tractor Wheels -->
+  <circle cx="210" cy="240" r="15" fill="#1E293B"/>
+  <circle cx="270" cy="240" r="25" fill="#1E293B"/>
+  <circle cx="210" cy="240" r="10" fill="#00BCD4"/>
+  <circle cx="270" cy="240" r="15" fill="#00BCD4"/>
+  
+  <!-- Tractor Headlights -->
+  <rect x="185" y="225" width="10" height="10" fill="#00BCD4"/>
+  <rect x="195" y="225" width="10" height="10" fill="#00BCD4"/>
+
+  <!-- Large Leaf on Tractor -->
+  <path d="M240 180 C230 170 220 170 210 180 C200 190 210 200 220 200 C230 200 240 190 240 180 Z" fill="#28A745"/>
+  <path d="M240 180 C250 170 260 170 270 180 C280 190 270 200 260 200 C250 200 240 190 240 180 Z" fill="#28A745"/>
+  <path d="M240 180 L250 170 L260 180 L250 190 Z" fill="#28A745"/>
+
+  <!-- Circuitry Lines -->
+  <path d="M150 200 L130 220 L120 210 L110 230" stroke="#00BCD4" stroke-width="2" fill="none"/>
+  <circle cx="110" cy="230" r="3" fill="#00BCD4"/>
+  <path d="M350 200 L370 220 L380 210 L390 230" stroke="#00BCD4" stroke-width="2" fill="none"/>
+  <circle cx="390" cy="230" r="3" fill="#00BCD4"/>
+  <path d="M160 180 L140 200 L130 190 L120 210" stroke="#00BCD4" stroke-width="1.5" fill="none"/>
+  <path d="M340 180 L360 200 L370 190 L380 210" stroke="#00BCD4" stroke-width="1.5" fill="none"/>
+
+  <!-- Drone -->
+  <rect x="240" y="120" width="20" height="5" fill="#1E293B"/>
+  <rect x="230" y="125" width="40" height="5" fill="#1E293B"/>
+  <circle cx="235" cy="120" r="3" fill="#1E293B"/>
+  <circle cx="265" cy="120" r="3" fill="#1E293B"/>
+  <line x1="235" y1="120" x2="235" y2="110" stroke="#1E293B" stroke-width="2"/>
+  <line x1="265" y1="120" x2="265" y2="110" stroke="#1E293B" stroke-width="2"/>
+
+  <!-- Wi-Fi Symbol -->
+  <path d="M300 150 A10 10 0 0 1 310 150 A10 10 0 0 1 300 150 Z" fill="white"/>
+  <path d="M295 145 A15 15 0 0 1 315 145 A15 15 0 0 1 295 145 Z" stroke="white" stroke-width="2" fill="none"/>
+  <path d="M290 140 A20 20 0 0 1 320 140 A20 20 0 0 1 290 140 Z" stroke="white" stroke-width="2" fill="none"/>
+
+  <!-- Data Bars -->
+  <rect x="150" y="150" width="20" height="5" fill="#FF9800"/>
+  <rect x="150" y="160" width="15" height="5" fill="#00BCD4"/>
+  <rect x="150" y="170" width="25" height="5" fill="#FF9800"/>
+  <rect x="150" y="180" width="10" height="5" fill="#00BCD4"/>
+
+  <!-- Ribbon Banner -->
+  <path d="M100 370 H400 L380 390 L400 410 H100 L120 390 Z" fill="#1E293B"/>
+  <path d="M100 370 H400 L380 390 L400 410 H100 L120 390 Z" stroke="white" stroke-width="2" fill="none"/>
+
+  <!-- AGRITEC Text -->
+  <text x="250" y="398" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="white" text-anchor="middle">AGRITEC</text>
+  
+  <!-- Leaf for 'i' in AGRITEC -->
+  <path d="M295 380 C290 375 285 375 280 380 C275 385 280 390 285 390 C290 390 295 385 295 380 Z" fill="#28A745"/>
+
+  <!-- FARM MANAGER Text -->
+  <text x="250" y="440" font-family="Arial, sans-serif" font-size="20" fill="#1E293B" text-anchor="middle">FARM MANAGER</text>
+</svg>

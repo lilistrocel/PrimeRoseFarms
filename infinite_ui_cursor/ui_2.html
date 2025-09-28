@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrimeRose Farms - Version 2</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Meditation App - Nature Harmony</title>
     <style>
         * {
             margin: 0;
@@ -13,379 +12,416 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0F0F23;
-            color: #FFFFFF;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(180deg, #1B4D3E 0%, #2D1B69 50%, #1B4D3E 100%);
+            min-height: 100vh;
+            color: white;
             overflow-x: hidden;
         }
 
         .container {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Sidebar - Glassmorphism Style */
-        .sidebar {
-            width: 280px;
-            background: rgba(15, 15, 35, 0.8);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 2rem 0;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-        }
-
-        .logo-section {
-            text-align: center;
-            padding: 0 2rem 2rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 2rem;
-            background: linear-gradient(135deg, rgba(233, 30, 99, 0.1) 0%, rgba(156, 39, 176, 0.05) 100%);
-            border-radius: 0 0 20px 20px;
-            margin: 0 1rem 2rem;
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 1rem;
-            background: linear-gradient(135deg, #E91E63 0%, #9C27B0 50%, #00BCD4 100%);
-            border-radius: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            font-weight: 700;
-            box-shadow: 0 8px 32px rgba(233, 30, 99, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
-            position: relative;
-        }
-
-        .logo::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            background: linear-gradient(135deg, #E91E63, #9C27B0, #00BCD4);
-            border-radius: 26px;
-            z-index: -1;
-            opacity: 0.3;
-            filter: blur(8px);
-        }
-
-        .brand-text {
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #E91E63 0%, #9C27B0 50%, #00BCD4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 0.5rem;
-        }
-
-        .brand-subtitle {
-            font-size: 0.875rem;
-            color: #B0B0B0;
-            font-weight: 500;
-        }
-
-        .nav-menu {
-            padding: 0 1rem;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem 1.25rem;
-            margin: 0.5rem 0;
-            border-radius: 16px;
-            color: #B0B0B0;
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            font-weight: 500;
-        }
-
-        .nav-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: #FFFFFF;
-            transform: translateX(8px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        .nav-item.active {
-            background: linear-gradient(135deg, rgba(233, 30, 99, 0.2) 0%, rgba(156, 39, 176, 0.1) 100%);
-            color: #FFFFFF;
-            border: 1px solid rgba(233, 30, 99, 0.3);
-            box-shadow: 0 4px 20px rgba(233, 30, 99, 0.2);
-        }
-
-        .nav-item.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 60%;
-            background: linear-gradient(180deg, #E91E63 0%, #9C27B0 100%);
-            border-radius: 0 4px 4px 0;
-        }
-
-        .nav-icon {
-            width: 24px;
-            height: 24px;
-            margin-right: 1rem;
-            opacity: 0.8;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-left: 280px;
-            padding: 2rem;
-            background: linear-gradient(135deg, #0F0F23 0%, #1A1A2E 50%, #16213E 100%);
+            max-width: 375px;
+            margin: 0 auto;
             min-height: 100vh;
             position: relative;
         }
 
-        .main-content::before {
-            content: '';
+        /* Nature-inspired background */
+        .nature-bg {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at 20% 80%, rgba(233, 30, 99, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(0, 188, 212, 0.08) 0%, transparent 50%);
-            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
         }
 
+        .mountain-silhouette {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(180deg, transparent 0%, rgba(78, 205, 196, 0.1) 100%);
+            clip-path: polygon(0% 100%, 25% 60%, 50% 80%, 75% 40%, 100% 70%, 100% 100%);
+        }
+
+        .floating-leaves {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(127, 176, 105, 0.3);
+            border-radius: 50% 0;
+            animation: leaf-fall 8s linear infinite;
+        }
+
+        .floating-leaves:nth-child(1) {
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-leaves:nth-child(2) {
+            left: 30%;
+            animation-delay: 2s;
+        }
+
+        .floating-leaves:nth-child(3) {
+            left: 60%;
+            animation-delay: 4s;
+        }
+
+        .floating-leaves:nth-child(4) {
+            left: 80%;
+            animation-delay: 6s;
+        }
+
+        @keyframes leaf-fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Header with organic curves */
         .header {
+            position: relative;
+            z-index: 10;
+            padding: 24px 20px;
+            background: rgba(27, 77, 62, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(78, 205, 196, 0.3);
+        }
+
+        .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 3rem;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            position: relative;
-            z-index: 1;
         }
 
-        .page-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #E91E63 0%, #9C27B0 50%, #00BCD4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .user-info {
+        .logo-section {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
-            padding: 1rem 1.5rem;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 12px;
         }
 
-        .user-avatar {
-            width: 56px;
-            height: 56px;
+        .lotus-container {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #4ECDC4, #7FB069);
             border-radius: 50%;
-            background: linear-gradient(135deg, #E91E63 0%, #9C27B0 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
-            font-size: 1.25rem;
-            border: 3px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 16px rgba(233, 30, 99, 0.3);
-        }
-
-        /* Dashboard Grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            gap: 2rem;
-            margin-bottom: 2rem;
             position: relative;
-            z-index: 1;
+            animation: pulse 3s ease-in-out infinite;
         }
 
-        .card {
-            background: rgba(30, 30, 46, 0.8);
-            backdrop-filter: blur(20px);
+        .lotus-container::before {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 2px solid rgba(78, 205, 196, 0.3);
+            border-radius: 50%;
+            animation: ripple 2s ease-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        .lotus-icon {
+            font-size: 24px;
+            color: white;
+        }
+
+        .app-title {
+            font-size: 22px;
+            font-weight: 300;
+            color: white;
+            letter-spacing: 1px;
+        }
+
+        .profile-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #4ECDC4, #7FB069);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
+        }
+
+        /* Main content with organic spacing */
+        .main-content {
+            position: relative;
+            z-index: 10;
+            padding: 32px 20px 120px;
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 48px;
+            position: relative;
+        }
+
+        .welcome-title {
+            font-size: 36px;
+            font-weight: 200;
+            margin-bottom: 16px;
+            background: linear-gradient(45deg, #4ECDC4, #7FB069, #4ECDC4);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 4s ease-in-out infinite;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .welcome-subtitle {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        /* Organic mood selector */
+        .mood-selector {
+            margin-bottom: 48px;
+        }
+
+        .mood-title {
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 24px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .mood-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        .mood-item {
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 24px;
-            padding: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            padding: 20px 24px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(78, 205, 196, 0.2);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
             position: relative;
             overflow: hidden;
         }
 
-        .card::before {
+        .mood-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(78, 205, 196, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .mood-item:hover::before {
+            left: 100%;
+        }
+
+        .mood-item:hover {
+            transform: translateY(-8px) scale(1.02);
+            background: rgba(78, 205, 196, 0.15);
+            border-color: rgba(78, 205, 196, 0.4);
+            box-shadow: 0 12px 40px rgba(78, 205, 196, 0.2);
+        }
+
+        .mood-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            background: linear-gradient(135deg, #4ECDC4, #7FB069);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .mood-name {
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Meditation content with nature theme */
+        .meditation-section {
+            margin-bottom: 48px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .meditation-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 28px;
+            padding: 28px;
+            margin-bottom: 20px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .meditation-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(233, 30, 99, 0.6), transparent);
+            height: 4px;
+            background: linear-gradient(90deg, #4ECDC4, #7FB069, #4ECDC4);
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite;
         }
 
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(233, 30, 99, 0.2);
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 0%; }
+            50% { background-position: 100% 0%; }
         }
 
-        .card-large {
-            grid-column: span 8;
-        }
-
-        .card-medium {
-            grid-column: span 6;
-        }
-
-        .card-small {
-            grid-column: span 4;
-        }
-
-        .card-full {
-            grid-column: span 12;
+        .meditation-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
         }
 
         .card-header {
             display: flex;
-            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #4ECDC4, #7FB069);
+            border-radius: 20px;
+            display: flex;
             align-items: center;
-            margin-bottom: 1.5rem;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
         }
 
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #FFFFFF;
+        .card-content h3 {
+            color: #2C2C2C;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.3;
         }
 
-        .card-value {
-            font-size: 3rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #E91E63 0%, #9C27B0 50%, #00BCD4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin: 1rem 0;
+        .card-content p {
+            color: #6B7280;
+            font-size: 15px;
+            line-height: 1.5;
+            font-weight: 400;
         }
 
-        .card-subtitle {
-            color: #B0B0B0;
-            font-size: 1rem;
-            font-weight: 500;
-        }
-
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 1.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .stat-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateY(-2px);
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #4CAF50;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            font-size: 0.875rem;
-            color: #B0B0B0;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .progress-bar {
+        .card-illustration {
             width: 100%;
-            height: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
+            height: 140px;
+            background: linear-gradient(135deg, #4ECDC4, #7FB069);
+            border-radius: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 56px;
+            position: relative;
             overflow: hidden;
-            margin: 1.5rem 0;
-            position: relative;
         }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #E91E63 0%, #9C27B0 100%);
-            border-radius: 12px;
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-
-        .progress-fill::after {
+        .card-illustration::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            animation: shimmer 2s infinite;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.3)"/><circle cx="80" cy="30" r="1.5" fill="rgba(255,255,255,0.2)"/><circle cx="40" cy="70" r="1" fill="rgba(255,255,255,0.4)"/><circle cx="70" cy="80" r="2.5" fill="rgba(255,255,255,0.2)"/></svg>');
+            opacity: 0.6;
         }
 
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        .chart-container {
-            height: 250px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #B0B0B0;
-            font-size: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .button {
-            background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%);
-            color: #FFFFFF;
+        .watch-btn {
+            background: linear-gradient(135deg, #1B4D3E, #2D1B69);
+            color: white;
             border: none;
             border-radius: 16px;
-            padding: 1rem 2rem;
-            font-weight: 600;
+            padding: 16px 32px;
+            font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 20px rgba(233, 30, 99, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 auto;
             position: relative;
             overflow: hidden;
         }
 
-        .button::before {
+        .watch-btn::before {
             content: '';
             position: absolute;
             top: 0;
@@ -393,248 +429,179 @@
             width: 100%;
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
+            transition: left 0.5s ease;
         }
 
-        .button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 32px rgba(233, 30, 99, 0.4);
-        }
-
-        .button:hover::before {
+        .watch-btn:hover::before {
             left: 100%;
         }
 
-        .button-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: #FFFFFF;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: none;
+        .watch-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 32px rgba(27, 77, 62, 0.3);
         }
 
-        .button-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Activity Items */
-        .activity-item {
-            padding: 1.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            margin-bottom: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .activity-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateX(4px);
-        }
-
-        .activity-header {
+        /* Bottom navigation with organic styling */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 375px;
+            background: rgba(27, 77, 62, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 20px 16px;
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
             align-items: center;
-            margin-bottom: 0.5rem;
+            border-top: 1px solid rgba(78, 205, 196, 0.3);
+            border-radius: 24px 24px 0 0;
         }
 
-        .activity-title {
-            font-weight: 600;
-            font-size: 1rem;
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 16px;
         }
 
-        .activity-subtitle {
-            font-size: 0.875rem;
-            color: #B0B0B0;
-            margin-bottom: 0.5rem;
+        .nav-item.active {
+            color: #4ECDC4;
+            background: rgba(78, 205, 196, 0.1);
         }
 
-        .activity-value {
-            font-weight: 700;
-            font-size: 1.125rem;
+        .nav-item:hover {
+            color: #4ECDC4;
+            transform: translateY(-2px);
+            background: rgba(78, 205, 196, 0.1);
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-            }
-            
-            .main-content {
-                margin-left: 0;
-                padding: 1rem;
-            }
-            
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            
-            .card-large,
-            .card-medium,
-            .card-small {
-                grid-column: span 1;
-            }
+        .nav-icon {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Sidebar -->
-        <nav class="sidebar">
-            <div class="logo-section">
-                <div class="logo">🌱</div>
-                <div class="brand-text">PrimeRose Farms</div>
-                <div class="brand-subtitle">Agricultural Management System</div>
-            </div>
-            
-            <div class="nav-menu">
-                <a href="#" class="nav-item active">
-                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
-                    </svg>
-                    Dashboard
-                </a>
-                <a href="#" class="nav-item">
-                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    Farm Management
-                </a>
-                <a href="#" class="nav-item">
-                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"/>
-                    </svg>
-                    Cost Management
-                </a>
-                <a href="#" class="nav-item">
-                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-                    </svg>
-                    Plant Data
-                </a>
-                <a href="#" class="nav-item">
-                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 8v6h-2v4a1 1 0 01-1 1H4a1 1 0 01-1-1v-4H1V8a5 5 0 018.5-3.67A6.97 6.97 0 0010 8c0 .34.024.673.07 1h2.86z"/>
-                    </svg>
-                    User Management
-                </a>
-            </div>
-        </nav>
+        <!-- Nature background -->
+        <div class="nature-bg">
+            <div class="mountain-silhouette"></div>
+            <div class="floating-leaves"></div>
+            <div class="floating-leaves"></div>
+            <div class="floating-leaves"></div>
+            <div class="floating-leaves"></div>
+        </div>
 
-        <!-- Main Content -->
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="lotus-container">
+                        <div class="lotus-icon">🧘</div>
+                    </div>
+                    <span class="app-title">Meditate</span>
+                </div>
+                <div class="profile-avatar">👤</div>
+            </div>
+        </header>
+
+        <!-- Main content -->
         <main class="main-content">
-            <header class="header">
-                <h1 class="page-title">Dashboard</h1>
-                <div class="user-info">
-                    <div class="user-avatar">SA</div>
-                    <div>
-                        <div style="font-weight: 700; font-size: 1.125rem;">Sarah Administrator</div>
-                        <div style="font-size: 0.875rem; color: #B0B0B0;">admin@primerose.com</div>
+            <!-- Welcome section -->
+            <section class="welcome-section">
+                <h1 class="welcome-title">Embrace Serenity</h1>
+                <p class="welcome-subtitle">Connect with nature's rhythm and find your inner peace</p>
+            </section>
+
+            <!-- Mood selector -->
+            <section class="mood-selector">
+                <h2 class="mood-title">What brings you here today?</h2>
+                <div class="mood-container">
+                    <div class="mood-item">
+                        <div class="mood-icon">🌿</div>
+                        <div class="mood-name">Calm</div>
+                    </div>
+                    <div class="mood-item">
+                        <div class="mood-icon">🍃</div>
+                        <div class="mood-name">Relax</div>
+                    </div>
+                    <div class="mood-item">
+                        <div class="mood-icon">🎯</div>
+                        <div class="mood-name">Focus</div>
+                    </div>
+                    <div class="mood-item">
+                        <div class="mood-icon">💚</div>
+                        <div class="mood-name">Heal</div>
                     </div>
                 </div>
-            </header>
+            </section>
 
-            <div class="dashboard-grid">
-                <!-- Farm Overview Card -->
-                <div class="card card-large">
+            <!-- Meditation content -->
+            <section class="meditation-section">
+                <h2 class="section-title">Nature's Wisdom</h2>
+                
+                <div class="meditation-card">
                     <div class="card-header">
-                        <h3 class="card-title">Farm Overview</h3>
-                        <button class="button button-secondary">View Details</button>
-                    </div>
-                    <div class="stat-grid">
-                        <div class="stat-item">
-                            <div class="stat-value">3</div>
-                            <div class="stat-label">Active Farms</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">24</div>
-                            <div class="stat-label">Total Blocks</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">156</div>
-                            <div class="stat-label">Workers</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Performance Metrics -->
-                <div class="card card-medium">
-                    <div class="card-header">
-                        <h3 class="card-title">Performance</h3>
-                    </div>
-                    <div class="card-value">94.2%</div>
-                    <div class="card-subtitle">Efficiency Rating</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 94.2%;"></div>
-                    </div>
-                </div>
-
-                <!-- Revenue Card -->
-                <div class="card card-medium">
-                    <div class="card-header">
-                        <h3 class="card-title">Revenue</h3>
-                    </div>
-                    <div class="card-value">$2.4M</div>
-                    <div class="card-subtitle">This Quarter</div>
-                    <div style="color: #4CAF50; font-size: 1rem; margin-top: 1rem; font-weight: 600;">
-                        ↗ +12.5% from last quarter
-                    </div>
-                </div>
-
-                <!-- Charts Section -->
-                <div class="card card-full">
-                    <div class="card-header">
-                        <h3 class="card-title">Production Analytics</h3>
-                        <div style="display: flex; gap: 1rem;">
-                            <button class="button button-secondary">Monthly</button>
-                            <button class="button">Yearly</button>
+                        <div class="card-icon">🌱</div>
+                        <div class="card-content">
+                            <h3>Forest Breathing</h3>
+                            <p>Connect with ancient trees and learn the art of mindful breathing</p>
                         </div>
                     </div>
-                    <div class="chart-container">
-                        📊 Interactive Chart - Production trends over time
-                    </div>
+                    <div class="card-illustration">🌲</div>
+                    <button class="watch-btn">
+                        ▶️ Begin Journey
+                    </button>
                 </div>
 
-                <!-- Recent Activity -->
-                <div class="card card-large">
+                <div class="meditation-card">
                     <div class="card-header">
-                        <h3 class="card-title">Recent Activity</h3>
-                        <button class="button button-secondary">View All</button>
-                    </div>
-                    <div>
-                        <div class="activity-item">
-                            <div class="activity-header">
-                                <div class="activity-title">Harvest Completed</div>
-                                <div class="activity-value" style="color: #4CAF50;">+2.3 tons</div>
-                            </div>
-                            <div class="activity-subtitle">North Valley Farm - Block A1</div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-header">
-                                <div class="activity-title">New Worker Added</div>
-                                <div class="activity-value" style="color: #00BCD4;">Today</div>
-                            </div>
-                            <div class="activity-subtitle">Maria Garcia - Field Operations</div>
+                        <div class="card-icon">🌊</div>
+                        <div class="card-content">
+                            <h3>Ocean Waves</h3>
+                            <p>Let the rhythm of waves guide you to deep relaxation and peace</p>
                         </div>
                     </div>
+                    <div class="card-illustration">🌊</div>
+                    <button class="watch-btn">
+                        ▶️ Begin Journey
+                    </button>
                 </div>
-
-                <!-- Quick Actions -->
-                <div class="card card-medium">
-                    <div class="card-header">
-                        <h3 class="card-title">Quick Actions</h3>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <button class="button">Add New Farm</button>
-                        <button class="button button-secondary">Schedule Harvest</button>
-                        <button class="button button-secondary">Generate Report</button>
-                    </div>
-                </div>
-            </div>
+            </section>
         </main>
+
+        <!-- Bottom navigation -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active">
+                <div class="nav-icon">🧘</div>
+                <div class="nav-label">Home</div>
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">🎵</div>
+                <div class="nav-label">Sounds</div>
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">Profile</div>
+            </a>
+        </nav>
     </div>
 </body>
 </html>

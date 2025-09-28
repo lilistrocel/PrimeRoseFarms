@@ -28,7 +28,7 @@ class CostManagementApi {
       const response = await axios.get(url, {
         headers: this.getAuthHeader()
       });
-      return response.data.data;
+      return response.data.data.categories;
     } catch (error) {
       console.error('Error fetching costs data:', error);
       throw error;

@@ -156,7 +156,12 @@ export interface IBlockData {
 /**
  * Block Data Document Interface
  */
-export interface IBlockDataDocument extends Omit<IBlockData, '_id'>, Document {}
+export interface IBlockDataDocument extends Omit<IBlockData, '_id'>, Document {
+  transitionToState(newState: string, triggeredBy?: string, notes?: string): void;
+  assignPlant(plantDataId: string, plantName: string, count: number): void;
+  removePlantAssignment(plantDataId: string): void;
+  isReadyForHarvest(): boolean;
+}
 
 /**
  * Block Data Schema

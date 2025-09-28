@@ -842,6 +842,28 @@ class FarmManagementApi {
       throw error;
     }
   }
+
+  async changeBlockState(blockId: string, newState: string, notes?: string): Promise<any> {
+    if (testModeService.isTestMode() && !testModeService.useRealData('farm-management')) {
+      console.log('🔧 Using mock block state change');
+      return Promise.resolve({ success: true, message: 'Block state changed successfully (mock)' });
+    }
+    
+    console.log('🔧 Using real block state change API');
+    try {
+      const response = await axios.put(`${API_BASE_URL}/api/v1/manager/blocks/${blockId}/state`, {
+        newState,
+        notes: notes || '',
+        triggeredBy: 'user' // This would be the actual user ID in a real implementation
+      }, {
+        headers: this.getAuthHeader()
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error changing block state:', error);
+      throw error;
+    }
+  }
 }
 
 export const farmManagementApi = new FarmManagementApi();
